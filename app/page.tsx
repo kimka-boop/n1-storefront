@@ -27,7 +27,7 @@ function folderIdFromUrl(url: string): string | null {
 }
 
 function driveImg(fileId: string, w = 1000) {
-  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${w}`;
+  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${w}&v=${Math.floor(Date.now() / 600000)}`; // 10분 캐시버스터
 }
 
 export default function Home() {
