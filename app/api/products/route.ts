@@ -25,13 +25,21 @@ function loadSheetId(): string {
 }
 
 async function getSheetRows() {
-  // 프로젝트 루트(Next.js output 폴더의 상위)에 있는 credentials.json 사용
-  const credPath = path.join(process.cwd(), "..", "credentials.json");
-  const cred = JSON.parse(fs.readFileSync(credPath, "utf-8"));
+  // Vercel: 환경변수 / 로컬: credentials.json 파일 — 둘 다 지원
+  let email: string, key: string;
+  if (process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
+    email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+    key = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n");
+  } else {
+    const credPath = path.join(process.cwd(), "..", "credentials.json");
+    const cred = JSON.parse(fs.readFileSync(credPath, "utf-8"));
+    email = cred.client_email;
+    key = cred.private_key;
+  }
 
   const serviceAccountAuth = new JWT({
-    email: cred.client_email,
-    key: cred.private_key,
+    email,
+    key,
     scopes: ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"],
   });
   const doc = new GoogleSpreadsheet(loadSheetId(), serviceAccountAuth);
