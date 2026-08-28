@@ -5,7 +5,7 @@
  *   1) GOOGLE_SERVICE_ACCOUNT_EMAIL + GOOGLE_PRIVATE_KEY (서비스계정 JWT — products API와 동일, 안정적)
  *   2) DRIVE_REFRESH_TOKEN + DRIVE_CLIENT_ID + DRIVE_CLIENT_SECRET
  *   3) 로컬 token.json / oauth_client.json
- * 반환: files(샷순 정렬) + thumb(01_full 썸네일 URL) + dbg(디버그)
+ * 반환: files(샷순 정렬) + thumb(01_full 썸네일 URL)
  */
 import { NextResponse } from "next/server";
 import fs from "fs";
@@ -106,7 +106,7 @@ export async function GET(req: Request) {
     const full = sorted.find((f: any) => f.name.startsWith("01_full"));
     const thumb = full ? `https://drive.google.com/thumbnail?id=${full.id}&sz=w800` : null;
 
-    return NextResponse.json({ ok: true, files: sorted, thumb, dbg: mode.which });
+    return NextResponse.json({ ok: true, files: sorted, thumb });
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : String(e);
     return NextResponse.json({ ok: false, error: message, files: [], thumb: null }, { status: 500 });
