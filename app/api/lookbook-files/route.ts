@@ -1,7 +1,9 @@
 /**
- * N°1 — 대표이미지 + 슬라이드 파일 API
+ * N°1 — 드라이브 폴더 내 파일 목록 API (Vercel 호환)
  * GET /api/lookbook-files?folder={folderId}
- *   → { ok, files: [{id,name}], thumb: 01_full의 드라이브 뷰 URL }
+ * 토큰: 환경변수 DRIVE_REFRESH_TOKEN + DRIVE_CLIENT_ID + DRIVE_CLIENT_SECRET
+ *   또는 로컬 token.json / oauth_client.json
+ * 반환: files(이름순 정렬) + thumb(01_full 뷰 URL)
  */
 import { NextResponse } from "next/server";
 import fs from "fs";
@@ -10,6 +12,28 @@ import path from "path";
 export const dynamic = "force-dynamic";
 
 async function getAccessToken(): Promise<string> {
+  // 1) 환경변수 우선 (Vercel)
+  const refreshToken = process.env.DRIVE_REFRESH_TOKEN;
+  const clientId = process.env.DRIVE_CLIENT_ID;
+  const clientSecret = process.env.DRIVE_CLIENT_SECRET;
+
+  if (refreshToken && clientId && clientSecret) {
+    const res = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        client_id: clientId,
+        client_secret: clientSecret,
+        refresh_token: refreshToken,
+        grant_type: "refresh_token",
+      }),
+    });
+    const data = await res.json();
+    if (!data.access_token) throw new Error(`토큰 갱신 실패: ${JSON.stringify(data).slice(0, 150)}`);
+    return data.access_token;
+  }
+
+  // 2) 로컬 token.json 폴백
   const tokenPath = path.join(process.cwd(), "..", "token.json");
   const token = JSON.parse(fs.readFileSync(tokenPath, "utf-8"));
   const clientPath = path.join(process.cwd(), "..", "oauth_client.json");
@@ -28,7 +52,7 @@ async function getAccessToken(): Promise<string> {
       }),
     });
     const data = await res.json();
-    if (!data.access_token) throw new Error(`토큰 갱신 실패: ${JSON.stringify(data).slice(0, 150)}`);
+    if (!data.access_token) throw new Error(`토큰 갱신 실패`);
     accessToken = data.access_token;
     fs.writeFileSync(tokenPath, JSON.stringify({ ...token, access_token: accessToken, expiry_date: Date.now() + data.expires_in * 1000 }));
   }
@@ -50,6 +74,7 @@ export async function GET(req: Request) {
     });
     const driveRes = await fetch(`https://www.googleapis.com/drive/v3/files?${params}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
     });
     const data = await driveRes.json();
 
@@ -58,9 +83,8 @@ export async function GET(req: Request) {
       (a: any, b: any) => (order[a.name.replace(/\.\w+$/, "")] || 9) - (order[b.name.replace(/\.\w+$/, "")] || 9)
     );
 
-    // 01_full의 직접 뷰 URL (대표이미지용 — <img>에서 안정적으로 렌더됨)
     const full = sorted.find((f: any) => f.name.startsWith("01_full"));
-    const thumb = full ? `https://drive.google.com/uc?export=view&id=${full.id}` : null;
+    const thumb = full ? `https://drive.google.com/thumbnail?id=${full.id}&sz=w800` : null;
 
     return NextResponse.json({ ok: true, files: sorted, thumb });
   } catch (e: unknown) {
