@@ -3,3 +3,8 @@ node_modules
 out
 .env
 *.log
+qr_n1.png
+audit_*.jpg
+full_audit*.jpg
+recheck_*.jpg
+qr_*.png
