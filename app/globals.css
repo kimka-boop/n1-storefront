@@ -1,0 +1,104 @@
+/* ── N°1 반응형 + 애니메이션 스타일 ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink: #111111;
+  --paper: #faf9f7;
+  --accent: #C0282C;
+  --muted: #999999;
+  --line: #EDEAE4;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  background: var(--paper); color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── 히어로 ── */
+.hero { min-height: 52vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 48px 16px; }
+.hero-brand { opacity: 0; transform: translateY(28px); animation: heroIn .9s ease .1s forwards; }
+.hero-brand h1 { font-size: clamp(56px, 12vw, 120px); letter-spacing: clamp(4px, 2vw, 16px); font-weight: 700; }
+.hero-tag { margin-top: 14px; color: var(--muted); letter-spacing: clamp(2px, 1vw, 6px); font-size: clamp(13px, 2.5vw, 18px); }
+@keyframes heroIn { to { opacity: 1; transform: none; } }
+
+/* ── 그리드 ── */
+.grid {
+  display: grid; gap: 28px; max-width: 1240px; margin: 0 auto;
+  padding: 24px clamp(16px, 4vw, 48px) 80px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+}
+
+/* ── 카드 + 스크롤 리빌 ── */
+.card {
+  background: #fff; padding: 18px; border: 1px solid var(--line); border-radius: 6px;
+  opacity: 0; transform: translateY(36px);
+  transition: opacity .6s ease, transform .6s cubic-bezier(.22,.61,.36,1), box-shadow .3s;
+}
+.card.revealed { opacity: 1; transform: none; }
+.card.clickable { cursor: pointer; }
+.card.clickable:hover { box-shadow: 0 14px 40px rgba(0,0,0,.10); transform: translateY(-5px); }
+.card .tryon { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; margin-bottom: 14px; border-radius: 3px; }
+.card .placeholder { width: 100%; aspect-ratio: 3/4; background: linear-gradient(160deg, #EDEAE4, #B9B2A5); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; letter-spacing: 3px; margin-bottom: 14px; border-radius: 3px; }
+.card-body .category { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+.card-body h2 { font-size: 15px; margin-top: 8px; line-height: 1.45; font-weight: 600; }
+.card .price { margin-top: 8px; font-size: 15px; font-weight: 600; }
+.card-foot { display: flex; justify-content: space-between; margin-top: 12px; align-items: center; }
+.card .stock { font-size: 12px; color: #4A7C4A; }
+.card .supplier { font-size: 11px; letter-spacing: 1px; color: var(--muted); text-decoration: none; }
+
+/* ── 모달 (구매 페이지) ── */
+.modal { position: fixed; inset: 0; background: rgba(15,14,13,.88); z-index: 100; display: flex; align-items: center; justify-content: center; padding: clamp(8px, 2vw, 28px); animation: fadeIn .25s ease; }
+@keyframes fadeIn { from { opacity: 0; } }
+.modal-body { background: #fff; max-width: 1020px; width: 100%; max-height: 94vh; display: flex; gap: 28px; padding: clamp(16px, 3vw, 28px); position: relative; border-radius: 10px; overflow-y: auto; animation: slideUp .35s cubic-bezier(.22,.61,.36,1); }
+@keyframes slideUp { from { transform: translateY(36px); opacity: 0; } }
+.modal-close { position: absolute; top: 10px; right: 14px; font-size: 22px; background: none; border: none; cursor: pointer; color: #888; z-index: 2; }
+
+.slider { position: relative; flex: 1.1; min-width: 0; }
+.slide-img { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 6px; animation: shotIn .35s ease; }
+@keyframes shotIn { from { opacity: .4; transform: scale(.98); } }
+.nav { position: absolute; top: 50%; transform: translateY(-50%); font-size: 30px; background: rgba(255,255,255,.9); border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; color: #333; box-shadow: 0 2px 10px rgba(0,0,0,.15); }
+.nav.prev { left: 10px; } .nav.next { right: 10px; }
+.slide-label { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.65); color: #fff; padding: 5px 16px; border-radius: 14px; font-size: 12px; letter-spacing: 1px; white-space: nowrap; }
+
+.detail-info { flex: 1; padding-top: 8px; min-width: 0; }
+.detail-info .category { font-size: 11px; letter-spacing: 2px; color: var(--muted); }
+.detail-info h2 { font-size: clamp(18px, 2.4vw, 24px); margin-top: 10px; line-height: 1.45; }
+.detail-price { font-size: clamp(20px, 3vw, 26px); font-weight: 700; margin-top: 14px; }
+
+.buy-box { margin-top: 20px; padding: 18px; background: var(--paper); border-radius: 8px; }
+.stock-line { margin-bottom: 12px; }
+.stock-badge { font-size: 12px; padding: 4px 12px; border-radius: 12px; }
+.stock-badge.in { background: #E8F2E8; color: #2E6B2E; }
+.stock-badge.out { background: #F2E8E8; color: #8B2E2E; }
+.buy-btn { width: 100%; padding: 15px; font-size: 16px; font-weight: 700; letter-spacing: 2px; background: var(--ink); color: #fff; border: none; border-radius: 6px; cursor: pointer; transition: transform .15s, background .15s; }
+.buy-btn:hover:not(:disabled) { background: var(--accent); transform: translateY(-1px); }
+.buy-btn:disabled { background: #ccc; cursor: not-allowed; }
+.buy-note { font-size: 11px; color: var(--muted); margin-top: 10px; text-align: center; }
+
+.info-rows { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 14px; }
+.info-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; }
+.info-row span { color: var(--muted); }
+
+.thumbs { display: flex; gap: 8px; margin-top: 22px; flex-wrap: wrap; }
+.thumb { width: clamp(52px, 8vw, 68px); height: auto; aspect-ratio: 3/4; object-fit: cover; cursor: pointer; border: 2px solid transparent; border-radius: 4px; opacity: .6; transition: all .2s; }
+.thumb.active { border-color: var(--accent); opacity: 1; }
+
+.error { text-align: center; color: var(--accent); padding: 24px; }
+footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px; letter-spacing: 2px; }
+
+/* ── 모바일 ── */
+@media (max-width: 760px) {
+  .grid { grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 16px 14px 60px; }
+  .card { padding: 12px; }
+  .card-body h2 { font-size: 13px; }
+  .card .price { font-size: 14px; }
+  .modal { padding: 6px; align-items: flex-start; }
+  .modal-body { flex-direction: column; gap: 14px; padding: 14px; }
+  .nav { width: 36px; height: 36px; font-size: 24px; }
+  .detail-info h2 { font-size: 17px; }
+}
+@media (max-width: 380px) {
+  .grid { grid-template-columns: 1fr; }
+}
