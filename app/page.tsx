@@ -1,8 +1,9 @@
 "use client";
 
 /**
- * N°1 — 반응형 쇼핑몰 (시트 실시간 연동 + Lookbook 슬라이드 + 구매 페이지)
- * 이미지 소스: 구글 드라이브 (오프라인 대비 로컬 폴백 없음 — 배포 환경 공통)
+ * N°1 — 반응형 쇼핑몰
+ * 대표이미지: 드라이브 01_full (서버 API로 file_id 조회)
+ * 클릭: 구매 상세 + 5장 슬라이드
  */
 import { useEffect, useState, useCallback } from "react";
 
@@ -14,13 +15,10 @@ interface Product {
   supplierUrl: string;
   price: number;
   stockStatus: string;
-  lookbookImage: string; // drive folder URL
-  lookbookStatus?: string;
-  lookbookDrive?: string;
-  lookbookLocal?: string;
+  lookbookStatus: string;
+  lookbookImage: string;
 }
 
-const SHOT_FILES = ["01_full.jpg", "02_45deg.jpg", "03_90deg.jpg", "04_back.jpg", "05_product.png"];
 const SHOT_LABELS = ["전체샷", "45도", "90도", "후면", "제품만"];
 
 function folderIdFromUrl(url: string): string | null {
@@ -28,12 +26,13 @@ function folderIdFromUrl(url: string): string | null {
   return m ? m[1] : null;
 }
 
-function driveImgUrl(fileId: string, w = 800) {
+function driveImg(fileId: string, w = 1000) {
   return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${w}`;
 }
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [thumbs, setThumbs] = useState<Record<string, string>>({}); // pid → 대표 이미지 URL
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<Product | null>(null);
   const [slide, setSlide] = useState(0);
@@ -44,14 +43,25 @@ export default function Home() {
     try {
       const res = await fetch("/api/products", { cache: "no-store" });
       const data = await res.json();
-      if (data.ok) {
-        setProducts(data.products);
-        setError("");
-      } else setError(data.error || "시트 조회 실패");
+      if (data.ok) setProducts(data.products);
+      else setError(data.error || "시트 조회 실패");
     } catch {
       setError("서버 연결 실패");
     }
   }, []);
+
+  // 대표이미지 로딩 (생성완료 제품만, 드라이브에서 file_id 조회)
+  const loadThumb = useCallback(async (p: Product) => {
+    const fid = folderIdFromUrl(p.lookbookImage);
+    if (!fid || thumbs[p.id]) return;
+    try {
+      const res = await fetch(`/api/lookbook-files?folder=${fid}`);
+      const data = await res.json();
+      if (data.ok && data.thumb) {
+        setThumbs((prev) => ({ ...prev, [p.id]: data.thumb }));
+      }
+    } catch {}
+  }, [thumbs]);
 
   useEffect(() => {
     fetchProducts();
@@ -59,7 +69,13 @@ export default function Home() {
     return () => clearInterval(t);
   }, [fetchProducts]);
 
-  // 스크롤 리빌 애니메이션
+  // 생성완료 제품의 대표이미지 순차 로딩
+  useEffect(() => {
+    const pending = products.filter((p) => p.lookbookStatus === "생성완료" && !thumbs[p.id]);
+    pending.slice(0, 4).forEach((p) => loadThumb(p));
+  }, [products, thumbs, loadThumb]);
+
+  // 스크롤 리빌
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -76,7 +92,6 @@ export default function Home() {
     return () => observer.disconnect();
   }, [products]);
 
-  // 상세 열기: 드라이브 폴더의 5장 file_id 조회
   const openDetail = useCallback(async (p: Product) => {
     const fid = folderIdFromUrl(p.lookbookImage);
     if (!fid) return;
@@ -84,16 +99,11 @@ export default function Home() {
       const res = await fetch(`/api/lookbook-files?folder=${fid}`);
       const data = await res.json();
       if (data.ok) {
-        // 파일명 순서대로 정렬 (01→05)
-        const order: Record<string, number> = { "01_full": 1, "02_45deg": 2, "03_90deg": 3, "04_back": 4, "05_product": 5 };
-        const sorted = data.files.sort((a: any, b: any) => (order[a.name.replace(/\.\w+$/, "")] || 9) - (order[b.name.replace(/\.\w+$/, "")] || 9));
-        setSlideIds(sorted.map((f: any) => f.id));
+        setSlideIds(data.files.map((f: any) => f.id));
         setSelected(p);
         setSlide(0);
       }
-    } catch {
-      // 폴백 없음
-    }
+    } catch {}
   }, []);
 
   const closeDetail = () => setSelected(null);
@@ -130,9 +140,8 @@ export default function Home() {
 
       <section className="grid">
         {products.map((p, idx) => {
-          const fid = folderIdFromUrl(p.lookbookImage);
-          const thumb = fid ? `https://drive.google.com/thumbnail?id=${fid}&sz=w600` : null;
-          const ready = p.lookbookStatus === "생성완료" && fid;
+          const ready = p.lookbookStatus === "생성완료";
+          const thumb = thumbs[p.id];
           return (
             <article
               key={p.id}
@@ -146,7 +155,7 @@ export default function Home() {
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img src={thumb} alt={p.name} className="tryon" loading="lazy" />
               ) : (
-                <div className="placeholder"><span>PREPARING</span></div>
+                <div className="placeholder"><span>{ready ? "LOADING" : "PREPARING"}</span></div>
               )}
               <div className="card-body">
                 <p className="category">{p.category}</p>
@@ -154,11 +163,6 @@ export default function Home() {
                 <p className="price">₩{p.price.toLocaleString("ko-KR")}</p>
                 <div className="card-foot">
                   <span className="stock">{p.stockStatus}</span>
-                  {p.supplierUrl && (
-                    <a className="supplier" href={p.supplierUrl} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}>
-                      SUPPLIER ↗
-                    </a>
-                  )}
                 </div>
               </div>
             </article>
@@ -166,7 +170,7 @@ export default function Home() {
         })}
       </section>
 
-      {/* ── 구매 상세 모달 ── */}
+      {/* ── 구매 상세 ── */}
       {selected && (
         <div className="modal" onClick={closeDetail}>
           <div className="modal-body" onClick={(e) => e.stopPropagation()}>
@@ -176,7 +180,7 @@ export default function Home() {
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   key={slide}
-                  src={driveImgUrl(slideIds[slide], 1000)}
+                  src={driveImg(slideIds[slide], 1000)}
                   alt={`${selected.name} — ${SHOT_LABELS[slide]}`}
                   className="slide-img"
                 />
@@ -214,7 +218,7 @@ export default function Home() {
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img
                     key={fid}
-                    src={driveImgUrl(fid, 200)}
+                    src={driveImg(fid, 200)}
                     alt={SHOT_LABELS[n]}
                     className={`thumb ${n === slide ? "active" : ""}`}
                     onClick={() => setSlide(n)}
