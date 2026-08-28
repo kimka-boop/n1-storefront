@@ -77,6 +77,11 @@ export async function GET(req: Request) {
       cache: "no-store",
     });
     const data = await driveRes.json();
+    if (!driveRes.ok || data.error) {
+      return NextResponse.json({ ok: false, error: `drive ${driveRes.status}: ${JSON.stringify(data).slice(0, 200)}`, files: [], thumb: null }, { status: 502 });
+    }
+    // 디버그: 토큰 계정 확인용
+    const dbgEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL ? "svc" : "oauth";
 
     const order: Record<string, number> = { "01_full": 1, "02_45deg": 2, "03_90deg": 3, "04_back": 4, "05_product": 5 };
     const sorted = (data.files || []).sort(
@@ -86,7 +91,7 @@ export async function GET(req: Request) {
     const full = sorted.find((f: any) => f.name.startsWith("01_full"));
     const thumb = full ? `https://drive.google.com/thumbnail?id=${full.id}&sz=w800` : null;
 
-    return NextResponse.json({ ok: true, files: sorted, thumb });
+    return NextResponse.json({ ok: true, files: sorted, thumb, dbg: dbgEmail });
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : String(e);
     return NextResponse.json({ ok: false, error: message, files: [], thumb: null }, { status: 500 });
