@@ -56,6 +56,7 @@ export async function POST(req: Request) {
 
     // 에스컬레이션 판별
     const needsHuman = ESCALATION_KW.some((k) => message.includes(k));
+    console.log("[cs] message:", message.slice(0, 30), "| needsHuman:", needsHuman);
     let escalated = false;
     if (needsHuman && !sess.escalated) {
       sess.escalated = true;
