@@ -32,6 +32,8 @@ function writeStore(data: any) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+    // 클라이언트가 encodeURIComponent로 전송 → 복원 (ASCII 전송으로 mojibake 원천 차단)
+    if (body.message) body.message = decodeURIComponent(body.message);
     const { sid, customer, message } = body || {};
     if (!message?.trim()) return NextResponse.json({ ok: false, error: "메시지 누락" }, { status: 400 });
 

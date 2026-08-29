@@ -46,7 +46,7 @@ export default function CsWidget() {
       const res = await fetch("/api/cs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sid, message: text, customer: { name: "웹방문자", phone: "" } }),
+        body: JSON.stringify({ sid, message: encodeURIComponent(text), customer: { name: "web" } }),
       });
       const data = await res.json();
       if (data.ok) {
