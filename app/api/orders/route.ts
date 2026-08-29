@@ -63,7 +63,9 @@ async function notifyNewOrder(orderId: string, name: string, amount: number, shi
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    // ⚠️ Vercel edge에서 한글 mojibake 방지: text → UTF-8 명시 파싱
+const raw = await req.text();
+const body = JSON.parse(raw);
     const { customer, items } = body || {};
     // ── 1. 입력 검증 ──
     if (!customer?.name || !customer?.phone || !customer?.address || !Array.isArray(items) || items.length === 0) {
@@ -145,8 +147,14 @@ export async function POST(req: Request) {
         if (k && v) stockMap[k.trim()] = Number(v) || 0;
       }
       const key = r.color && r.size ? `${r.color}_${r.size}` : (r.size || r.color || "");
-      console.log(`[stock-decrement] sku=${r.sku} key="${key}" keyLen=${key.length} keyCodes=${Array.from(key).map(c=>c.codePointAt(0)).join(",")} | stockKeys=${Object.keys(stockMap).join("/")} 존재=${key in stockMap}`);
-      if (stockMap[key] !== undefined) stockMap[key] = Math.max(0, stockMap[key] - r.qty);
+      let tKey = key;
+      if (!(tKey in stockMap)) {
+        // mojibake 폴백: 사이즈+요청 길이로 후보 키 탐색 (색상_사이즈 조합 1:1 매칭)
+        const sizePart = r.size || "";
+        const cand = Object.keys(stockMap).filter((k) => k.endsWith(`_${sizePart}`) || k === sizePart);
+        if (cand.length === 1) tKey = cand[0];
+      }
+      if (stockMap[tKey] !== undefined) stockMap[tKey] = Math.max(0, stockMap[tKey] - r.qty);
       newValByRow[pIndex + 2] = Object.entries(stockMap).map(([k, v]) => `${k}:${v}`).join("|"); // +2: 헤더 보정
     }
     console.log("[stock-decrement] 대상 행:", Object.keys(newValByRow), "값:", newValByRow);
