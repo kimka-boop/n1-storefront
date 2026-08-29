@@ -55,7 +55,9 @@ export async function POST(req: Request) {
     sess.messages.push({ role: "customer", text: message.trim(), ts: new Date().toISOString() });
 
     // 에스컬레이션 판별
-    const needsHuman = ESCALATION_KW.some((k) => message.includes(k));
+    // NFC 정규화 + 키워드 매칭 (mojibake 대비: 키워드도 정규화 비교)
+    const normalized = message.normalize("NFC");
+    const needsHuman = ESCALATION_KW.some((k) => normalized.includes(k.normalize("NFC")));
     console.log("[cs] message:", message.slice(0, 30), "| needsHuman:", needsHuman);
     let escalated = false;
     if (needsHuman && !sess.escalated) {
