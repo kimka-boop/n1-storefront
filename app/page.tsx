@@ -34,6 +34,112 @@ function orRef(v?: string): string {
   return v && v.trim() ? v : "상세페이지 참조";
 }
 
+/** 실측사이즈 문자열 → 가독용 표 ("M-총장66/가슴단면48/..." 또는 "M: 총장 66, 가슴 48..." 형식 파싱) */
+function parseSizeChart(chart: string): { cols: string[]; rows: { label: string; vals: string[] }[] } | null {
+  if (!chart || !chart.trim()) return null;
+  // 사이즈 그룹 분리: " | " 또는 " / " 앞에 사이즈명이 오는 패턴
+  const groups = chart.split(/\s*\|\s*|\s+(?=[A-Z0-9가-힣]+\(|\d+[-~]\d+)/).filter(Boolean);
+  const rows: { label: string; vals: string[] }[] = [];
+  const colSet = new Set<string>();
+  const parsed = groups.map((g) => {
+    const m = g.match(/^([^:：-]+)[-:]([^:：]+)$/);
+    if (!m) return null;
+    const label = m[1].trim();
+    const items: [string, string][] = [];
+    for (const part of m[2].split(/[,，·]/)) {
+      const kv = part.match(/([가-힣A-Za-z()앞뒤~\s]+?)\s*([0-9]+(?:\.[0-9]+)?(?:-[0-9]+(?:\.[0-9]+)?)?)\s*(?:cm)?\s*$/);
+      if (kv) items.push([kv[1].trim(), kv[2].trim()]);
+    }
+    return { label, items };
+  }).filter(Boolean) as { label: string; items: [string, string][] }[];
+  if (parsed.length < 1 || !parsed.some((p) => p.items.length >= 2)) return null;
+  parsed.forEach((p) => p.items.forEach(([k]) => colSet.add(k)));
+  const cols = Array.from(colSet);
+  parsed.forEach((p) => {
+    const vals = cols.map((c) => p.items.find(([k]) => k === c)?.[1] ?? "-");
+    rows.push({ label: p.label, vals });
+  });
+  return { cols, rows };
+}
+
+function SizeChartTable({ chart }: { chart?: string }) {
+  const parsed = parseSizeChart(chart || "");
+  if (!parsed) {
+    return (
+      <div className="info-row"><span>실측사이즈</span><b>{orRef(chart)}</b></div>
+    );
+  }
+  return (
+    <div className="size-table-wrap">
+      <span className="size-table-title">실측사이즈 (단위 cm)</span>
+      <table className="size-table">
+        <thead>
+          <tr><th>사이즈</th>{parsed.cols.map((c) => <th key={c}>{c}</th>)}</tr>
+        </thead>
+        <tbody>
+          {parsed.rows.map((r) => (
+            <tr key={r.label}><td>{r.label}</td>{r.vals.map((v, i) => <td key={i}>{v}</td>)}</tr>
+          ))}
+        </tbody>
+      </table>
+      {chart.includes("오차") || chart.includes("차이") ? null : (
+        <p className="size-note">· 측정 위치와 방법에 따라 1~3cm의 오차가 있을 수 있습니다</p>
+      )}
+    </div>
+  );
+}
+
+/** 배송/교환/반품 탭 안내 */
+function PolicyTabs() {
+  const [tab, setTab] = useState<"shipping" | "exchange" | "return">("shipping");
+  const TABS = [
+    { key: "shipping", label: "배송" },
+    { key: "exchange", label: "교환" },
+    { key: "return", label: "반품" },
+  ] as const;
+  return (
+    <div className="spec-block">
+      <h3 className="spec-title">배송 · 교환 · 반품 안내</h3>
+      <div className="policy-tabs">
+        {TABS.map((t) => (
+          <button
+            key={t.key}
+            className={`policy-tab ${tab === t.key ? "active" : ""}`}
+            onClick={() => setTab(t.key)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      <div className="policy-content">
+        {tab === "shipping" && (
+          <ul className="policy-list">
+            <li>· 전국 택배 배송 (결제 완료 후 신속 출고, 평균 1~3일 소요)</li>
+            <li>· 배송비: 기본 3,000원 — 5만원 이상 구매 시 무료배송</li>
+            <li>· 도서·산간 지역은 추가 배송비가 발생할 수 있습니다</li>
+          </ul>
+        )}
+        {tab === "exchange" && (
+          <ul className="policy-list">
+            <li>· 상품 수령 후 7일 이내 고객센터로 신청 가능</li>
+            <li>· 사이즈/색상 교환 1회 무료 (재고 있을 시)</li>
+            <li>· 왕복 배송비 6,000원 고객 부담 (단순 변심 기준)</li>
+            <li>· 택 제거·착용 흔적·세탁·향수 냄새가 있으면 교환이 불가합니다</li>
+          </ul>
+        )}
+        {tab === "return" && (
+          <ul className="policy-list">
+            <li>· 상품 수령 후 7일 이내 신청 가능</li>
+            <li>· 단순 변심 반품 편도 배송비 3,000원 고객 부담</li>
+            <li>· 교환/반품 불가: 택 제거·착용 흔적·세탁/향수 냄새 등 상품 가치 훼손 시, 모니터 색상 차이, 시간 경과 개봉 상품</li>
+            <li>· 표기·광고 내용과 상이한 상품은 전자상거래법에 따라 청약철회 가능합니다</li>
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
+
 const SHOT_LABELS = ["전체샷", "45도", "90도", "후면", "제품만"];
 
 function folderIdFromUrl(url: string): string | null {
@@ -287,11 +393,11 @@ export default function Home() {
                     : selectedStock === 0 ? "품절"
                     : "구매하기"}
                 </button>
-                <p className="buy-note">오후 1시 이전 결제 완료 시 당일 출고됩니다</p>
+                <p className="buy-note">결제 완료 후 신속하게 출고됩니다</p>
               </div>
               <div className="info-rows">
                 <div className="info-row"><span>품번</span><b>{selected.id}</b></div>
-                <div className="info-row"><span>배송</span><b>파스토 당일출고 (오후 1시 이전 결제 완료 시)</b></div>
+                <div className="info-row"><span>배송</span><b>전국 택배 (결제 완료 후 신속 출고)</b></div>
               </div>
 
               {/* ── 소재 / 핏 / 사이즈 ── */}
@@ -308,7 +414,7 @@ export default function Home() {
                   </div>
                 )}
                 <div className="info-row"><span>세탁/취급</span><b>{orRef(selected.washingInfo)}</b></div>
-                <div className="info-row"><span>실측사이즈</span><b>{orRef(selected.sizeChart)}</b></div>
+                <SizeChartTable chart={selected.sizeChart} />
                 {selected.modelInfo && selected.modelInfo.trim() && (
                   <div className="info-row"><span>모델착용</span><b>{selected.modelInfo}</b></div>
                 )}
@@ -319,26 +425,26 @@ export default function Home() {
                 <h3 className="spec-title">상품정보제공고시</h3>
                 <div className="notice-table">
                   <div className="info-row"><span>제품 소재</span><b>{orRef(selected.material)}</b></div>
-                  <div className="info-row"><span>색상 / 치수</span><b>{orRef(selected.notice?.colorSize)}</b></div>
+                  <div className="info-row"><span>색상</span><b>{selected.colorOptions?.length ? selected.colorOptions.join(", ") : orRef(undefined)}</b></div>
+                  <div className="info-row"><span>치수</span><b>{selected.sizeOptions?.length ? selected.sizeOptions.join(", ") : orRef(undefined)}</b></div>
                   <div className="info-row"><span>제조자(수입자)</span><b>{orRef(selected.notice?.manufacturer)}</b></div>
                   <div className="info-row"><span>제조국(원산지)</span><b>{orRef(selected.origin)}</b></div>
                   <div className="info-row"><span>제조연월</span><b>{orRef(selected.notice?.madeAt)}</b></div>
-                  <div className="info-row"><span>품질보증기준</span><b>{selected.notice?.quality || "전자상거래법 규정 소비자청약철회 범위 준수"}</b></div>
+                  <div className="info-row">
+                    <span>품질보증기준</span>
+                    <b className="quality-tip">
+                      소비자 분쟁해결기준에 따름
+                      <span className="tooltip">
+                        전자상거래 법에 규정되어 있는 소비자 청약철회 가능 범위를 준수합니다.
+                      </span>
+                    </b>
+                  </div>
                   <div className="info-row"><span>A/S 책임자</span><b>{selected.notice?.as || "N°1 고객센터"}</b></div>
                 </div>
               </div>
 
-              {/* ── 배송 / 교환 / 반품 ── */}
-              <div className="spec-block">
-                <h3 className="spec-title">배송 · 교환 · 반품 안내</h3>
-                <ul className="policy-list">
-                  <li>· 배송: 오후 1시 이전 결제 완료 시 당일 출고 (전국 택배, 평균 1~3일 소요)</li>
-                  <li>· 배송비: 기본 3,000원 (5만원 이상 구매 시 무료배송)</li>
-                  <li>· 교환/반품: 수령 후 7일 이내 신청 가능 (고객센터 문의)</li>
-                  <li>· 교환/반품 불가: 택 제거·착용 흔적·세탁/향수 냄새 등 상품 가치 훼손 시, 모니터 색상 차이, 시간 경과 개봉 상품</li>
-                  <li>· 표기 광고 내용과 상이한 상품은 전자상거래법에 따라 청약철회 가능</li>
-                </ul>
-              </div>
+              {/* ── 배송 / 교환 / 반품 (탭형) ── */}
+              <PolicyTabs />
 
               <div className="thumbs">
                 {slideIds.map((fid, n) => (
