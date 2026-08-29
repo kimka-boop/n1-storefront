@@ -9,16 +9,24 @@ import path from "path";
 
 export const dynamic = "force-dynamic";
 
-const STORE = path.join(process.cwd(), "..", "cs_sessions.json");
+// ⚠️ Vercel은 읽기전용 FS → 세션 저장을 인메모리로 대체 (서버리스 재시작 시 초기화됨)
+// 실전 운영: Upstash Redis / Vercel KV로 교체 권장. 현재는 세션 수명이 요청 범위 내인 테스트용.
+declare global {
+  // eslint-disable-next-line no-var
+  var __csStore: { sessions: Record<string, any>; counter: number } | undefined;
+}
+const STORE_FALLBACK = () => {
+  if (!global.__csStore) global.__csStore = { sessions: {}, counter: 100 };
+  return global.__csStore;
+};
 
 const ESCALATION_KW = ["상담원", "사람", "통화", "전화", "환불", "파손", "불량", "항의", "직접"];
 
 function readStore() {
-  if (fs.existsSync(STORE)) return JSON.parse(fs.readFileSync(STORE, "utf-8"));
-  return { sessions: {}, counter: 100 };
+  return STORE_FALLBACK();
 }
 function writeStore(data: any) {
-  fs.writeFileSync(STORE, JSON.stringify(data, null, 1), "utf-8");
+  global.__csStore = data; // 인메모리 (Vercel FS 읽기전용)
 }
 
 export async function POST(req: Request) {
