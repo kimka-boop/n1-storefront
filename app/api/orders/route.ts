@@ -148,12 +148,14 @@ export async function POST(req: Request) {
       if (stockMap[key] !== undefined) stockMap[key] = Math.max(0, stockMap[key] - r.qty);
       newValByRow[pIndex + 2] = Object.entries(stockMap).map(([k, v]) => `${k}:${v}`).join("|"); // +2: 헤더 보정
     }
+    console.log("[stock-decrement] 대상 행:", Object.keys(newValByRow), "값:", newValByRow);
     await stockSheet.loadCells(`AB2:AB${pRows.length + 1}`); // AB열 = 옵션별재고(28)
     for (const [rowNum, val] of Object.entries(newValByRow)) {
       const cell = stockSheet.getCell(Number(rowNum) - 1, 27); // 0-based: 행-1, 열 27=AB
       cell.value = val;
     }
     await stockSheet.saveUpdatedCells();
+    console.log("[stock-decrement] 저장 완료");
 
     // ── 6. 디렉터 텔레그램 알림 ──
     const itemsDesc = resolved.map((r) => `${r.sku}(${r.color}${r.size ? " " + r.size : ""})x${r.qty}`).join(", ");
