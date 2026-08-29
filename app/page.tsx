@@ -38,40 +38,42 @@ const OUTER_KW = /(블루종|자켓|점퍼|가디건|코트|아우터|블루종|
 const SIZE_ORDER = ["S", "M", "L", "XL", "2XL", "3XL"];
 const NUM_ORDER = ["95", "100", "105", "110"];
 
+// 숫자(95/100/105/110) → 문자(S/M/L/XL/2XL) 환산
+const NUM_TO_ALPHA: Record<string, string> = { "95": "S", "100": "L", "105": "XL", "110": "2XL" };
+
 function smartFitPreset(product: Product, getProfile: () => any): string {
   const profile = getProfile();
   if (!profile || !product.sizeOptions?.length) return "";
-  const { size: baseSize, fit } = profile;
-  if (!baseSize) return "";
+  const { size: rawSize, fit } = profile;
+  if (!rawSize) return "";
 
   const opts = product.sizeOptions;
   const isOuter = OUTER_KW.test(product.name);
 
-  // 기준 사이즈 인덱스 찾기 (문자/숫자 혼용 대응)
-  let baseIdx = -1;
-  if (/^\d+$/.test(baseSize)) {
-    // 숫자 사이즈 (95/100/105/110) — 하의 인치(28~35)는 별도
-    baseIdx = NUM_ORDER.indexOf(baseSize);
-    if (baseIdx === -1) {
-      // 하의 인치 매칭: 가장 근접한 옵션
-      const inchMap: Record<string, string> = { "28~29": "30", "30~31": "32", "32~33": "34", "34~35": "36" };
-      return opts.find((o) => o.includes(baseSize)) || "";
-    }
-  } else {
-    baseIdx = SIZE_ORDER.findIndex((s) => opts.some((o) => o.toUpperCase().includes(s) && s === baseSize));
-    if (baseIdx === -1) baseIdx = SIZE_ORDER.indexOf(baseSize);
+  // 기준 사이즈 → 문자 사이즈 정규화 (숫자 입력 대응)
+  let baseAlpha = NUM_TO_ALPHA[rawSize] || rawSize;  // "100"→"L"
+  // 문자 기준이 옵션에 없으면 옵션 체계에 맞는 가장 근접 사이즈 탐색
+  let baseIdx = SIZE_ORDER.indexOf(baseAlpha);
+  if (baseIdx === -1) {
+    // 옵션에 문자 사이즈가 아예 없으면(FREE 등) 프리셋 스킵
+    return "";
   }
+  // 옵션에서 정확 일치하는 인덱스 재조정 (옵션이 M부터 시작하는 경우 등)
+  const exactIdx = opts.findIndex((o) => o.toUpperCase() === baseAlpha);
+  if (exactIdx >= 0) baseIdx = SIZE_ORDER.indexOf(baseAlpha); // SIZE_ORDER 기준 유지
 
   let targetIdx = baseIdx;
-  if (fit === "B" && isOuter) targetIdx = baseIdx + 1;       // 세미오버 + 아우터: +1
+  if (fit === "B" && isOuter) targetIdx = baseIdx + 1;          // 세미오버 + 아우터: +1
   else if (fit === "C") targetIdx = baseIdx + (isOuter ? 2 : 1); // 오버핏: +1~2
 
-  if (targetIdx >= opts.length) targetIdx = opts.length - 1;
-  if (targetIdx < 0) targetIdx = 0;
+  targetIdx = Math.max(0, Math.min(targetIdx, SIZE_ORDER.length - 1));
+  const targetAlpha = SIZE_ORDER[targetIdx];
 
-  const chosen = opts[targetIdx];
-  // 옵션 문자열에 사이즈가 포함된 형태 매칭 (예: "2XL" → "2XL" 포함 옵션)
-  return opts.find((o) => o === chosen) || opts.find((o) => o.toUpperCase().includes(chosen)) || "";
+  // 옵션에서 정확 일치 (대소문자 무시)
+  const hit = opts.find((o) => o.toUpperCase() === targetAlpha);
+  if (hit) return hit;
+  // 타겟이 옵션 범위 초과 시(예: 2XL 요청인데 XL까지) 가장 큰 옵션 반환
+  return "";
 }
 
 // 프리셋 사유 뱃지 텍스트
