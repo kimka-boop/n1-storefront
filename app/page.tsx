@@ -295,6 +295,7 @@ export default function Home() {
           items: [{
             sku: selected.id,
             color: selColor,
+            colorIndex: selected.colorOptions?.indexOf(selColor) ?? -1,
             size: selSize,
             qty: 1,
           }],

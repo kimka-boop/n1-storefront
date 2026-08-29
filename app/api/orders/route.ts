@@ -78,7 +78,7 @@ const body = JSON.parse(raw);
 
     // ── 2. 서버 측 가격 재계산 (클라이언트 금액 신뢰 금지) + 재고 확인 ──
     let total = 0;
-    const resolved: { sku: string; color: string; size: string; qty: number; unit_price: number; supplier: string }[] = [];
+    const resolved: { sku: string; color: string; size: string; qty: number; unit_price: number; supplier: string; colorIndex: number }[] = [];
     for (const it of items) {
       const p = pRows.find((r) => r.get("상품ID") === it.sku);
       if (!p) return NextResponse.json({ ok: false, error: `존재하지 않는 상품: ${it.sku}` }, { status: 400 });
@@ -93,10 +93,10 @@ const body = JSON.parse(raw);
       const key = it.color && it.size ? `${it.color}_${it.size}` : (it.size || it.color || "");
       const avail = stockMap[key] ?? Object.values(stockMap).reduce((a, b) => Math.max(a, b), 0);
       if (avail < qty) {
-        return NextResponse.json({ ok: false, error: `품절: ${it.sku} ${key} 잔여 ${avail}개` }, { status: 409 });
+        return NextResponse.json({ ok: false, error: `품절: 잔여 ${avail}개` }, { status: 409 });
       }
       total += price * qty;
-      resolved.push({ sku: it.sku, color: it.color || "", size: it.size || "", qty, unit_price: price, supplier: String(p.get("공급사명") || "") });
+      resolved.push({ sku: it.sku, color: it.color || "", size: it.size || "", qty, unit_price: price, supplier: String(p.get("공급사명") || ""), colorIndex: (typeof it.colorIndex === "number" ? it.colorIndex : -1) });
     }
 
     // ── 3. 분리배송 판별 (공급사명 기준 그룹핑) ──
@@ -149,10 +149,17 @@ const body = JSON.parse(raw);
       const key = r.color && r.size ? `${r.color}_${r.size}` : (r.size || r.color || "");
       let tKey = key;
       if (!(tKey in stockMap)) {
-        // mojibake 폴백: 사이즈+요청 길이로 후보 키 탐색 (색상_사이즈 조합 1:1 매칭)
-        const sizePart = r.size || "";
-        const cand = Object.keys(stockMap).filter((k) => k.endsWith(`_${sizePart}`) || k === sizePart);
-        if (cand.length === 1) tKey = cand[0];
+        // 폴백 1: 색상 인덱스 기반 (UI가 colorIndex 전송 시 — mojibake 무관 정확 매칭)
+        const stockKeys = Object.keys(stockMap).sort();
+        if (typeof r.colorIndex === "number" && r.size) {
+          const cand = stockKeys.filter((k) => k.endsWith(`_${r.size}`));
+          if (cand[r.colorIndex]) tKey = cand[r.colorIndex];
+        }
+        // 폴백 2: 사이즈만 일치하는 후보가 유일할 때
+        if (!(tKey in stockMap) && r.size) {
+          const cand = stockKeys.filter((k) => k.endsWith(`_${r.size}`) || k === r.size);
+          if (cand.length === 1) tKey = cand[0];
+        }
       }
       console.log(`[stock-final] 요청키="${key}" 사용키="${tKey}" 매칭=${tKey in stockMap} 차감전=${stockMap[tKey]}`);
       if (stockMap[tKey] !== undefined) stockMap[tKey] = Math.max(0, stockMap[tKey] - r.qty);
