@@ -43,8 +43,10 @@ function cleanMaterial(v?: string): string {
 /** 실측사이즈 문자열 → 가독용 표 ("M-총장66/가슴단면48/..." 또는 "M: 총장 66, 가슴 48..." 형식 파싱) */
 function parseSizeChart(chart: string): { cols: string[]; rows: { label: string; vals: string[] }[] } | null {
   if (!chart || !chart.trim()) return null;
+  // 보조 설명 꼬리 제거: "(한국사이즈 ...)", "단위 cm" 등은 표 데이터가 아님
+  const cleaned = chart.replace(/\s*\((?:한국사이즈|단위)[\s\S]*$/, "").trim();
   // 사이즈 그룹 분리: " | " 또는 " / " 앞에 사이즈명이 오는 패턴
-  const groups = chart.split(/\s*\|\s*|\s+(?=[A-Z0-9가-힣]+\(|\d+[-~]\d+)/).filter(Boolean);
+  const groups = cleaned.split(/\s*\|\s*|\s+(?=[A-Z0-9가-힣]+\(|\d+[-~]\d+)/).filter(Boolean);
   const rows: { label: string; vals: string[] }[] = [];
   const colSet = new Set<string>();
   const parsed = groups.map((g) => {
