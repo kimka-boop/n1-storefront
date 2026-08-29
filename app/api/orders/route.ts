@@ -145,6 +145,7 @@ export async function POST(req: Request) {
         if (k && v) stockMap[k.trim()] = Number(v) || 0;
       }
       const key = r.color && r.size ? `${r.color}_${r.size}` : (r.size || r.color || "");
+      console.log(`[stock-decrement] sku=${r.sku} color=${r.color} size=${r.size} → key="${key}" 존재=${key in stockMap} 현재값=${stockMap[key]} 차감수=${r.qty}`);
       if (stockMap[key] !== undefined) stockMap[key] = Math.max(0, stockMap[key] - r.qty);
       newValByRow[pIndex + 2] = Object.entries(stockMap).map(([k, v]) => `${k}:${v}`).join("|"); // +2: 헤더 보정
     }
