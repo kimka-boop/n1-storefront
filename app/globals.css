@@ -303,3 +303,73 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   font-size: 13.5px; font-weight: 600; cursor: pointer;
 }
 .fit-next:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ═══ 체크아웃 페이지 ═══ */
+.checkout-page { min-height: 70vh; padding: 60px 6vw; display: flex; flex-direction: column; align-items: center; }
+.checkout-title { font-size: 20px; font-weight: 600; margin: 0 0 24px; letter-spacing: 0.05em; }
+.checkout-box { width: 100%; max-width: 560px; }
+.checkout-empty { color: #888; text-align: center; padding: 40px 0; }
+.checkout-cart { border: 1px solid var(--line, #e5e5e5); padding: 14px 16px; margin-bottom: 18px; }
+.checkout-item { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; }
+.checkout-fields { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.checkout-fields input {
+  padding: 12px 14px; font-size: 13.5px; border: 1px solid var(--line, #e5e5e5);
+  background: transparent; color: inherit;
+}
+.checkout-fields input:focus { outline: none; border-color: currentColor; }
+.checkout-total {
+  display: grid; grid-template-columns: 1fr auto; gap: 6px 12px;
+  padding: 14px 16px; background: rgba(127,127,127,0.06); margin-bottom: 18px; font-size: 13.5px;
+}
+.checkout-total .total-label { font-weight: 700; margin-top: 6px; }
+.checkout-total .total-val { font-weight: 800; font-size: 16px; margin-top: 6px; }
+.checkout-btn {
+  width: 100%; padding: 16px; font-size: 15px; font-weight: 700;
+  background: #111; color: #fff; border: none; cursor: pointer; letter-spacing: 0.05em;
+}
+.checkout-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.checkout-btn.big { font-size: 16px; padding: 18px; }
+.deposit-emphasis {
+  padding: 14px 16px; background: #fff8e6; border: 1px solid #f0d890;
+  font-size: 13px; line-height: 1.7; margin-bottom: 16px; border-radius: 4px;
+}
+.deposit-box-lg { border: 1px solid var(--line, #e5e5e5); padding: 16px 18px; margin-bottom: 18px; }
+.deposit-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; font-size: 13.5px; }
+.deposit-row span { color: #888; }
+.deposit-row.highlight b { color: #d93025; font-size: 16px; }
+.deposit-row .green { color: #0b7a3e; }
+.account-num { display: flex; align-items: center; gap: 8px; }
+.copy-btn {
+  padding: 3px 10px; font-size: 11px; border: 1px solid #ccc; background: #fff;
+  cursor: pointer; border-radius: 3px; color: #333;
+}
+.pending-box { text-align: center; padding: 60px 30px; }
+.pending-icon { font-size: 44px; margin-bottom: 12px; }
+.pending-text { font-size: 14px; line-height: 1.9; color: #555; margin-bottom: 24px; }
+
+/* ═══ 좌측 플로팅 바 ═══ */
+.float-bar {
+  position: fixed; left: 0; top: 50%; transform: translateY(-50%); z-index: 900;
+  writing-mode: vertical-rl; padding: 18px 8px;
+  background: #111; color: #fff; font-size: 12px; cursor: pointer;
+  border-radius: 0 8px 8px 0; box-shadow: 2px 2px 12px rgba(0,0,0,0.2);
+  display: flex; align-items: center; gap: 8px; letter-spacing: 0.08em;
+}
+.float-bar .float-icon { writing-mode: horizontal-tb; font-size: 16px; }
+.float-bar .float-status { color: #ffd54a; font-weight: 600; }
+.float-bar .float-status.done { color: #7ee787; }
+.float-popup {
+  position: fixed; left: 44px; top: 50%; transform: translateY(-50%); z-index: 901;
+  width: 300px; background: #fff; color: #111; border: 1px solid #e5e5e5;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+}
+.float-popup-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 14px; background: #111; color: #fff; font-size: 13px;
+}
+.float-popup-head button { background: none; border: none; color: #fff; cursor: pointer; }
+.float-popup-body { padding: 14px 16px; }
+.float-item { font-size: 11.5px; color: #777; margin: 4px 0 0; }
+@media (max-width: 640px) {
+  .float-popup { left: 12px; width: calc(100vw - 24px); }
+}
