@@ -190,9 +190,9 @@ const body = JSON.parse(raw);
           : undefined,
       },
       deposit_info: {
-        bank: "국민은행",
-        account: "123456-01-789012", // ⚠️ 디렉터님 실제 계좌로 교체 필요
-        holder: "N°1",
+        bank: "케이뱅크",
+        account: "100127890230",
+        holder: "김성빈",
         amount: total,
         depositor: customer.depositor || customer.name,
         due_hours: 24,
