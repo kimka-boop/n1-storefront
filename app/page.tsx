@@ -34,6 +34,12 @@ function orRef(v?: string): string {
   return v && v.trim() ? v : "상세페이지 참조";
 }
 
+// 소재 표기 Component Rule: 색상 등 부가정보 제거, 원단 정보만 출력
+function cleanMaterial(v?: string): string {
+  if (!v) return "";
+  return v.replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim().replace(/[,·\s]+$/, "");
+}
+
 /** 실측사이즈 문자열 → 가독용 표 ("M-총장66/가슴단면48/..." 또는 "M: 총장 66, 가슴 48..." 형식 파싱) */
 function parseSizeChart(chart: string): { cols: string[]; rows: { label: string; vals: string[] }[] } | null {
   if (!chart || !chart.trim()) return null;
@@ -114,9 +120,9 @@ function PolicyTabs() {
       <div className="policy-content">
         {tab === "shipping" && (
           <ul className="policy-list">
-            <li>· 전국 택배 배송 (결제 완료 후 신속 출고, 평균 1~3일 소요)</li>
+            <li>· 파스토 당일출고 — <b>오후 1시 이전 결제 시 당일 출고</b> (전국 택배, 평균 1~3일 소요)</li>
             <li>· 배송비: 기본 3,000원 — 5만원 이상 구매 시 무료배송</li>
-            <li>· 도서·산간 지역은 추가 배송비가 발생할 수 있습니다</li>
+            <li className="policy-highlight">· 제주 및 도서·산간 지역은 3,000원의 추가 배송비가 발생합니다.</li>
           </ul>
         )}
         {tab === "exchange" && (
@@ -397,13 +403,13 @@ export default function Home() {
               </div>
               <div className="info-rows">
                 <div className="info-row"><span>품번</span><b>{selected.id}</b></div>
-                <div className="info-row"><span>배송</span><b>전국 택배 (결제 완료 후 신속 출고)</b></div>
+                <div className="info-row"><span>배송</span><b>파스토 당일출고 (오후 1시 이전 결제 시)</b></div>
               </div>
 
               {/* ── 소재 / 핏 / 사이즈 ── */}
               <div className="spec-block">
                 <h3 className="spec-title">소재 &amp; 핏</h3>
-                <div className="info-row"><span>소재</span><b>{orRef(selected.material)}</b></div>
+                <div className="info-row"><span>소재</span><b>{orRef(cleanMaterial(selected.material))}</b></div>
                 {selected.fit && (
                   <div className="fit-grid">
                     {([["두께감", selected.fit.thickness], ["신축성", selected.fit.stretch],
@@ -424,10 +430,10 @@ export default function Home() {
               <div className="spec-block">
                 <h3 className="spec-title">상품정보제공고시</h3>
                 <div className="notice-table">
-                  <div className="info-row"><span>제품 소재</span><b>{orRef(selected.material)}</b></div>
+                  <div className="info-row"><span>제품 소재</span><b>{orRef(cleanMaterial(selected.material))}</b></div>
                   <div className="info-row"><span>색상</span><b>{selected.colorOptions?.length ? selected.colorOptions.join(", ") : orRef(undefined)}</b></div>
                   <div className="info-row"><span>치수</span><b>{selected.sizeOptions?.length ? selected.sizeOptions.join(", ") : orRef(undefined)}</b></div>
-                  <div className="info-row"><span>제조자(수입자)</span><b>{orRef(selected.notice?.manufacturer)}</b></div>
+                  <div className="info-row"><span>제조자(수입자)</span><b>N°1 협력업체</b></div>
                   <div className="info-row"><span>제조국(원산지)</span><b>{orRef(selected.origin)}</b></div>
                   <div className="info-row"><span>제조연월</span><b>{orRef(selected.notice?.madeAt)}</b></div>
                   <div className="info-row">
