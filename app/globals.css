@@ -188,3 +188,50 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   font-size: 12.5px; color: var(--muted); background: rgba(127,127,127,0.08);
   padding: 8px 10px; margin: 8px 0 0; line-height: 1.6;
 }
+
+/* ── CS 채팅 위젯 ── */
+.cs-fab {
+  position: fixed; right: 20px; bottom: 20px; z-index: 999;
+  width: 54px; height: 54px; border-radius: 50%;
+  background: #111; color: #fff; font-size: 22px;
+  border: none; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  transition: transform 0.15s;
+}
+.cs-fab:hover { transform: scale(1.08); }
+.cs-window {
+  position: fixed; right: 20px; bottom: 20px; z-index: 1000;
+  width: 320px; max-width: calc(100vw - 32px); height: 440px;
+  background: #fff; color: #111; border: 1px solid #e5e5e5;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+}
+.cs-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 14px; background: #111; color: #fff;
+  font-size: 13px; letter-spacing: 0.1em;
+}
+.cs-close { background: none; border: none; color: #fff; cursor: pointer; font-size: 14px; }
+.cs-messages { flex: 1; overflow-y: auto; padding: 14px; }
+.cs-welcome { font-size: 12.5px; color: #888; line-height: 1.8; }
+.cs-msg { margin-bottom: 10px; }
+.cs-msg p {
+  margin: 0; padding: 9px 12px; font-size: 13px; line-height: 1.6;
+  border-radius: 10px; max-width: 85%; display: inline-block;
+}
+.cs-msg.customer { text-align: right; }
+.cs-msg.customer p { background: #111; color: #fff; }
+.cs-msg.agent p, .cs-msg.bot p { background: #f2f2f2; color: #111; }
+.cs-agent-badge {
+  display: block; font-size: 10px; color: #d93025; font-weight: 700;
+  margin-bottom: 2px; text-align: left; letter-spacing: 0.05em;
+}
+.cs-typing { font-size: 11.5px; color: #aaa; }
+.cs-input-row { display: flex; border-top: 1px solid #e5e5e5; }
+.cs-input-row input {
+  flex: 1; border: none; padding: 12px; font-size: 13px; outline: none;
+}
+.cs-input-row button {
+  border: none; background: #111; color: #fff; padding: 0 18px;
+  font-size: 13px; cursor: pointer;
+}
+.cs-input-row button:disabled { opacity: 0.4; cursor: not-allowed; }
