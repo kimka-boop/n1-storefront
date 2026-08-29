@@ -7,6 +7,7 @@
  */
 import { useEffect, useState, useCallback } from "react";
 import CsWidget from "@/components/CsWidget";
+import FitProfileModal from "@/components/FitProfileModal";
 
 interface FitInfo { thickness: string; stretch: string; sheer: string; lining: string; shape: string; }
 interface NoticeInfo { manufacturer: string; madeAt: string; colorSize: string; quality: string; as: string; }
@@ -28,6 +29,59 @@ interface Product {
   colorOptions?: string[];
   sizeOptions?: string[];
   optionStock?: Record<string, number>;
+}
+
+
+// ═══ STEP 3: 스마트 핏 사이즈 프리셋 엔진 ═══
+// B유형(세미오버): 아우터류 +1치수 / C유형(오버핏): +1~2 / A유형: 기준 그대로
+const OUTER_KW = /(블루종|자켓|점퍼|가디건|코트|아우터|블루종|항공점퍼|패딩|야상)/i;
+const SIZE_ORDER = ["S", "M", "L", "XL", "2XL", "3XL"];
+const NUM_ORDER = ["95", "100", "105", "110"];
+
+function smartFitPreset(product: Product, getProfile: () => any): string {
+  const profile = getProfile();
+  if (!profile || !product.sizeOptions?.length) return "";
+  const { size: baseSize, fit } = profile;
+  if (!baseSize) return "";
+
+  const opts = product.sizeOptions;
+  const isOuter = OUTER_KW.test(product.name);
+
+  // 기준 사이즈 인덱스 찾기 (문자/숫자 혼용 대응)
+  let baseIdx = -1;
+  if (/^\d+$/.test(baseSize)) {
+    // 숫자 사이즈 (95/100/105/110) — 하의 인치(28~35)는 별도
+    baseIdx = NUM_ORDER.indexOf(baseSize);
+    if (baseIdx === -1) {
+      // 하의 인치 매칭: 가장 근접한 옵션
+      const inchMap: Record<string, string> = { "28~29": "30", "30~31": "32", "32~33": "34", "34~35": "36" };
+      return opts.find((o) => o.includes(baseSize)) || "";
+    }
+  } else {
+    baseIdx = SIZE_ORDER.findIndex((s) => opts.some((o) => o.toUpperCase().includes(s) && s === baseSize));
+    if (baseIdx === -1) baseIdx = SIZE_ORDER.indexOf(baseSize);
+  }
+
+  let targetIdx = baseIdx;
+  if (fit === "B" && isOuter) targetIdx = baseIdx + 1;       // 세미오버 + 아우터: +1
+  else if (fit === "C") targetIdx = baseIdx + (isOuter ? 2 : 1); // 오버핏: +1~2
+
+  if (targetIdx >= opts.length) targetIdx = opts.length - 1;
+  if (targetIdx < 0) targetIdx = 0;
+
+  const chosen = opts[targetIdx];
+  // 옵션 문자열에 사이즈가 포함된 형태 매칭 (예: "2XL" → "2XL" 포함 옵션)
+  return opts.find((o) => o === chosen) || opts.find((o) => o.toUpperCase().includes(chosen)) || "";
+}
+
+// 프리셋 사유 뱃지 텍스트
+function fitBadge(product: Product, profile: any): string {
+  if (!profile) return "";
+  const isOuter = OUTER_KW.test(product.name);
+  const label = { A: "스탠다드", B: "세미오버", C: "오버핏" }[profile.fit as "A"|"B"|"C"] || "";
+  if (profile.fit === "B" && isOuter) return `${profile.size} 기준 — 자켓 여유핏 +1추천`;
+  if (profile.fit === "C") return `${profile.size} 기준 — 오버핏 +${isOuter ? 2 : 1}추천`;
+  return `${profile.size} 기준 추천`;
 }
 
 // 상품정보제공고시 — 빈값 기본 강제 매핑 ('상세페이지 참조' 문구 시스템적 금지)
@@ -178,6 +232,39 @@ export default function Home() {
   const [slide, setSlide] = useState(0);
   const [slideIds, setSlideIds] = useState<string[]>([]);
   const [revealed, setRevealed] = useState<Set<number>>(new Set());
+  // ── STEP 1: 성별 퀵 필터 (localStorage 기억) ──
+  const [genderTab, setGenderTab] = useState<"all" | "male" | "female">("all");
+  useEffect(() => {
+    const saved = localStorage.getItem("n1_gender_tab");
+    if (saved === "male" || saved === "female") setGenderTab(saved);
+  }, []);
+  const changeTab = (t: "all" | "male" | "female") => {
+    setGenderTab(t);
+    if (t === "all") localStorage.removeItem("n1_gender_tab");
+    else localStorage.setItem("n1_gender_tab", t);
+  };
+  // 필터링된 상품 (남성: 카테고리에 여성/여자 없음, 여성: 여성/여자 포함)
+  const filteredProducts = products.filter((p) => {
+    if (genderTab === "all") return true;
+    const isW = /여자|여성/.test(p.category + p.name);
+    return genderTab === "female" ? isW : !isW;
+  });
+
+  // ── STEP 2/3: 스마트 핏 프로필 (localStorage) ──
+  const [fitProfile, setFitProfile] = useState<{gender: string; size: string; fit: string} | null>(null);
+  const [showFitModal, setShowFitModal] = useState(false);
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("n1_fit_profile");
+      if (raw) setFitProfile(JSON.parse(raw));
+    } catch {}
+  }, []);
+  const saveFitProfile = (p: {gender: string; size: string; fit: string}) => {
+    setFitProfile(p);
+    localStorage.setItem("n1_fit_profile", JSON.stringify(p));
+    setShowFitModal(false);
+  };
+
   // ── 옵션 선택 상태 (D2C 구매 UI) ──
   const [selColor, setSelColor] = useState("");
   const [selSize, setSelSize] = useState("");
@@ -254,7 +341,11 @@ export default function Home() {
         setSlide(0);
         // 옵션 초기화 — 단일 옵션이면 자동 선택
         setSelColor(p.colorOptions?.length === 1 ? p.colorOptions[0] : "");
-        setSelSize(p.sizeOptions?.length === 1 ? p.sizeOptions[0] : "");
+        // STEP 3: 스마트 핏 프리셋 — 프로필이 있으면 사이즈 자동 선택
+        const presetSize = smartFitPreset(p, () => {
+          try { const raw = localStorage.getItem("n1_fit_profile"); return raw ? JSON.parse(raw) : null; } catch { return null; }
+        });
+        setSelSize(presetSize || (p.sizeOptions?.length === 1 ? p.sizeOptions[0] : ""));
         setOptTouched(false);
         setOrderStage("options");
         setOrderResult(null);
@@ -357,8 +448,24 @@ export default function Home() {
 
       {error && <p className="error">⚠️ {error}</p>}
 
+      {/* ── STEP 1: 성별 퀵 필터 탭바 ── */}
+      <nav className="gender-tabs">
+        <button className={`gtab ${genderTab === "all" ? "active" : ""}`} onClick={() => changeTab("all")}>
+          전체 <span className="gcount">({products.length})</span>
+        </button>
+        <button className={`gtab ${genderTab === "male" ? "active" : ""}`} onClick={() => changeTab("male")}>
+          남성 <span className="gcount">({products.filter((p) => !/여자|여성/.test(p.category + p.name)).length})</span>
+        </button>
+        <button className={`gtab ${genderTab === "female" ? "active" : ""}`} onClick={() => changeTab("female")}>
+          여성 <span className="gcount">({products.filter((p) => /여자|여성/.test(p.category + p.name)).length})</span>
+        </button>
+        <button className="gtab gtab-fit" onClick={() => setShowFitModal(true)}>
+          {fitProfile ? `내 핏: ${fitProfile.size}${fitProfile.fit ? " · " + ({A:"스탠다드",B:"세미오버",C:"오버핏"}[fitProfile.fit as "A"|"B"|"C"] ?? "") : ""} ⚙` : "스마트 핏 설정 ⚙"}
+        </button>
+      </nav>
+
       <section className="grid">
-        {products.map((p, idx) => {
+        {filteredProducts.map((p, idx) => {
           const ready = p.lookbookStatus === "생성완료";
           const thumb = thumbs[p.id];
           return (
@@ -388,6 +495,16 @@ export default function Home() {
           );
         })}
       </section>
+
+
+      {/* ── STEP 2: 스마트 핏 온보딩 모달 (15초 3문 3답) ── */}
+      {showFitModal && (
+        <FitProfileModal
+          initial={fitProfile}
+          onSave={saveFitProfile}
+          onClose={() => setShowFitModal(false)}
+        />
+      )}
 
       {/* ── 구매 상세 ── */}
       {selected && (
@@ -440,6 +557,9 @@ export default function Home() {
                 {selected.sizeOptions && selected.sizeOptions.length > 0 && (
                   <div className="option-row">
                     <label className="option-label">사이즈</label>
+                    {fitProfile && selSize && (
+                      <span className="fit-badge">✨ {fitBadge(selected, fitProfile)}</span>
+                    )}
                     <select
                       className="option-select"
                       value={selSize}

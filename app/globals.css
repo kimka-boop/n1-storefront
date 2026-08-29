@@ -235,3 +235,71 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   font-size: 13px; cursor: pointer;
 }
 .cs-input-row button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ═══ STEP 1: 성별 퀵 필터 탭바 ═══ */
+.gender-tabs {
+  display: flex; gap: 8px; align-items: center;
+  padding: 0 6vw; margin: -10px 0 8px; flex-wrap: wrap;
+}
+.gtab {
+  padding: 9px 18px; font-size: 13px; letter-spacing: 0.04em;
+  border: 1px solid var(--line, #e5e5e5); background: transparent;
+  color: var(--muted, #888); cursor: pointer; border-radius: 20px;
+  transition: all 0.15s;
+}
+.gtab.active { background: #111; color: #fff; border-color: #111; }
+.gcount { opacity: 0.7; font-size: 11.5px; }
+.gtab-fit { margin-left: auto; font-size: 12px; border-style: dashed; }
+.gtab-fit.active { background: transparent; color: #111; border-color: #111; }
+
+/* ═══ STEP 3: 추천 뱃지 ═══ */
+.fit-badge {
+  font-size: 11px; color: #0b7a3e; background: rgba(11,122,62,0.08);
+  padding: 3px 8px; border-radius: 10px; margin-left: 6px; font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ═══ STEP 2: 스마트 핏 모달 ═══ */
+.fit-modal-bg {
+  position: fixed; inset: 0; z-index: 1100;
+  background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.fit-modal {
+  position: relative; width: 380px; max-width: 100%;
+  background: #fff; color: #111; padding: 28px 24px 20px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+  max-height: 90vh; overflow-y: auto;
+}
+.fit-close { position: absolute; top: 10px; right: 12px; background: none; border: none; font-size: 15px; cursor: pointer; color: #888; }
+.fit-progress { font-size: 11px; letter-spacing: 0.12em; color: #999; margin: 0 0 14px; text-transform: uppercase; }
+.fit-q { font-size: 16px; font-weight: 600; margin: 0 0 16px; }
+.fit-opts { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.fit-opt {
+  padding: 10px 20px; font-size: 13.5px;
+  border: 1px solid #ddd; background: #fff; cursor: pointer; border-radius: 4px;
+  transition: all 0.12s;
+}
+.fit-opt.selected { border-color: #111; background: #111; color: #fff; font-weight: 600; }
+.fit-cat-toggle { display: flex; gap: 6px; margin-bottom: 12px; }
+.fit-cat-toggle button {
+  padding: 6px 14px; font-size: 12px; border: 1px solid #ddd; background: #fafafa;
+  cursor: pointer; border-radius: 14px; color: #777;
+}
+.fit-cat-toggle button.on { border-color: #111; color: #111; font-weight: 600; background: #fff; }
+.fit-vertical { flex-direction: column; }
+.fit-opt-v {
+  text-align: left; padding: 13px 16px; border: 1px solid #ddd; background: #fff;
+  cursor: pointer; display: flex; flex-direction: column; gap: 3px; border-radius: 4px;
+  transition: all 0.12s;
+}
+.fit-opt-v b { font-size: 13.5px; }
+.fit-opt-v span { font-size: 11.5px; color: #888; }
+.fit-opt-v.selected { border-color: #111; background: #f7f7f7; }
+.fit-btns { display: flex; gap: 8px; margin-top: 4px; }
+.fit-prev { padding: 12px 18px; border: 1px solid #ddd; background: #fff; cursor: pointer; font-size: 13px; }
+.fit-next {
+  flex: 1; padding: 12px; border: none; background: #111; color: #fff;
+  font-size: 13.5px; font-weight: 600; cursor: pointer;
+}
+.fit-next:disabled { opacity: 0.35; cursor: not-allowed; }
