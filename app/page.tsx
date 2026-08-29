@@ -48,11 +48,11 @@ function parseSizeChart(chart: string): { cols: string[]; rows: { label: string;
   const rows: { label: string; vals: string[] }[] = [];
   const colSet = new Set<string>();
   const parsed = groups.map((g) => {
-    const m = g.match(/^([^:：-]+)[-:]([^:：]+)$/);
+    const m = g.match(/^([^:：-]+)[-:：]\s*([^:：]+)$/);
     if (!m) return null;
     const label = m[1].trim();
     const items: [string, string][] = [];
-    for (const part of m[2].split(/[,，·]/)) {
+    for (const part of m[2].split(/[,，·\/|]/)) {
       const kv = part.match(/([가-힣A-Za-z()앞뒤~\s]+?)\s*([0-9]+(?:\.[0-9]+)?(?:-[0-9]+(?:\.[0-9]+)?)?)\s*(?:cm)?\s*$/);
       if (kv) items.push([kv[1].trim(), kv[2].trim()]);
     }
