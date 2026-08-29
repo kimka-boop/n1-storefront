@@ -133,9 +133,11 @@ export async function POST(req: Request) {
     });
 
     // ── 5. 재고 차감 (Products 옵션별재고) ──
+    const stockUpdates: { rowIndex: number; value: string }[] = [];
     for (const r of resolved) {
-      const prow = pRows.find((pr) => pr.get("상품ID") === r.sku);
-      if (!prow) continue;
+      const pIndex = pRows.findIndex((pr) => pr.get("상품ID") === r.sku);
+      if (pIndex === -1) continue;
+      const prow = pRows[pIndex];
       const stockMap: Record<string, number> = {};
       for (const pair of String(prow.get("옵션별재고") || "").split("|")) {
         const [k, v] = pair.split(":");
@@ -143,10 +145,10 @@ export async function POST(req: Request) {
       }
       const key = r.color && r.size ? `${r.color}_${r.size}` : (r.size || r.color || "");
       if (stockMap[key] !== undefined) stockMap[key] = Math.max(0, stockMap[key] - r.qty);
-      await prow.save(); // google-spreadsheet: set 후 save
-      // 옵션별재고 열만 갱신
-      prow.set("옵션별재고", Object.entries(stockMap).map(([k, v]) => `${k}:${v}`).join("|"));
+      const newVal = Object.entries(stockMap).map(([k, v]) => `${k}:${v}`).join("|");
+      prow.set("옵션별재고", newVal);
       await prow.save();
+      stockUpdates.push({ rowIndex: pIndex + 2, value: newVal }); // +2: 헤더행 보정
     }
 
     // ── 6. 디렉터 텔레그램 알림 ──
