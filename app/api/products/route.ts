@@ -60,6 +60,26 @@ async function getSheetRows() {
     lookbookImage: r.get("Lookbook_Image_URL") || "",
     lookbookDrive: (r.get("Lookbook_Image_URL") || "").startsWith("https://drive.google.com") ? r.get("Lookbook_Image_URL") : "",
     lookbookLocal: (r.get("Lookbook_Image_URL") || "").startsWith("lookbook/") ? r.get("Lookbook_Image_URL") : "",
+    // ── 상품정보제공고시 / 상세 스펙 (2026-08 추가) ──
+    material: r.get("Material") || "",
+    washingInfo: r.get("Washing_Info") || "",
+    sizeChart: r.get("Size_Chart") || "",
+    modelInfo: r.get("Model_Info") || "",
+    fit: {
+      thickness: r.get("Fit_Thickness") || "",
+      stretch: r.get("Fit_Stretch") || "",
+      sheer: r.get("Fit_Sheer") || "",
+      lining: r.get("Fit_Lining") || "",
+      shape: r.get("Fit_Shape") || "",
+    },
+    origin: r.get("Origin") || "",
+    notice: {
+      manufacturer: r.get("Notice_Manufacturer") || "",
+      madeAt: r.get("Notice_Made_At") || "",
+      colorSize: "상세페이지 참조",
+      quality: "전자상거래 법에 규정되어 있는 소비자 청약철회 가능 범위를 준수합니다.",
+      as: "N°1 고객센터 (상품 문의는 페이지 하단 문의하기 이용)",
+    },
   }));
 }
 

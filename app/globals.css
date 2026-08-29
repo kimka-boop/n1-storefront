@@ -102,3 +102,13 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 @media (max-width: 380px) {
   .grid { grid-template-columns: 1fr; }
 }
+
+/* ── 상세 스펙 · 고시 · 정책 (2026-08) ── */
+.spec-block { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 14px; }
+.spec-title { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
+.fit-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 14px; margin: 6px 0; }
+.fit-cell { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; border-bottom: 1px dashed var(--line); }
+.fit-cell span { color: var(--muted); }
+.notice-table { border-top: 1px dashed var(--line); }
+.policy-list { list-style: none; margin: 0; padding: 0; font-size: 12.5px; line-height: 1.9; color: var(--muted); }
+@media (max-width: 640px) { .fit-grid { grid-template-columns: 1fr; } }
