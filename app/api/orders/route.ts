@@ -132,8 +132,10 @@ export async function POST(req: Request) {
       "CS메모": "",
     });
 
-    // ── 5. 재고 차감 (Products 옵션별재고) ──
-    const stockUpdates: { rowIndex: number; value: string }[] = [];
+    // ── 5. 재고 차감 (Products 옵션별재고) — 블록 셀 직접 갱신 (검증된 방식) ──
+    const stockSheet = doc.sheetsByIndex[0];
+    const stockCells = stockSheet.range(2, 28, pRows.length + 1, 28); // 28열 = 옵션별재고
+    const newValByRow: Record<number, string> = {};
     for (const r of resolved) {
       const pIndex = pRows.findIndex((pr) => pr.get("상품ID") === r.sku);
       if (pIndex === -1) continue;
@@ -145,11 +147,12 @@ export async function POST(req: Request) {
       }
       const key = r.color && r.size ? `${r.color}_${r.size}` : (r.size || r.color || "");
       if (stockMap[key] !== undefined) stockMap[key] = Math.max(0, stockMap[key] - r.qty);
-      const newVal = Object.entries(stockMap).map(([k, v]) => `${k}:${v}`).join("|");
-      prow.set("옵션별재고", newVal);
-      await prow.save();
-      stockUpdates.push({ rowIndex: pIndex + 2, value: newVal }); // +2: 헤더행 보정
+      newValByRow[pIndex + 2] = Object.entries(stockMap).map(([k, v]) => `${k}:${v}`).join("|"); // +2: 헤더 보정
     }
+    for (const cell of stockCells) {
+      if (newValByRow[cell.row]) cell.value = newValByRow[cell.row];
+    }
+    await stockSheet.updateCells(stockCells);
 
     // ── 6. 디렉터 텔레그램 알림 ──
     const itemsDesc = resolved.map((r) => `${r.sku}(${r.color}${r.size ? " " + r.size : ""})x${r.qty}`).join(", ");
