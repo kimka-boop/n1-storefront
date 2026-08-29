@@ -150,8 +150,8 @@ const body = JSON.parse(raw);
       let tKey = key;
       if (!(tKey in stockMap)) {
         // 폴백 1: 색상 인덱스 기반 (UI가 colorIndex 전송 시 — mojibake 무관 정확 매칭)
-        const stockKeys = Object.keys(stockMap).sort();
-        if (typeof r.colorIndex === "number" && r.size) {
+        const stockKeys = Object.keys(stockMap); // 시트 기입 순서 유지 (정렬 금지)
+        if (typeof r.colorIndex === "number" && r.colorIndex >= 0 && r.size) {
           const cand = stockKeys.filter((k) => k.endsWith(`_${r.size}`));
           if (cand[r.colorIndex]) tKey = cand[r.colorIndex];
         }
