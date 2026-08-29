@@ -13,8 +13,6 @@ interface Product {
   id: string;
   name: string;
   category: string;
-  supplier: string;
-  supplierUrl: string;
   price: number;
   stockStatus: string;
   lookbookStatus: string;
@@ -26,6 +24,9 @@ interface Product {
   fit?: FitInfo;
   origin?: string;
   notice?: NoticeInfo;
+  colorOptions?: string[];
+  sizeOptions?: string[];
+  optionStock?: Record<string, number>;
 }
 
 // 상품정보제공고시 (전자상거래법) — 시트값 없으면 "상세페이지 참조"로 표기
@@ -52,6 +53,10 @@ export default function Home() {
   const [slide, setSlide] = useState(0);
   const [slideIds, setSlideIds] = useState<string[]>([]);
   const [revealed, setRevealed] = useState<Set<number>>(new Set());
+  // ── 옵션 선택 상태 (D2C 구매 UI) ──
+  const [selColor, setSelColor] = useState("");
+  const [selSize, setSelSize] = useState("");
+  const [optTouched, setOptTouched] = useState(false);
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -116,9 +121,24 @@ export default function Home() {
         setSlideIds(data.files.map((f: any) => f.id));
         setSelected(p);
         setSlide(0);
+        // 옵션 초기화 — 단일 옵션이면 자동 선택
+        setSelColor(p.colorOptions?.length === 1 ? p.colorOptions[0] : "");
+        setSelSize(p.sizeOptions?.length === 1 ? p.sizeOptions[0] : "");
+        setOptTouched(false);
       }
     } catch {}
   }, []);
+
+  // 선택된 옵션의 재고 수 (옵션별재고 맵)
+  const selectedStock = (() => {
+    if (!selected?.optionStock) return null;
+    const key = selSize || selColor;
+    if (key && selected.optionStock[key] !== undefined) return selected.optionStock[key];
+    const vals = Object.values(selected.optionStock);
+    return vals.length ? Math.min(...vals) : null;
+  })();
+  const lowStock = selectedStock !== null && selectedStock > 0 && selectedStock <= 5;
+  const optionsReady = (!selected?.colorOptions?.length || selColor) && (!selected?.sizeOptions?.length || selSize);
 
   const closeDetail = () => setSelected(null);
   const nextSlide = (e?: React.MouseEvent) => {
@@ -208,6 +228,50 @@ export default function Home() {
               <h2>{selected.name}</h2>
               <p className="detail-price">₩{selected.price.toLocaleString("ko-KR")}</p>
               <div className="buy-box">
+                {/* ── 옵션 선택 (색상/사이즈) ── */}
+                {selected.colorOptions && selected.colorOptions.length > 0 && (
+                  <div className="option-row">
+                    <label className="option-label">색상</label>
+                    <select
+                      className="option-select"
+                      value={selColor}
+                      onChange={(e) => { setSelColor(e.target.value); setOptTouched(true); }}
+                    >
+                      {selected.colorOptions.length > 1 && <option value="">색상을 선택하세요</option>}
+                      {selected.colorOptions.map((c) => (
+                        <option key={c} value={c} disabled={(selected.optionStock?.[c] ?? 1) === 0}>
+                          {c}{selected.optionStock?.[c] === 0 ? " (품절)" : ""}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                {selected.sizeOptions && selected.sizeOptions.length > 0 && (
+                  <div className="option-row">
+                    <label className="option-label">사이즈</label>
+                    <select
+                      className="option-select"
+                      value={selSize}
+                      onChange={(e) => { setSelSize(e.target.value); setOptTouched(true); }}
+                    >
+                      {selected.sizeOptions.length > 1 && <option value="">사이즈를 선택하세요</option>}
+                      {selected.sizeOptions.map((s) => {
+                        const st = selected.optionStock?.[s];
+                        return (
+                          <option key={s} value={s} disabled={st === 0}>
+                            {s}{st === 0 ? " (품절)" : ""}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                )}
+
+                {/* ── 품절 임박 (재고 5개 이하, 마스터 DB 실시간 연동) ── */}
+                {optionsReady && lowStock && (
+                  <p className="stock-alert">품절 임박! 남은 수량: {selectedStock}개</p>
+                )}
+
                 <div className="stock-line">
                   <span className={`stock-badge ${selected.stockStatus === "판매중" ? "in" : "out"}`}>
                     {selected.stockStatus}
@@ -215,17 +279,19 @@ export default function Home() {
                 </div>
                 <button
                   className="buy-btn"
-                  disabled={selected.stockStatus !== "판매중"}
-                  onClick={() => window.open(selected.supplierUrl, "_blank")}
+                  disabled={selected.stockStatus !== "판매중" || !optionsReady || selectedStock === 0}
+                  onClick={() => setOptTouched(true)}
                 >
-                  {selected.stockStatus === "판매중" ? "구매하기" : "품절"}
+                  {selected.stockStatus !== "판매중" ? "품절"
+                    : !optionsReady ? (optTouched ? "옵션을 선택해 주세요" : "옵션 선택")
+                    : selectedStock === 0 ? "품절"
+                    : "구매하기"}
                 </button>
-                <p className="buy-note">도매 공급사 페이지로 연결됩니다</p>
+                <p className="buy-note">오후 1시 이전 결제 완료 시 당일 출고됩니다</p>
               </div>
               <div className="info-rows">
                 <div className="info-row"><span>품번</span><b>{selected.id}</b></div>
-                <div className="info-row"><span>공급사</span><b>{selected.supplier}</b></div>
-                <div className="info-row"><span>배송</span><b>도매공급사 직배송</b></div>
+                <div className="info-row"><span>배송</span><b>파스토 당일출고 (오후 1시 이전 결제 완료 시)</b></div>
               </div>
 
               {/* ── 소재 / 핏 / 사이즈 ── */}
@@ -266,9 +332,9 @@ export default function Home() {
               <div className="spec-block">
                 <h3 className="spec-title">배송 · 교환 · 반품 안내</h3>
                 <ul className="policy-list">
-                  <li>· 배송: 도매공급사 직배송 (평균 2~5일 소요)</li>
-                  <li>· 배송비: 공급사별 상이 — 구매 전 공급사 페이지 확인</li>
-                  <li>· 교환/반품: 구매확정 이전 공급사 협의를 통해 신청 가능</li>
+                  <li>· 배송: 오후 1시 이전 결제 완료 시 당일 출고 (전국 택배, 평균 1~3일 소요)</li>
+                  <li>· 배송비: 기본 3,000원 (5만원 이상 구매 시 무료배송)</li>
+                  <li>· 교환/반품: 수령 후 7일 이내 신청 가능 (고객센터 문의)</li>
                   <li>· 교환/반품 불가: 택 제거·착용 흔적·세탁/향수 냄새 등 상품 가치 훼손 시, 모니터 색상 차이, 시간 경과 개봉 상품</li>
                   <li>· 표기 광고 내용과 상이한 상품은 전자상거래법에 따라 청약철회 가능</li>
                 </ul>

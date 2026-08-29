@@ -1,8 +1,6 @@
 /**
  * N°1 — 시트 실시간 연동 API (Route Handler)
- * GET /api/products → 구글 시트 Products에서 데이터를 읽어 JSON으로 반환
- * credentials.json 파일을 직접 읽어 인증하므로 키를 env에 복사할 필요가 없다.
- * 시트가 바뀌면 홈페이지가 다음 요청 때 자동으로 반영된다.
+ * GET /api/products → 구글 시트 Products(한국어 헤더)에서 데이터를 읽어 JSON으로 반환
  */
 import { NextResponse } from "next/server";
 import { GoogleSpreadsheet } from "google-spreadsheet";
@@ -10,9 +8,8 @@ import { JWT } from "google-auth-library";
 import fs from "fs";
 import path from "path";
 
-export const dynamic = "force-dynamic"; // 캐시 없이 매 요청 시트를 읽음
+export const dynamic = "force-dynamic";
 
-// .env 파일을 런타임에 직접 로드 (next start는 .env의 확장 변수를 안 읽을 수 있음)
 function loadSheetId(): string {
   if (process.env.N1_SHEET_ID) return process.env.N1_SHEET_ID;
   try {
@@ -25,7 +22,6 @@ function loadSheetId(): string {
 }
 
 async function getSheetRows() {
-  // Vercel: 환경변수 / 로컬: credentials.json 파일 — 둘 다 지원
   let email: string, key: string;
   if (process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
     email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
@@ -46,41 +42,51 @@ async function getSheetRows() {
   await doc.loadInfo();
   const sheet = doc.sheetsByIndex[0]; // Products
   const rows = await sheet.getRows();
-  return rows.map((r) => ({
-    id: r.get("Product_ID") || "",
-    name: r.get("Product_Name") || "",
-    category: r.get("Category") || "",
-    supplier: r.get("Supplier_Name") || "",
-    supplierUrl: r.get("Supplier_URL") || "",
-    supplyPrice: Number(String(r.get("Supply_Price") || "0").replace(/[^\d]/g, "")) || 0,
-    price: Number(String(r.get("Selling_Price") || "0").replace(/[^\d]/g, "")) || 0,
-    stockStatus: r.get("Stock_Status") || "",
-    lookbookStatus: r.get("Lookbook_Status") || "",
-    // 로컬 경로와 드라이브 URL 중 있는 쪽 반환 (양쪽 모두 지원)
-    lookbookImage: r.get("Lookbook_Image_URL") || "",
-    lookbookDrive: (r.get("Lookbook_Image_URL") || "").startsWith("https://drive.google.com") ? r.get("Lookbook_Image_URL") : "",
-    lookbookLocal: (r.get("Lookbook_Image_URL") || "").startsWith("lookbook/") ? r.get("Lookbook_Image_URL") : "",
-    // ── 상품정보제공고시 / 상세 스펙 (2026-08 추가) ──
-    material: r.get("Material") || "",
-    washingInfo: r.get("Washing_Info") || "",
-    sizeChart: r.get("Size_Chart") || "",
-    modelInfo: r.get("Model_Info") || "",
-    fit: {
-      thickness: r.get("Fit_Thickness") || "",
-      stretch: r.get("Fit_Stretch") || "",
-      sheer: r.get("Fit_Sheer") || "",
-      lining: r.get("Fit_Lining") || "",
-      shape: r.get("Fit_Shape") || "",
-    },
-    origin: r.get("Origin") || "",
-    notice: {
-      manufacturer: r.get("Notice_Manufacturer") || "",
-      madeAt: r.get("Notice_Made_At") || "",
-      colorSize: "상세페이지 참조",
-      quality: "전자상거래 법에 규정되어 있는 소비자 청약철회 가능 범위를 준수합니다.",
-      as: "N°1 고객센터 (상품 문의는 페이지 하단 문의하기 이용)",
-    },
-  }));
+
+  return rows.map((r) => {
+    // 옵션별재고: "L:10|XL:5|2XL:0" 파싱
+    const rawStock = r.get("옵션별재고") || "";
+    const optionStock: Record<string, number> = {};
+    for (const pair of rawStock.split("|")) {
+      const [k, v] = pair.split(":");
+      if (k && v !== undefined && v !== "") optionStock[k.trim()] = Number(v) || 0;
+    }
+    return {
+      id: r.get("상품ID") || "",
+      name: r.get("상품명") || "",
+      category: r.get("카테고리") || "",
+      price: Number(String(r.get("판매가") || "0").replace(/[^\d]/g, "")) || 0,
+      stockStatus: r.get("재고상태") || "",
+      lookbookStatus: r.get("룩북상태") || "",
+      lookbookImage: r.get("룩북이미지URL") || "",
+      lookbookDrive: (r.get("룩북이미지URL") || "").startsWith("https://drive.google.com") ? r.get("룩북이미지URL") : "",
+      lookbookLocal: (r.get("룩북이미지URL") || "").startsWith("lookbook/") ? r.get("룩북이미지URL") : "",
+      // ── 상품 디테일 (D2C) ──
+      material: r.get("소재") || "",
+      washingInfo: r.get("세탁정보") || "",
+      sizeChart: r.get("실측사이즈") || "",
+      modelInfo: r.get("모델정보") || "",
+      fit: {
+        thickness: r.get("두께감") || "",
+        stretch: r.get("신축성") || "",
+        sheer: r.get("비침") || "",
+        lining: r.get("안감") || "",
+        shape: r.get("핏감") || "",
+      },
+      origin: r.get("원산지") || "",
+      notice: {
+        manufacturer: r.get("제조자") || "",
+        madeAt: r.get("제조연월") || "",
+        colorSize: "상세페이지 참조",
+        quality: "전자상거래 법에 규정되어 있는 소비자 청약철회 가능 범위를 준수합니다.",
+        as: "N°1 고객센터 (상품 문의는 페이지 하단 문의하기 이용)",
+      },
+      // ── 옵션 & 재고 (D2C 구매 UI) ──
+      colorOptions: (r.get("색상옵션") || "").split(",").map((s: string) => s.trim()).filter(Boolean),
+      sizeOptions: (r.get("사이즈옵션") || "").split(",").map((s: string) => s.trim()).filter(Boolean),
+      optionStock,
+    };
+  });
 }
 
 export async function GET() {
