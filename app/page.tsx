@@ -243,12 +243,15 @@ export default function Home() {
     } catch {}
   }, []);
 
-  // 선택된 옵션의 재고 수 (옵션별재고 맵)
+  // 선택된 옵션의 재고 수 — 신형 키(색상_사이즈) 우선, 구형 키(사이즈) 폴백
   const selectedStock = (() => {
     if (!selected?.optionStock) return null;
-    const key = selSize || selColor;
-    if (key && selected.optionStock[key] !== undefined) return selected.optionStock[key];
-    const vals = Object.values(selected.optionStock);
+    const os = selected.optionStock;
+    if (selColor && selSize && os[`${selColor}_${selSize}`] !== undefined) return os[`${selColor}_${selSize}`];
+    if (selColor && selSize && os[`${selColor}_${selSize}`.replace(/\s/g, "")] !== undefined) return os[`${selColor}_${selSize}`.replace(/\s/g, "")];
+    if (selSize && os[selSize] !== undefined) return os[selSize];
+    if (selColor && os[selColor] !== undefined) return os[selColor];
+    const vals = Object.values(os);
     return vals.length ? Math.min(...vals) : null;
   })();
   const lowStock = selectedStock !== null && selectedStock > 0 && selectedStock <= 5;
@@ -353,8 +356,14 @@ export default function Home() {
                     >
                       {selected.colorOptions.length > 1 && <option value="">색상을 선택하세요</option>}
                       {selected.colorOptions.map((c) => (
-                        <option key={c} value={c} disabled={(selected.optionStock?.[c] ?? 1) === 0}>
-                          {c}{selected.optionStock?.[c] === 0 ? " (품절)" : ""}
+                        <option key={c} value={c} disabled={(() => {
+                          // 색상 단위 품절: 해당 색상의 모든 조합이 0일 때
+                          const entries = Object.entries(selected.optionStock || {});
+                          const rel = entries.filter(([k]) => selSize ? k === `${c}_${selSize}` || k.replace(/\s/g,"") === `${c}_${selSize}` : k === c || k.startsWith(`${c}_`));
+                          if (!rel.length) return false;
+                          return rel.every(([, v]) => v === 0);
+                        })()}>
+                          {c}
                         </option>
                       ))}
                     </select>
@@ -370,7 +379,13 @@ export default function Home() {
                     >
                       {selected.sizeOptions.length > 1 && <option value="">사이즈를 선택하세요</option>}
                       {selected.sizeOptions.map((s) => {
-                        const st = selected.optionStock?.[s];
+                        const st = (() => {
+                          const os = selected.optionStock || {};
+                          if (selColor && os[`${selColor}_${s}`] !== undefined) return os[`${selColor}_${s}`];
+                          if (selColor && os[`${selColor}_${s}`.replace(/\s/g, "")] !== undefined) return os[`${selColor}_${s}`.replace(/\s/g, "")];
+                          if (os[s] !== undefined) return os[s];
+                          return undefined;
+                        })();
                         return (
                           <option key={s} value={s} disabled={st === 0}>
                             {s}{st === 0 ? " (품절)" : ""}
