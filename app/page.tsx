@@ -181,6 +181,12 @@ export default function Home() {
   const [selColor, setSelColor] = useState("");
   const [selSize, setSelSize] = useState("");
   const [optTouched, setOptTouched] = useState(false);
+  // ── 주문 폼 상태 (모듈 2: 계좌이체) ──
+  const [orderStage, setOrderStage] = useState<"options" | "form" | "done">("options");
+  const [orderForm, setOrderForm] = useState({ name: "", phone: "", address: "", depositor: "" });
+  const [orderResult, setOrderResult] = useState<{ order_id: string; total: number; type: string; notice?: string; bank: string; account: string; holder: string } | null>(null);
+  const [orderError, setOrderError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -249,6 +255,9 @@ export default function Home() {
         setSelColor(p.colorOptions?.length === 1 ? p.colorOptions[0] : "");
         setSelSize(p.sizeOptions?.length === 1 ? p.sizeOptions[0] : "");
         setOptTouched(false);
+        setOrderStage("options");
+        setOrderResult(null);
+        setOrderError("");
       }
     } catch {}
   }, []);
@@ -266,6 +275,53 @@ export default function Home() {
   })();
   const lowStock = selectedStock !== null && selectedStock > 0 && selectedStock <= 5;
   const optionsReady = (!selected?.colorOptions?.length || selColor) && (!selected?.sizeOptions?.length || selSize);
+
+  // ── 주문 제출 (모듈 2: /api/orders) ──
+  const submitOrder = useCallback(async () => {
+    if (!selected) return;
+    setSubmitting(true);
+    setOrderError("");
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer: {
+            name: orderForm.name,
+            phone: orderForm.phone,
+            address: orderForm.address,
+            depositor: orderForm.depositor || orderForm.name,
+          },
+          items: [{
+            sku: selected.id,
+            color: selColor,
+            size: selSize,
+            qty: 1,
+          }],
+        }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setOrderResult({
+          order_id: data.order_id,
+          total: data.total_amount,
+          type: data.shipping.type,
+          notice: data.shipping.notice,
+          bank: data.deposit_info.bank,
+          account: data.deposit_info.account,
+          holder: data.deposit_info.holder,
+        });
+        setOrderStage("done");
+        fetchProducts(); // 재고 반영 새로고침
+      } else {
+        setOrderError(data.error || "주문 처리 중 오류가 발생했습니다");
+      }
+    } catch {
+      setOrderError("서버 연결 실패 — 잠시 후 다시 시도해주세요");
+    } finally {
+      setSubmitting(false);
+    }
+  }, [selected, orderForm, selColor, selSize, fetchProducts]);
 
   const closeDetail = () => setSelected(null);
   const nextSlide = (e?: React.MouseEvent) => {
@@ -411,22 +467,70 @@ export default function Home() {
                   <p className="stock-alert">품절 임박! 남은 수량: {selectedStock}개</p>
                 )}
 
-                <div className="stock-line">
-                  <span className={`stock-badge ${selected.stockStatus === "판매중" ? "in" : "out"}`}>
-                    {selected.stockStatus}
-                  </span>
-                </div>
-                <button
-                  className="buy-btn"
-                  disabled={selected.stockStatus !== "판매중" || !optionsReady || selectedStock === 0}
-                  onClick={() => setOptTouched(true)}
-                >
-                  {selected.stockStatus !== "판매중" ? "품절"
-                    : !optionsReady ? (optTouched ? "옵션을 선택해 주세요" : "옵션 선택")
-                    : selectedStock === 0 ? "품절"
-                    : "구매하기"}
-                </button>
-                <p className="buy-note">결제 완료 후 신속하게 출고됩니다</p>
+                {/* ── 주문 플로우: 옵션 → 주문폼 → 입금안내 ── */}
+                {orderStage === "options" && (
+                  <>
+                    <div className="stock-line">
+                      <span className={`stock-badge ${selected.stockStatus === "판매중" ? "in" : "out"}`}>
+                        {selected.stockStatus}
+                      </span>
+                    </div>
+                    <button
+                      className="buy-btn"
+                      disabled={selected.stockStatus !== "판매중" || !optionsReady || selectedStock === 0}
+                      onClick={() => setOrderStage("form")}
+                    >
+                      {selected.stockStatus !== "판매중" ? "품절"
+                        : !optionsReady ? (optTouched ? "옵션을 선택해 주세요" : "옵션 선택")
+                        : selectedStock === 0 ? "품절"
+                        : "구매하기"}
+                    </button>
+                    <p className="buy-note">결제 완료 후 신속하게 출고됩니다</p>
+                  </>
+                )}
+
+                {orderStage === "form" && (
+                  <div className="order-form">
+                    <h4 className="order-form-title">주문 정보 입력</h4>
+                    <input className="order-input" placeholder="주문자명" value={orderForm.name}
+                      onChange={(e) => setOrderForm({ ...orderForm, name: e.target.value })} />
+                    <input className="order-input" placeholder="연락처 (010-0000-0000)" type="tel" value={orderForm.phone}
+                      onChange={(e) => setOrderForm({ ...orderForm, phone: e.target.value })} />
+                    <input className="order-input" placeholder="배송지 주소" value={orderForm.address}
+                      onChange={(e) => setOrderForm({ ...orderForm, address: e.target.value })} />
+                    <input className="order-input" placeholder="입금자명 (주문자명과 같으면 비워도 됨)" value={orderForm.depositor}
+                      onChange={(e) => setOrderForm({ ...orderForm, depositor: e.target.value })} />
+                    <p className="order-summary">
+                      {selected.name} · {selColor}{selSize && ` / ${selSize}`} · <b>₩{selected.price.toLocaleString("ko-KR")}</b>
+                    </p>
+                    {orderError && <p className="stock-alert">{orderError}</p>}
+                    <div className="order-form-btns">
+                      <button className="order-btn-back" onClick={() => setOrderStage("options")}>← 이전</button>
+                      <button className="buy-btn order-btn-submit"
+                        disabled={submitting || !orderForm.name || !orderForm.phone || !orderForm.address}
+                        onClick={submitOrder}>
+                        {submitting ? "처리 중..." : "주문하기 (계좌이체)"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {orderStage === "done" && orderResult && (
+                  <div className="order-done">
+                    <p className="order-done-title">✓ 주문이 접수되었습니다</p>
+                    <div className="deposit-box">
+                      <div className="info-row"><span>주문번호</span><b>{orderResult.order_id}</b></div>
+                      <div className="info-row"><span>입금 금액</span><b>₩{orderResult.total.toLocaleString("ko-KR")}</b></div>
+                      <div className="info-row"><span>입금 계좌</span><b>{orderResult.bank} {orderResult.account}</b></div>
+                      <div className="info-row"><span>예금주</span><b>{orderResult.holder}</b></div>
+                      <div className="info-row"><span>입금 기한</span><b>24시간 이내</b></div>
+                    </div>
+                    <p className="buy-note">입금 확인 후 출고됩니다. 주문번호를 보관해주세요.</p>
+                    {orderResult.notice && (
+                      <p className="split-notice">📦 {orderResult.notice}</p>
+                    )}
+                  </div>
+                )}
               </div>
               <div className="info-rows">
                 <div className="info-row"><span>품번</span><b>{selected.id}</b></div>

@@ -166,3 +166,25 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 /* ── 라벨 줄바꿈 방지 (긴급 시정 #2) ── */
 .nowrap { white-space: nowrap; }
 .info-row span, .fit-cell span { white-space: nowrap; flex-shrink: 0; }
+
+/* ── 주문 폼 (모듈 2) ── */
+.order-form-title { font-size: 13px; font-weight: 600; margin: 0 0 10px; }
+.order-input {
+  width: 100%; padding: 10px 12px; font-size: 13px; margin-bottom: 8px;
+  border: 1px solid var(--line); background: transparent; color: inherit; border-radius: 0;
+  box-sizing: border-box;
+}
+.order-input:focus { outline: none; border-color: currentColor; }
+.order-summary { font-size: 12.5px; color: var(--muted); margin: 8px 0 10px; }
+.order-form-btns { display: flex; gap: 8px; }
+.order-btn-back {
+  padding: 12px 16px; font-size: 13px; border: 1px solid var(--line);
+  background: transparent; color: var(--muted); cursor: pointer;
+}
+.order-btn-submit { flex: 1; }
+.order-done-title { font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+.deposit-box { border: 1px solid var(--line); padding: 10px 12px; margin-bottom: 10px; }
+.split-notice {
+  font-size: 12.5px; color: var(--muted); background: rgba(127,127,127,0.08);
+  padding: 8px 10px; margin: 8px 0 0; line-height: 1.6;
+}
