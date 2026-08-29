@@ -162,3 +162,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 
 /* ── 정책 강조 (도서산간 등) ── */
 .policy-highlight { color: #d93025; font-weight: 600; }
+
+/* ── 라벨 줄바꿈 방지 (긴급 시정 #2) ── */
+.nowrap { white-space: nowrap; }
+.info-row span, .fit-cell span { white-space: nowrap; flex-shrink: 0; }

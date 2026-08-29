@@ -29,9 +29,19 @@ interface Product {
   optionStock?: Record<string, number>;
 }
 
-// 상품정보제공고시 (전자상거래법) — 시트값 없으면 "상세페이지 참조"로 표기
-function orRef(v?: string): string {
-  return v && v.trim() ? v : "상세페이지 참조";
+// 상품정보제공고시 — 빈값 기본 강제 매핑 ('상세페이지 참조' 문구 시스템적 금지)
+const DEFAULTS: Record<string, string> = {
+  제조연월: "2026년 1월 이후 상시제조",
+  제품소재: "혼용률 상세 문의는 고객센터",
+  색상: "단일 색상",
+  치수: "단일 사이즈",
+  제조자: "N°1 협력업체",
+  원산지: "상담 문의",
+};
+function orRef(v?: string, key?: string): string {
+  const s = (v || "").trim();
+  if (s && s !== "상세페이지 참조") return s;
+  return (key && DEFAULTS[key]) || "고객센터 문의";
 }
 
 // 소재 표기 Component Rule: 색상 등 부가정보 제거, 원단 정보만 출력
@@ -74,7 +84,7 @@ function SizeChartTable({ chart }: { chart?: string }) {
   const parsed = parseSizeChart(chart || "");
   if (!parsed) {
     return (
-      <div className="info-row"><span>실측사이즈</span><b>{orRef(chart)}</b></div>
+      <div className="info-row"><span className="nowrap">실측 사이즈</span><b>{orRef(chart)}</b></div>
     );
   }
   return (
@@ -448,11 +458,11 @@ export default function Home() {
                 <h3 className="spec-title">상품정보제공고시</h3>
                 <div className="notice-table">
                   <div className="info-row"><span>제품 소재</span><b>{orRef(cleanMaterial(selected.material))}</b></div>
-                  <div className="info-row"><span>색상</span><b>{selected.colorOptions?.length ? selected.colorOptions.join(", ") : orRef(undefined)}</b></div>
+                  <div className="info-row"><span>색상</span><b>{selected.colorOptions?.length ? selected.colorOptions.join(", ") : orRef(undefined, "색상")}</b></div>
                   <div className="info-row"><span>치수</span><b>{selected.sizeOptions?.length ? selected.sizeOptions.join(", ") : orRef(undefined)}</b></div>
                   <div className="info-row"><span>제조자(수입자)</span><b>N°1 협력업체</b></div>
-                  <div className="info-row"><span>제조국(원산지)</span><b>{orRef(selected.origin)}</b></div>
-                  <div className="info-row"><span>제조연월</span><b>{orRef(selected.notice?.madeAt)}</b></div>
+                  <div className="info-row"><span>제조국(원산지)</span><b>{orRef(selected.origin, "원산지")}</b></div>
+                  <div className="info-row"><span>제조연월</span><b>{orRef(selected.notice?.madeAt, "제조연월")}</b></div>
                   <div className="info-row">
                     <span>품질보증기준</span>
                     <b className="quality-tip">
