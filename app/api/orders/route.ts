@@ -154,6 +154,7 @@ const body = JSON.parse(raw);
         const cand = Object.keys(stockMap).filter((k) => k.endsWith(`_${sizePart}`) || k === sizePart);
         if (cand.length === 1) tKey = cand[0];
       }
+      console.log(`[stock-final] 요청키="${key}" 사용키="${tKey}" 매칭=${tKey in stockMap} 차감전=${stockMap[tKey]}`);
       if (stockMap[tKey] !== undefined) stockMap[tKey] = Math.max(0, stockMap[tKey] - r.qty);
       newValByRow[pIndex + 2] = Object.entries(stockMap).map(([k, v]) => `${k}:${v}`).join("|"); // +2: 헤더 보정
     }
