@@ -9,3 +9,6 @@ full_audit*.jpg
 recheck_*.jpg
 qr_*.png
 lookbook/
+
+.vercel
+.env*

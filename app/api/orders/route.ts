@@ -47,8 +47,8 @@ async function getDoc() {
 
 // ── 디렉터 텔레그램 알림 (신규 주문 인입) ──
 async function notifyNewOrder(orderId: string, name: string, amount: number, shipType: string, itemsDesc: string) {
-  const token = process.env.N1_TG_TOKEN;
-  const chat = process.env.N1_TG_CHAT;
+  const token = process.env.N1_PAYMENT_BOT_TOKEN; // 봇2: 결제·발주 전담
+  const chat = process.env.N1_PAYMENT_CHAT_ID; // 봇2 채널
   const msg = `🛎️ N°1 신규 주문!\n\n주문번호: ${orderId}\n고객: ${name}\n상품: ${itemsDesc}\n금액: ${amount.toLocaleString()}원\n배송: ${shipType}\n→ 입금 확인 후 출고해주세요`;
   if (token && chat) {
     try {
