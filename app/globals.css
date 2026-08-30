@@ -17,7 +17,8 @@ body {
 }
 
 /* ── 히어로 ── */
-.hero { min-height: 34vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 26px 16px; }
+.hero { min-height: 30vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 26px 16px; }
+@media (max-width: 640px) { .hero { min-height: 16vh; padding: 14px 12px; } .hero-brand h1 { font-size: 34px; letter-spacing: 2px; } .hero-tag { font-size: 11px; margin-top: 6px; } }
 .hero-brand { opacity: 0; transform: translateY(28px); animation: heroIn .9s ease .1s forwards; }
 .hero-brand h1 { font-size: clamp(40px, 9vw, 88px); letter-spacing: clamp(3px, 1.5vw, 12px); font-weight: 700; }
 .hero-tag { margin-top: 14px; color: var(--muted); letter-spacing: clamp(2px, 1vw, 6px); font-size: clamp(13px, 2.5vw, 18px); }
