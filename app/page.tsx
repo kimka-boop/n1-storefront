@@ -471,8 +471,9 @@ export default function Home() {
 
       {/* ── 주간 드롭 마감 뱃지 ── */}
       <div className="drop-badge">
-        <span className="drop-timer">⏱️ {dDay}</span>
-        <span className="drop-text">이번 주 컬렉션 마감 — 매주 일요일 자정 20종 전면 교체</span>
+        <span className="drop-text">⏱️ 이번 주 컬렉션 마감</span>
+        <span className="drop-timer">[{dDay}]</span>
+        <span className="drop-text">— 매주 일요일 자정 20종 전면 교체</span>
       </div>
 
       {/* ── STEP 1: 성별 퀵 필터 탭바 ── */}

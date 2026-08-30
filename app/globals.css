@@ -17,9 +17,9 @@ body {
 }
 
 /* ── 히어로 ── */
-.hero { min-height: 52vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 48px 16px; }
+.hero { min-height: 34vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 26px 16px; }
 .hero-brand { opacity: 0; transform: translateY(28px); animation: heroIn .9s ease .1s forwards; }
-.hero-brand h1 { font-size: clamp(56px, 12vw, 120px); letter-spacing: clamp(4px, 2vw, 16px); font-weight: 700; }
+.hero-brand h1 { font-size: clamp(40px, 9vw, 88px); letter-spacing: clamp(3px, 1.5vw, 12px); font-weight: 700; }
 .hero-tag { margin-top: 14px; color: var(--muted); letter-spacing: clamp(2px, 1vw, 6px); font-size: clamp(13px, 2.5vw, 18px); }
 @keyframes heroIn { to { opacity: 1; transform: none; } }
 
@@ -238,8 +238,9 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 
 /* ═══ STEP 1: 성별 퀵 필터 탭바 ═══ */
 .gender-tabs {
-  display: flex; gap: 8px; align-items: center;
-  padding: 0 6vw; margin: -10px 0 8px; flex-wrap: wrap;
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center;
+  padding: 0 5vw; margin: 12px auto 10px; width: fit-content; max-width: 100%;
+  position: static; /* absolute 간섭 제거 — 자연 플로우로 밀림 */
 }
 .gtab {
   padding: 9px 18px; font-size: 13px; letter-spacing: 0.04em;
@@ -349,24 +350,32 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 
 /* ═══ 좌측 플로팅 바 ═══ */
 .float-bar {
-  position: fixed; left: 0; top: 50%; transform: translateY(-50%); z-index: 900;
-  writing-mode: vertical-rl; padding: 18px 8px;
-  background: #111; color: #fff; font-size: 12px; cursor: pointer;
-  border-radius: 0 8px 8px 0; box-shadow: 2px 2px 12px rgba(0,0,0,0.2);
-  display: flex; align-items: center; gap: 8px; letter-spacing: 0.08em;
+  position: fixed; left: 16px; bottom: 20px; z-index: 900;
+  width: 50px; height: 50px; border-radius: 50%;
+  background: #fff; color: #111; border: 1px solid #e5e5e5;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; cursor: pointer; transition: transform 0.15s;
 }
-.float-bar .float-icon { writing-mode: horizontal-tb; font-size: 16px; }
-.float-bar .float-status { color: #ffd54a; font-weight: 600; }
-.float-bar .float-status.done { color: #7ee787; }
+.float-bar:hover { transform: scale(1.08); }
+.float-bar .float-icon { line-height: 1; }
+.float-bar .float-status {
+  position: absolute; top: -4px; right: -4px;
+  font-size: 9.5px; font-weight: 700; padding: 2px 6px;
+  background: #d93025; color: #fff; border-radius: 999px; white-space: nowrap;
+}
+.float-bar .float-status.done { background: #0b7a3e; }
 .float-popup {
-  position: fixed; left: 44px; top: 50%; transform: translateY(-50%); z-index: 901;
-  width: 300px; background: #fff; color: #111; border: 1px solid #e5e5e5;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  position: fixed; left: 16px; bottom: 80px; z-index: 901;
+  width: 290px; max-width: calc(100vw - 32px);
+  background: #fff; color: #111; border: 1px solid #e5e5e5;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2); border-radius: 10px; overflow: hidden;
 }
 .float-popup-head {
   display: flex; justify-content: space-between; align-items: center;
   padding: 12px 14px; background: #111; color: #fff; font-size: 13px;
 }
+@media (max-width: 640px) { .float-bar { left: 12px; bottom: 14px; } }
 .float-popup-head button { background: none; border: none; color: #fff; cursor: pointer; }
 .float-popup-body { padding: 14px 16px; }
 .float-item { font-size: 11.5px; color: #777; margin: 4px 0 0; }
@@ -376,19 +385,19 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 
 /* ═══ 주간 드롭 마감 뱃지 ═══ */
 .drop-badge {
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  margin: 18px 6vw -4px; padding: 11px 18px;
-  background: #111; color: #fff; border-radius: 4px;
-  font-size: 12.5px; letter-spacing: 0.03em;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin: 14px auto -2px; padding: 6px 16px;
+  width: fit-content; max-width: calc(100vw - 32px);
+  background: #f8fafc; border: 1px solid #e2e8f0; color: #475569;
+  border-radius: 999px; font-size: 12.5px; line-height: 1.5;
 }
 .drop-timer {
-  font-weight: 800; font-size: 14px; color: #ffd54a;
-  min-width: 44px; text-align: center;
-  font-variant-numeric: tabular-nums;
+  font-weight: 700; font-size: 12.5px; color: #0f172a;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
 }
-.drop-text { opacity: 0.92; }
+.drop-text { white-space: normal; }
 @media (max-width: 640px) {
-  .drop-badge { flex-direction: column; gap: 4px; text-align: center; padding: 10px 12px; }
+  .drop-badge { flex-direction: row; flex-wrap: wrap; gap: 4px 8px; text-align: center; padding: 6px 14px; }
 }
 
 /* ═══ 안전 실측 안심 카피 ═══ */
