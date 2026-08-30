@@ -1,19 +1,21 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import FloatingOrderTracker from "@/components/FloatingOrderTracker";
+import CsWidget from "@/components/CsWidget";
 
 export const metadata: Metadata = {
   title: "N°1 — 20 Pieces. Selected by AI.",
-  description: "Minimalist high-end fashion magazine, curated by AI.",
+  description: "AI가 선별한 큐레이션 패션 스토어",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        {children}
+        <FloatingOrderTracker />
+        <CsWidget />
+      </body>
     </html>
   );
 }

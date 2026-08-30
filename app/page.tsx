@@ -6,9 +6,7 @@
  * 클릭: 구매 상세 + 5장 슬라이드
  */
 import { useEffect, useState, useCallback } from "react";
-import CsWidget from "@/components/CsWidget";
 import FitProfileModal from "@/components/FitProfileModal";
-import FloatingOrderTracker from "@/components/FloatingOrderTracker";
 
 interface FitInfo { thickness: string; stretch: string; sheer: string; lining: string; shape: string; }
 interface NoticeInfo { manufacturer: string; madeAt: string; colorSize: string; quality: string; as: string; }
@@ -726,8 +724,6 @@ export default function Home() {
       )}
 
       <footer>© N°1 — MINIMALIST FASHION MAGAZINE</footer>
-      <CsWidget />
-      <FloatingOrderTracker />
     </main>
   );
 }
