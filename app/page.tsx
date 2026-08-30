@@ -233,6 +233,25 @@ export default function Home() {
   const [slide, setSlide] = useState(0);
   const [slideIds, setSlideIds] = useState<string[]>([]);
   const [revealed, setRevealed] = useState<Set<number>>(new Set());
+  // ── 주간 드롭 카운트다운 (매주 일요일 자정 마감) ──
+  const [dDay, setDDay] = useState("");
+  useEffect(() => {
+    const calc = () => {
+      const now = new Date();
+      const next = new Date(now);
+      const day = now.getDay(); // 0=일
+      let daysLeft = (7 - day) % 7;
+      if (daysLeft === 0) daysLeft = 7; // 일요일 당일은 마감일로 D-Day
+      next.setDate(now.getDate() + daysLeft);
+      next.setHours(24, 0, 0, 0);
+      const diff = Math.floor((next.getTime() - now.getTime()) / 86400000);
+      setDDay(daysLeft === 0 ? "D-DAY" : `D-${diff}`);
+    };
+    calc();
+    const t = setInterval(calc, 60000);
+    return () => clearInterval(t);
+  }, []);
+
   // ── STEP 1: 성별 퀵 필터 (localStorage 기억) ──
   const [genderTab, setGenderTab] = useState<"all" | "male" | "female">("all");
   useEffect(() => {
@@ -450,6 +469,12 @@ export default function Home() {
 
       {error && <p className="error">⚠️ {error}</p>}
 
+      {/* ── 주간 드롭 마감 뱃지 ── */}
+      <div className="drop-badge">
+        <span className="drop-timer">⏱️ {dDay}</span>
+        <span className="drop-text">이번 주 컬렉션 마감 — 매주 일요일 자정 20종 전면 교체</span>
+      </div>
+
       {/* ── STEP 1: 성별 퀵 필터 탭바 ── */}
       <nav className="gender-tabs">
         <button className={`gtab ${genderTab === "all" ? "active" : ""}`} onClick={() => changeTab("all")}>
@@ -532,6 +557,10 @@ export default function Home() {
               <h2>{selected.name}</h2>
               <p className="detail-price">₩{selected.price.toLocaleString("ko-KR")}</p>
               <div className="buy-box">
+                <p className="safe-fit-note">
+                  💡 체형 맞춤 추천: AI 스마트 핏과 실측 단면(cm)을 확인해 주세요.<br />
+                  (수령 후 7일 이내 규정 교환·반품 가능)
+                </p>
                 {/* ── 옵션 선택 (색상/사이즈) ── */}
                 {selected.colorOptions && selected.colorOptions.length > 0 && (
                   <div className="option-row">

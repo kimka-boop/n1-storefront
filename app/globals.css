@@ -373,3 +373,27 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 @media (max-width: 640px) {
   .float-popup { left: 12px; width: calc(100vw - 24px); }
 }
+
+/* ═══ 주간 드롭 마감 뱃지 ═══ */
+.drop-badge {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin: 18px 6vw -4px; padding: 11px 18px;
+  background: #111; color: #fff; border-radius: 4px;
+  font-size: 12.5px; letter-spacing: 0.03em;
+}
+.drop-timer {
+  font-weight: 800; font-size: 14px; color: #ffd54a;
+  min-width: 44px; text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.drop-text { opacity: 0.92; }
+@media (max-width: 640px) {
+  .drop-badge { flex-direction: column; gap: 4px; text-align: center; padding: 10px 12px; }
+}
+
+/* ═══ 안전 실측 안심 카피 ═══ */
+.safe-fit-note {
+  font-size: 12px; color: #64748b; line-height: 1.7;
+  background: #f8fafc; border: 1px solid #e2e8f0;
+  padding: 8px 11px; margin: 0 0 10px; border-radius: 4px;
+}
