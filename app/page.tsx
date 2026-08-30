@@ -244,11 +244,12 @@ export default function Home() {
     if (t === "all") localStorage.removeItem("n1_gender_tab");
     else localStorage.setItem("n1_gender_tab", t);
   };
-  // 필터링된 상품 (남성: 카테고리에 여성/여자 없음, 여성: 여성/여자 포함)
+  // 필터링된 상품 — 상품ID 접두사 기준 (PRD-W = 여성, PRD-M = 남성)
+  // ⚠️ 상품명 키워드는 정제 과정에서 사라질 수 있어 2차 폴백으로만 사용
+  const isWomen = (p: Product) => p.id.startsWith("PRD-W") || /여자|여성/.test(p.category + p.name);
   const filteredProducts = products.filter((p) => {
     if (genderTab === "all") return true;
-    const isW = /여자|여성/.test(p.category + p.name);
-    return genderTab === "female" ? isW : !isW;
+    return genderTab === "female" ? isWomen(p) : !isWomen(p);
   });
 
   // ── STEP 2/3: 스마트 핏 프로필 (localStorage) ──
@@ -455,10 +456,10 @@ export default function Home() {
           전체 <span className="gcount">({products.length})</span>
         </button>
         <button className={`gtab ${genderTab === "male" ? "active" : ""}`} onClick={() => changeTab("male")}>
-          남성 <span className="gcount">({products.filter((p) => !/여자|여성/.test(p.category + p.name)).length})</span>
+          남성 <span className="gcount">({products.filter((p) => !isWomen(p)).length})</span>
         </button>
         <button className={`gtab ${genderTab === "female" ? "active" : ""}`} onClick={() => changeTab("female")}>
-          여성 <span className="gcount">({products.filter((p) => /여자|여성/.test(p.category + p.name)).length})</span>
+          여성 <span className="gcount">({products.filter((p) => isWomen(p)).length})</span>
         </button>
         <button className="gtab gtab-fit" onClick={() => setShowFitModal(true)}>
           {fitProfile ? `내 핏: ${fitProfile.size}${fitProfile.fit ? " · " + ({A:"스탠다드",B:"세미오버",C:"오버핏"}[fitProfile.fit as "A"|"B"|"C"] ?? "") : ""} ⚙` : "스마트 핏 설정 ⚙"}
