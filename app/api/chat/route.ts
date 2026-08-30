@@ -103,8 +103,11 @@ async function mirrorToBot3(message: string, reply: string, sid: string) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { sid, message, customer } = body || {};
-    if (!message?.trim()) return NextResponse.json({ ok: false, error: "메시지 누락" }, { status: 400 });
+    // 클라이언트가 encodeURIComponent로 전송 → 복원 (mojibake 방지)
+    let message: string = body.message || "";
+    try { message = decodeURIComponent(message); } catch {}
+    const { sid, customer } = body || {};
+    if (!message.trim()) return NextResponse.json({ ok: false, error: "메시지 누락" }, { status: 400 });
 
     // 세션 확보 (인메모리)
     if (!global.__csStore) global.__csStore = { sessions: {}, counter: 100 };

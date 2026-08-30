@@ -49,12 +49,10 @@ async function getDoc() {
 }
 
 async function getOrCreateUsersSheet(doc: any) {
-  try {
-    return doc.sheetsByTitle["Users"];
-  } catch {
-    const s = await doc.addSheet({ title: "Users", headerValues: ["이메일", "비밀번호해시", "성별", "기준사이즈", "핏취향", "가입일"] });
-    return s;
-  }
+  await doc.loadInfo(); // 시트 목록 로드 보장
+  const existing = Object.values(doc.sheetsByTitle || {}).find((s: any) => s.title === "Users");
+  if (existing) return existing;
+  return await doc.addSheet({ title: "Users", headerValues: ["이메일", "비밀번호해시", "성별", "기준사이즈", "핏취향", "가입일"] });
 }
 
 // 간단 해시 (실서비스 전환 시 bcrypt 권장)
