@@ -43,7 +43,8 @@ export default function CsWidget() {
     setMsgs((prev) => [...prev, { role: "customer", text }]);
     setTyping(true);
     try {
-      const res = await fetch("/api/cs", {
+      // 실시간 챗봇 응답 (/api/chat)
+      const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sid, message: encodeURIComponent(text), customer: { name: "web" } }),
@@ -51,8 +52,14 @@ export default function CsWidget() {
       const data = await res.json();
       if (data.ok) {
         setSid(data.sid);
+        setMsgs((prev) => [...prev, { role: data.escalated ? "bot" : "bot", text: data.reply }]);
         if (data.escalated) {
-          setTimeout(() => setMsgs((prev) => [...prev, { role: "bot", text: data.bot_reply }]), 600);
+          // 에스컬레이션 → 기존 세션 스토어에도 기록 (상담원 답장 대기)
+          fetch("/api/cs", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sid: data.sid, message: encodeURIComponent(text), customer: { name: "web" } }),
+          }).catch(() => {});
         }
       }
     } catch {

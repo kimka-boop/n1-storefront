@@ -7,6 +7,8 @@
  */
 import { useEffect, useState, useCallback } from "react";
 import FitProfileModal from "@/components/FitProfileModal";
+import AuthNav from "@/components/AuthNav";
+import { useAuth } from "@/components/AuthProvider";
 
 interface FitInfo { thickness: string; stretch: string; sheer: string; lining: string; shape: string; }
 interface NoticeInfo { manufacturer: string; madeAt: string; colorSize: string; quality: string; as: string; }
@@ -226,6 +228,7 @@ function driveImg(fileId: string, w = 1000) {
 }
 
 export default function Home() {
+  const { profile: authProfile } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [thumbs, setThumbs] = useState<Record<string, string>>({}); // pid → 대표 이미지 URL
   const [error, setError] = useState("");
@@ -285,6 +288,8 @@ export default function Home() {
     localStorage.setItem("n1_fit_profile", JSON.stringify(p));
     setShowFitModal(false);
   };
+  // auth 프로필 동기화 (로그인 시 프로필 표시)
+  useEffect(() => { if (authProfile) setFitProfile(authProfile); }, [authProfile]);
 
   // ── 옵션 선택 상태 (D2C 구매 UI) ──
   const [selColor, setSelColor] = useState("");
@@ -363,9 +368,7 @@ export default function Home() {
         // 옵션 초기화 — 단일 옵션이면 자동 선택
         setSelColor(p.colorOptions?.length === 1 ? p.colorOptions[0] : "");
         // STEP 3: 스마트 핏 프리셋 — 프로필이 있으면 사이즈 자동 선택
-        const presetSize = smartFitPreset(p, () => {
-          try { const raw = localStorage.getItem("n1_fit_profile"); return raw ? JSON.parse(raw) : null; } catch { return null; }
-        });
+        const presetSize = smartFitPreset(p, () => authProfile);
         setSelSize(presetSize || (p.sizeOptions?.length === 1 ? p.sizeOptions[0] : ""));
         setOptTouched(false);
         setOrderStage("options");
@@ -469,12 +472,9 @@ export default function Home() {
 
       {error && <p className="error">⚠️ {error}</p>}
 
-      {/* ── 주간 드롭 마감 뱃지 ── */}
-      <div className="drop-badge">
-        <span className="drop-text">⏱️ 이번 주 컬렉션 마감</span>
-        <span className="drop-timer">[{dDay}]</span>
-        <span className="drop-text">— 매주 일요일 자정 20종 전면 교체</span>
-      </div>
+      <AuthNav />
+      {/* ── 주간 드롭 마감 (초경량 1라인) ── */}
+      <p className="drop-line">⏱️ 이번 주 컬렉션 마감 [{dDay}] ㅡ 매주 일요일 자정 20종 전면 교체</p>
 
       {/* ── STEP 1: 성별 퀵 필터 탭바 ── */}
       <nav className="gender-tabs">

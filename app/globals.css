@@ -385,20 +385,10 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 }
 
 /* ═══ 주간 드롭 마감 뱃지 ═══ */
-.drop-badge {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  margin: 14px auto -2px; padding: 6px 16px;
-  width: fit-content; max-width: calc(100vw - 32px);
-  background: #f8fafc; border: 1px solid #e2e8f0; color: #475569;
-  border-radius: 999px; font-size: 12.5px; line-height: 1.5;
-}
-.drop-timer {
-  font-weight: 700; font-size: 12.5px; color: #0f172a;
-  font-variant-numeric: tabular-nums; white-space: nowrap;
-}
-.drop-text { white-space: normal; }
-@media (max-width: 640px) {
-  .drop-badge { flex-direction: row; flex-wrap: wrap; gap: 4px 8px; text-align: center; padding: 6px 14px; }
+.drop-line {
+  margin: 14px auto 0; padding: 0 16px;
+  font-size: 11.5px; color: #64748b; text-align: center;
+  letter-spacing: 0.02em; line-height: 1.6;
 }
 
 /* ═══ 안전 실측 안심 카피 ═══ */
@@ -407,3 +397,18 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   background: #f8fafc; border: 1px solid #e2e8f0;
   padding: 8px 11px; margin: 0 0 10px; border-radius: 4px;
 }
+
+/* ═══ 인증 네비 + D-7 1라인 ═══ */
+.auth-nav {
+  display: flex; justify-content: flex-end; align-items: center; gap: 14px;
+  padding: 10px 5vw 0; font-size: 12.5px;
+}
+.auth-link {
+  background: none; border: none; color: #64748b; cursor: pointer;
+  font-size: 12.5px; padding: 4px 2px;
+}
+.auth-link:hover { color: #111; }
+.auth-link.primary { border-bottom: 1px solid #64748b; padding-bottom: 2px; }
+.auth-user { color: #111; font-weight: 600; }
+.fit-alt { font-size: 12px; color: #888; text-align: center; margin: 12px 0 0; }
+.fit-alt button { background: none; border: none; color: #111; text-decoration: underline; cursor: pointer; font-size: 12px; }
