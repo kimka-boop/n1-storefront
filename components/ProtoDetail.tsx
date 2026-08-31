@@ -22,10 +22,11 @@ interface Props {
   product: ProtoProduct;
   fileIds: string[];        // lookbook-files API 정렬 순서 (01→06)
   onClose: () => void;
-  children?: React.ReactNode; // 우측/하단 info children (기존 detail-info 내용 재사용)
+  detailsChildren?: React.ReactNode; // PHASE 04 — 소재/핏/사이즈
+  fitChildren?: React.ReactNode;     // PHASE 05 — 옵션/Smart Fit/CTA
 }
 
-export default function ProtoDetail({ product, fileIds, onClose, children }: Props) {
+export default function ProtoDetail({ product, fileIds, onClose, detailsChildren, fitChildren }: Props) {
   // 4각도 file id 매핑 (files: 01,02,03,04,05,06 순서)
   const angleIds = PROTO_ANGLES.map((_, i) => fileIds[i]).filter(Boolean);
 
@@ -125,19 +126,20 @@ export default function ProtoDetail({ product, fileIds, onClose, children }: Pro
 
   return (
     <div className="proto-detail" data-proto ref={containerRef}>
-      {/* ── 헤더 ── */}
+      {/* ── 헤더 (최소 UI: 종료/브랜드/저데이터) ── */}
       <header className="proto-head">
-        <button className="proto-back" onClick={onClose} aria-label="뒤로">← BACK</button>
+        <button className="proto-back" onClick={onClose} aria-label="상품 목록으로 돌아가기">← 목록</button>
         <span className="proto-brand">N°1</span>
         <button
           className={`proto-lowdata ${lowData ? "on" : ""}`}
           onClick={() => { const v = !lowData; setLowData(v); setFallback(v || prefersReducedMotion()); localStorage.setItem("n1_lowdata", v ? "1" : "0"); }}
+          aria-label="저데이터 모드 전환"
         >
           LOW DATA {lowData ? "ON" : "OFF"}
         </button>
       </header>
 
-      {/* ── 1구간: sticky 회전 스테이지 ── */}
+      {/* ── PHASE 01~02: 상품을 본다 → 돌아본다 (sticky 회전 스테이지) ── */}
       <div className="proto-stage" ref={stageRef}>
         <div className="proto-sticky">
           <div className="proto-visual">
@@ -162,13 +164,15 @@ export default function ProtoDetail({ product, fileIds, onClose, children }: Pro
                 />
               );
             })}
+            {/* EN=상태 라벨 / KR=행동 안내 (언어 시스템) */}
             <div className="proto-angle-label">
               {fallback
                 ? `${PROTO_ANGLES[slide].label} (${slide + 1}/4)`
                 : PROTO_ANGLES[activeIdx].label}
+              <span className="proto-angle-kr">{PROTO_ANGLES[activeIdx].kr}</span>
             </div>
             {/* 스크롤 진행 트랙 */}
-            <div className="proto-track">
+            <div className="proto-track" role="progressbar" aria-label="상품 둘러보기 진행" aria-valuenow={Math.round((fallback ? slide / 3 : progress) * 100)} aria-valuemin={0} aria-valuemax={100}>
               <div className="proto-track-fill" style={{ width: `${(fallback ? slide / 3 : progress) * 100}%` }} />
             </div>
           </div>
@@ -176,28 +180,43 @@ export default function ProtoDetail({ product, fileIds, onClose, children }: Pro
           {/* 폴백: prev/next */}
           {fallback && (
             <div className="proto-fallback-nav">
-              <button onClick={() => setSlide((s) => Math.max(0, s - 1))} disabled={slide === 0}>‹</button>
+              <button onClick={() => setSlide((s) => Math.max(0, s - 1))} disabled={slide === 0} aria-label="이전 각도">‹</button>
               <span>{slide + 1} / 4</span>
-              <button onClick={() => setSlide((s) => Math.min(3, s + 1))} disabled={slide === 3}>›</button>
+              <button onClick={() => setSlide((s) => Math.min(3, s + 1))} disabled={slide === 3} aria-label="다음 각도">›</button>
             </div>
           )}
         </div>
 
-        {/* 스크롤 여백 — 이 높이가 회전 궤도 */}
-        {!fallback && <div style={{ height: "300vh" }} aria-hidden />}
+        {/* 스크롤 여백 — 회전 궤도 (모바일에서 축소됨) */}
+        {!fallback && <div className="proto-orbit" aria-hidden style={{ height: "260vh" }} />}
       </div>
 
-      {/* ── 2구간: 정보 (progress 100% 이후 자연 스크롤) ── */}
+      {/* ── PHASE 03~05: 정보 5단계 계층 (스크롤 시 단계 등장) ── */}
       <section className="proto-info">
-        <p className="category">{product.category}</p>
-        <h2>{product.name}</h2>
-        <p className="detail-price">₩{product.price.toLocaleString("ko-KR")}</p>
+        {/* PHASE 03: 상품 기본 */}
+        <div className="proto-phase" data-phase>
+          <p className="category">{product.category}</p>
+          <h2>{product.name}</h2>
+          <p className="detail-price">₩{product.price.toLocaleString("ko-KR")}</p>
+        </div>
+
+        {/* PHASE 04: 소재/핏/사이즈 — DETAILS */}
+        <div className="proto-phase" data-phase>
+          <h3 className="proto-phase-title">DETAILS <span>소재 · 핏 · 사이즈</span></h3>
+          {detailsChildren}
+        </div>
+
+        {/* PHASE 05: 가격/CTA — 구매 안내 */}
+        <div className="proto-phase proto-phase-cta" data-phase>
+          <h3 className="proto-phase-title">SMART FIT <span>내 사이즈로 보기</span></h3>
+          {fitChildren}
+        </div>
+
         <div className="proto-hint">
           {fallback
-            ? "LOW DATA 모드 — 이미지 버튼으로 넘겨보세요"
-            : "스크롤하면 상품을 돌아볼 수 있습니다"}
+            ? "저데이터 모드 — 화살표로 각도를 넘겨보세요"
+            : "스크롤하면 상품을 둘러볼 수 있습니다"}
         </div>
-        {children}
       </section>
     </div>
   );

@@ -458,3 +458,19 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 @media (prefers-reduced-motion: reduce) {
   .proto-img { transition: none; }
 }
+
+/* ── UX Refinement: 5-Phase 계층 ── */
+.proto-phase { padding: 22px 0; border-top: 1px solid #e5e3df; }
+.proto-phase:first-child { border-top: none; padding-top: 0; }
+.proto-phase-title { font-size: 12px; letter-spacing: 3px; font-weight: 700; margin: 0 0 14px; }
+.proto-phase-title span { font-size: 11px; letter-spacing: 0; font-weight: 400; color: #999; margin-left: 8px; }
+.proto-angle-kr { display: block; font-size: 10px; letter-spacing: 1px; opacity: .85; margin-top: 2px; }
+.proto-fit-note { background: #fff; border: 1px solid #e5e3df; border-left: 3px solid var(--ink); border-radius: 6px; padding: 12px 14px; margin-bottom: 14px; }
+.proto-fit-note .proto-fit-label { font-size: 10px; letter-spacing: 2px; font-weight: 700; color: #999; }
+.proto-fit-note p { margin: 4px 0 0; font-size: 13px; line-height: 1.5; color: #333; }
+/* phase 등장 애니 — IO로 .revealed 부여 (기존 observer 재사용) */
+.proto-phase { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s cubic-bezier(.22,.61,.36,1); }
+.proto-phase.revealed { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .proto-phase { transition: none; opacity: 1; transform: none; } }
+/* 모바일: 회전 궤도 축소 (스크롤 피로 감소) */
+@media (max-width: 760px) { .proto-orbit { height: 170vh !important; } }

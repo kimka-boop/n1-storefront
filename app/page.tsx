@@ -284,6 +284,7 @@ export default function Home() {
 
   // ── STEP 2/3: 스마트 핏 프로필 (localStorage) ──
   const [fitProfile, setFitProfile] = useState<{gender: string; size: string; fit: string} | null>(null);
+  const fitLabel = fitProfile?.fit ? ({A:"스탠다드", B:"세미오버", C:"오버핏"} as Record<string,string>)[fitProfile.fit] || "" : "";
   const [showFitModal, setShowFitModal] = useState(false);
   useEffect(() => {
     try {
@@ -359,16 +360,18 @@ export default function Home() {
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
-            const idx = Number((e.target as HTMLElement).dataset.idx);
+            const el = e.target as HTMLElement;
+            if (el.dataset.phase !== undefined) { el.classList.add("revealed"); return; }
+            const idx = Number(el.dataset.idx);
             setRevealed((prev) => new Set(prev).add(idx));
           }
         });
       },
       { threshold: 0.15 }
     );
-    document.querySelectorAll("[data-reveal]").forEach((el) => observer.observe(el));
+    document.querySelectorAll("[data-reveal], [data-phase]").forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [products]);
+  }, [products, selected]);
 
   const openDetail = useCallback(async (p: Product) => {
     const fid = folderIdFromUrl(p.lookbookImage);
@@ -554,103 +557,119 @@ export default function Home() {
 
       {/* ── STEP 1 PROTOTYPE: PRD-M-55 전용 Scroll Exploration ──
           기존 모달은 그대로 보존. flag: protoOn && selected.id === "PRD-M-55" */}
-      {selected && protoOn && selected.id === "PRD-M-55" && slideIds.length >= 4 && (
-        <ProtoDetail
-          product={{
-            id: selected.id, name: selected.name, category: selected.category,
-            price: selected.price, colorOptions: selected.colorOptions,
-            sizeOptions: selected.sizeOptions, optionStock: selected.optionStock,
-            material: selected.material, washingInfo: selected.washingInfo,
-            sizeChart: selected.sizeChart, fit: selected.fit,
-          }}
-          fileIds={slideIds}
-          onClose={closeDetail}
-        >
-          {/* 기존 detail-info 내용을 proto-info children으로 재사용 */}
-          <div className="buy-box">
-            <p className="safe-fit-note">
-              💡 체형 맞춤 추천: AI 스마트 핏과 실측 단면(cm)을 확인해 주세요.<br />
-              (수령 후 7일 이내 규정 교환·반품 가능)
-            </p>
-            {selected.colorOptions && selected.colorOptions.length > 0 && (
-              <div className="option-row">
-                <label className="option-label">색상</label>
-                <select className="option-select" value={selColor}
-                  onChange={(e) => { setSelColor(e.target.value); setOptTouched(true); }}>
-                  {selected.colorOptions.map((c) => <option key={c} value={c}>{c}</option>)}
-                </select>
+      {selected && protoOn && selected.id === "PRD-M-55" && slideIds.length >= 4 && (() => {
+        const protoDetails = (
+          <>
+            {/* DETAILS — 소재/핏/사이즈 */}
+            <div className="spec-block">
+              <div className="info-row"><span>소재</span><b>{orRef(cleanMaterial(selected.material))}</b></div>
+              <div className="info-row"><span>세탁/취급</span><b>{orRef(selected.washingInfo)}</b></div>
+              <SizeChartTable chart={selected.sizeChart} />
+            </div>
+          </>
+        );
+        const protoFit = (
+          <>
+            {/* SMART FIT — 옵션/CTA */}
+            {fitProfile && (
+              <div className="proto-fit-note">
+                <span className="proto-fit-label">SMART FIT</span>
+                <p>입력해 주신 정보를 바탕으로 <b>{fitProfile.size}{fitLabel ? ` · ${fitLabel}` : ""}</b> 사이즈를 추천해 드려요. 아래에서 확인해 주세요.</p>
               </div>
             )}
-            {selected.sizeOptions && selected.sizeOptions.length > 0 && (
-              <div className="option-row">
-                <label className="option-label">사이즈</label>
-                {fitProfile && selSize && <span className="fit-badge">✨ {fitBadge(selected, fitProfile)}</span>}
-                <select className="option-select" value={selSize}
-                  onChange={(e) => { setSelSize(e.target.value); setOptTouched(true); }}>
-                  {selected.sizeOptions.map((s) => (
-                    <option key={s} value={s} disabled={(() => {
-                      const os = selected.optionStock || {};
-                      if (selColor && os[`${selColor}_${s}`] !== undefined) return os[`${selColor}_${s}`] === 0;
-                      if (os[s] !== undefined) return os[s] === 0;
-                      return false;
-                    })()}>{s}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-            {orderStage === "options" && (
-              <button className="buy-btn"
-                disabled={selected.stockStatus !== "판매중" || !optionsReady || selectedStock === 0}
-                onClick={() => setOrderStage("form")}>
-                {selected.stockStatus !== "판매중" ? "품절"
-                  : !optionsReady ? (optTouched ? "옵션을 선택해 주세요" : "옵션 선택")
-                  : selectedStock === 0 ? "품절" : "구매하기"}
-              </button>
-            )}
-            {orderStage === "form" && (
-              <div className="order-form">
-                <h4 className="order-form-title">주문 정보 입력</h4>
-                <input className="order-input" placeholder="주문자명" value={orderForm.name}
-                  onChange={(e) => setOrderForm({ ...orderForm, name: e.target.value })} />
-                <input className="order-input" placeholder="연락처 (010-0000-0000)" type="tel" value={orderForm.phone}
-                  onChange={(e) => setOrderForm({ ...orderForm, phone: e.target.value })} />
-                <input className="order-input" placeholder="배송지 주소" value={orderForm.address}
-                  onChange={(e) => setOrderForm({ ...orderForm, address: e.target.value })} />
-                <input className="order-input" placeholder="입금자명 (주문자명과 같으면 비워도 됨)" value={orderForm.depositor}
-                  onChange={(e) => setOrderForm({ ...orderForm, depositor: e.target.value })} />
-                <p className="order-summary">
-                  {selected.name} · {selColor}{selSize && ` / ${selSize}`} · <b>₩{selected.price.toLocaleString("ko-KR")}</b>
-                </p>
-                {orderError && <p className="stock-alert">{orderError}</p>}
-                <div className="order-form-btns">
-                  <button className="order-btn-back" onClick={() => setOrderStage("options")}>← 이전</button>
-                  <button className="buy-btn order-btn-submit"
-                    disabled={submitting || !orderForm.name || !orderForm.phone || !orderForm.address}
-                    onClick={submitOrder}>
-                    {submitting ? "처리 중..." : "주문하기 (계좌이체)"}
-                  </button>
+            <div className="buy-box">
+              <p className="safe-fit-note">
+                💡 체형 맞춤 추천: AI 스마트 핏과 실측 단면(cm)을 확인해 주세요.<br />
+                (수령 후 7일 이내 규정 교환·반품 가능)
+              </p>
+              {selected.colorOptions && selected.colorOptions.length > 0 && (
+                <div className="option-row">
+                  <label className="option-label">색상</label>
+                  <select className="option-select" value={selColor}
+                    onChange={(e) => { setSelColor(e.target.value); setOptTouched(true); }}>
+                    {selected.colorOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
                 </div>
-              </div>
-            )}
-            {orderStage === "done" && orderResult && (
-              <div className="order-done">
-                <p className="order-done-title">✓ 주문이 접수되었습니다</p>
-                <div className="deposit-box">
-                  <div className="info-row"><span>주문번호</span><b>{orderResult.order_id}</b></div>
-                  <div className="info-row"><span>입금 계좌</span><b>{orderResult.bank} {orderResult.account}</b></div>
+              )}
+              {selected.sizeOptions && selected.sizeOptions.length > 0 && (
+                <div className="option-row">
+                  <label className="option-label">사이즈</label>
+                  {fitProfile && selSize && <span className="fit-badge">✨ {fitBadge(selected, fitProfile)}</span>}
+                  <select className="option-select" value={selSize}
+                    onChange={(e) => { setSelSize(e.target.value); setOptTouched(true); }}>
+                    {selected.sizeOptions.map((s) => (
+                      <option key={s} value={s} disabled={(() => {
+                        const os = selected.optionStock || {};
+                        if (selColor && os[`${selColor}_${s}`] !== undefined) return os[`${selColor}_${s}`] === 0;
+                        if (os[s] !== undefined) return os[s] === 0;
+                        return false;
+                      })()}>{s}</option>
+                    ))}
+                  </select>
                 </div>
-              </div>
-            )}
-          </div>
-          {/* 소재/핏 요약 */}
-          <div className="spec-block">
-            <h3 className="spec-title">소재 &amp; 핏</h3>
-            <div className="info-row"><span>소재</span><b>{orRef(cleanMaterial(selected.material))}</b></div>
-            <div className="info-row"><span>세탁/취급</span><b>{orRef(selected.washingInfo)}</b></div>
-            <SizeChartTable chart={selected.sizeChart} />
-          </div>
-        </ProtoDetail>
-      )}
+              )}
+              {orderStage === "options" && (
+                <button className="buy-btn"
+                  disabled={selected.stockStatus !== "판매중" || !optionsReady || selectedStock === 0}
+                  onClick={() => setOrderStage("form")}>
+                  {selected.stockStatus !== "판매중" ? "품절"
+                    : !optionsReady ? (optTouched ? "옵션을 선택해 주세요" : "옵션 선택")
+                    : selectedStock === 0 ? "품절" : "구매하기"}
+                </button>
+              )}
+              {orderStage === "form" && (
+                <div className="order-form">
+                  <h4 className="order-form-title">주문 정보 입력</h4>
+                  <input className="order-input" placeholder="주문자명" value={orderForm.name}
+                    onChange={(e) => setOrderForm({ ...orderForm, name: e.target.value })} />
+                  <input className="order-input" placeholder="연락처 (010-0000-0000)" type="tel" value={orderForm.phone}
+                    onChange={(e) => setOrderForm({ ...orderForm, phone: e.target.value })} />
+                  <input className="order-input" placeholder="배송지 주소" value={orderForm.address}
+                    onChange={(e) => setOrderForm({ ...orderForm, address: e.target.value })} />
+                  <input className="order-input" placeholder="입금자명 (주문자명과 같으면 비워도 됨)" value={orderForm.depositor}
+                    onChange={(e) => setOrderForm({ ...orderForm, depositor: e.target.value })} />
+                  <p className="order-summary">
+                    {selected.name} · {selColor}{selSize && ` / ${selSize}`} · <b>₩{selected.price.toLocaleString("ko-KR")}</b>
+                  </p>
+                  {orderError && <p className="stock-alert">{orderError}</p>}
+                  <div className="order-form-btns">
+                    <button className="order-btn-back" onClick={() => setOrderStage("options")}>← 이전</button>
+                    <button className="buy-btn order-btn-submit"
+                      disabled={submitting || !orderForm.name || !orderForm.phone || !orderForm.address}
+                      onClick={submitOrder}>
+                      {submitting ? "처리 중..." : "주문하기 (계좌이체)"}
+                    </button>
+                  </div>
+                </div>
+              )}
+              {orderStage === "done" && orderResult && (
+                <div className="order-done">
+                  <p className="order-done-title">✓ 주문이 접수되었습니다</p>
+                  <div className="deposit-box">
+                    <div className="info-row"><span>주문번호</span><b>{orderResult.order_id}</b></div>
+                    <div className="info-row"><span>입금 계좌</span><b>{orderResult.bank} {orderResult.account}</b></div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        );
+        return (
+          <ProtoDetail
+            product={{
+              id: selected.id, name: selected.name, category: selected.category,
+              price: selected.price, colorOptions: selected.colorOptions,
+              sizeOptions: selected.sizeOptions, optionStock: selected.optionStock,
+              material: selected.material, washingInfo: selected.washingInfo,
+              sizeChart: selected.sizeChart, fit: selected.fit,
+            }}
+            fileIds={slideIds}
+            onClose={closeDetail}
+            detailsChildren={protoDetails}
+            fitChildren={protoFit}
+          />
+        );
+      })()}
 
       {/* ── 구매 상세 (기존 모달 — PRD-M-55 prototype 외 전체) ── */}
       {selected && !(protoOn && selected.id === "PRD-M-55" && slideIds.length >= 4) && (
