@@ -54,6 +54,7 @@ async function getSheetRows() {
     return {
       id: r.get("상품ID") || "",
       name: r.get("상품명") || "",
+      gender: r.get("성별") || r.get("gender") || "",
       category: r.get("카테고리") || "",
       price: Number(String(r.get("판매가") || "0").replace(/[^\d]/g, "")) || 0,
       stockStatus: r.get("재고상태") || "",

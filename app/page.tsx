@@ -256,23 +256,29 @@ export default function Home() {
   }, []);
 
   // ── STEP 1: 성별 퀵 필터 (localStorage 기억) ──
-  const [genderTab, setGenderTab] = useState<"all" | "male" | "female">("all");
+  const [genderTab, setGenderTab] = useState<"all" | "male" | "female" | "genderless">("all");
   useEffect(() => {
     const saved = localStorage.getItem("n1_gender_tab");
-    if (saved === "male" || saved === "female") setGenderTab(saved);
+    if (saved === "male" || saved === "female" || saved === "genderless") setGenderTab(saved);
   }, []);
-  const changeTab = (t: "all" | "male" | "female") => {
+  const changeTab = (t: "all" | "male" | "female" | "genderless") => {
     setGenderTab(t);
     if (t === "all") localStorage.removeItem("n1_gender_tab");
     else localStorage.setItem("n1_gender_tab", t);
   };
-  // 필터링된 상품 — 상품ID 접두사 기준 (PRD-W = 여성, PRD-M = 남성)
-  // ⚠️ 상품명 키워드는 정제 과정에서 사라질 수 있어 2차 폴백으로만 사용
-  const isWomen = (p: Product) => p.id.startsWith("PRD-W") || /여자|여성/.test(p.category + p.name);
+  // 필터링 — 시트 성별 컬럼 기준 (남성/여성/남여공용). 상품명/ID로 판정하지 않음.
+  const genderOf = (p: Product): "male" | "female" | "genderless" => {
+    const g = (p as Product & { gender?: string }).gender || "";
+    if (g === "남성") return "male";
+    if (g === "여성") return "female";
+    return "genderless"; // 남여공용 및 미지정 → 젠더리스
+  };
   const filteredProducts = products.filter((p) => {
     if (genderTab === "all") return true;
-    return genderTab === "female" ? isWomen(p) : !isWomen(p);
+    return genderOf(p) === genderTab;
   });
+  const genderCount = (g: "male" | "female" | "genderless") =>
+    products.filter((p) => genderOf(p) === g).length;
 
   // ── STEP 2/3: 스마트 핏 프로필 (localStorage) ──
   const [fitProfile, setFitProfile] = useState<{gender: string; size: string; fit: string} | null>(null);
@@ -482,10 +488,13 @@ export default function Home() {
           전체 <span className="gcount">({products.length})</span>
         </button>
         <button className={`gtab ${genderTab === "male" ? "active" : ""}`} onClick={() => changeTab("male")}>
-          남성 <span className="gcount">({products.filter((p) => !isWomen(p)).length})</span>
+          남성 <span className="gcount">({genderCount("male")})</span>
         </button>
         <button className={`gtab ${genderTab === "female" ? "active" : ""}`} onClick={() => changeTab("female")}>
-          여성 <span className="gcount">({products.filter((p) => isWomen(p)).length})</span>
+          여성 <span className="gcount">({genderCount("female")})</span>
+        </button>
+        <button className={`gtab ${genderTab === "genderless" ? "active" : ""}`} onClick={() => changeTab("genderless")}>
+          젠더리스 <span className="gcount">({genderCount("genderless")})</span>
         </button>
         <button className="gtab gtab-fit" onClick={() => setShowFitModal(true)}>
           {fitProfile ? `Smart Fit — ${fitProfile.size}${fitProfile.fit ? " · " + ({A:"Standard",B:"Semi-Over",C:"Overfit"}[fitProfile.fit as "A"|"B"|"C"] ?? "") : ""}` : "Smart Fit"}
