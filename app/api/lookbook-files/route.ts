@@ -98,12 +98,16 @@ export async function GET(req: Request) {
       return NextResponse.json({ ok: false, error: `drive ${driveRes.status}: ${JSON.stringify(data).slice(0, 200)}`, files: [], thumb: null }, { status: 502 });
     }
 
-    const order: Record<string, number> = { "01_full": 1, "02_45deg": 2, "03_90deg": 3, "04_back": 4, "05_product": 5 };
+    const order: Record<string, number> = {
+      "01_full": 1, "02_45deg": 2, "03_90deg": 3, "04_back": 4, "05_product": 5,
+      "01_model_front": 1, "02_model_45deg": 2, "03_model_90deg": 3, "04_model_back": 4,
+      "05_ai_product_cutout": 5, "06_ai_product_reel": 6,
+    };
     const sorted = (data.files || []).sort(
       (a: any, b: any) => (order[a.name.replace(/\.\w+$/, "")] || 9) - (order[b.name.replace(/\.\w+$/, "")] || 9)
     );
 
-    const full = sorted.find((f: any) => f.name.startsWith("01_full"));
+    const full = sorted.find((f: any) => f.name.startsWith("01_full") || f.name.startsWith("01_model_front"));
     const thumb = full ? `https://drive.google.com/thumbnail?id=${full.id}&sz=w800` : null;
 
     return NextResponse.json({ ok: true, files: sorted, thumb });

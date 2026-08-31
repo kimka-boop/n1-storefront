@@ -424,3 +424,37 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 .auth-user { color: var(--ink, #0a0a0a); font-weight: 500; }
 .fit-alt { font-size: 12px; color: #888; text-align: center; margin: 12px 0 0; }
 .fit-alt button { background: none; border: none; color: #111; text-decoration: underline; cursor: pointer; font-size: 12px; }
+
+/* ═══ N°1 Proto Detail — Scroll Exploration (STEP 1) ═══ */
+.proto-detail { position: fixed; inset: 0; z-index: 200; background: #f6f6f4; overflow-y: auto; overflow-x: hidden; }
+.proto-head { position: sticky; top: 0; z-index: 20; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; background: rgba(246,246,244,.92); backdrop-filter: blur(8px); }
+.proto-back { background: none; border: none; font-size: 12px; letter-spacing: 2px; cursor: pointer; color: var(--ink); }
+.proto-brand { font-size: 14px; letter-spacing: 4px; font-weight: 700; }
+.proto-lowdata { background: none; border: 1px solid var(--ink); border-radius: 3px; font-size: 10px; letter-spacing: 1.5px; padding: 4px 10px; cursor: pointer; color: var(--ink); opacity: .55; }
+.proto-lowdata.on { opacity: 1; background: var(--ink); color: #fff; }
+.proto-stage { position: relative; }
+.proto-sticky { position: sticky; top: 53px; height: calc(100vh - 53px); display: flex; align-items: center; justify-content: center; }
+.proto-visual { position: relative; width: min(62vh, 86vw); aspect-ratio: 3/4; }
+.proto-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 10px; opacity: 0; transition: opacity .45s ease; will-change: opacity; }
+.proto-img.active { opacity: 1; }
+.proto-img.neighbor { opacity: 0; }
+.proto-angle-label { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); font-size: 11px; letter-spacing: 3px; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.45); background: rgba(15,14,13,.35); padding: 4px 14px; border-radius: 20px; }
+.proto-track { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 120px; height: 2px; background: rgba(255,255,255,.35); border-radius: 2px; }
+.proto-track-fill { height: 100%; background: #fff; border-radius: 2px; transition: width .2s linear; }
+.proto-fallback-nav { position: absolute; bottom: 44px; left: 50%; transform: translateX(-50%); display: flex; gap: 16px; align-items: center; }
+.proto-fallback-nav button { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--ink); background: #fff; font-size: 18px; cursor: pointer; }
+.proto-fallback-nav button:disabled { opacity: .3; cursor: default; }
+.proto-fallback-nav span { font-size: 12px; letter-spacing: 1px; }
+.proto-info { max-width: 640px; margin: 0 auto; padding: 40px 20px 80px; }
+.proto-info h2 { font-size: 22px; margin: 4px 0 8px; font-weight: 600; }
+.proto-hint { font-size: 12px; color: #999; margin-top: 12px; text-align: center; }
+@media (max-width: 760px) {
+  .proto-visual { width: 92vw; }
+  .proto-sticky { top: 49px; height: calc(100vh - 49px); }
+  .proto-head { padding: 10px 14px; }
+  .proto-info { padding: 28px 16px 60px; }
+}
+/* reduced motion: crossfade 즉시 전환 */
+@media (prefers-reduced-motion: reduce) {
+  .proto-img { transition: none; }
+}
