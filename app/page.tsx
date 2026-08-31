@@ -466,7 +466,7 @@ export default function Home() {
       <header className="hero">
         <div className="hero-brand" data-reveal>
           <h1>N°1</h1>
-          <p className="hero-tag">20 Pieces. Selected by AI.</p>
+          <p className="hero-tag">20 Pieces · Selected by AI</p>
         </div>
       </header>
 
@@ -474,7 +474,7 @@ export default function Home() {
 
       <AuthNav />
       {/* ── 주간 드롭 마감 (초경량 1라인) ── */}
-      <p className="drop-line">⏱️ 이번 주 컬렉션 마감 [{dDay}] ㅡ 매주 일요일 자정 20종 전면 교체</p>
+      <p className="drop-line">Weekly Drop — Collection closes in [{dDay}] · Refresh every Sunday 00:00</p>
 
       {/* ── STEP 1: 성별 퀵 필터 탭바 ── */}
       <nav className="gender-tabs">
@@ -488,7 +488,7 @@ export default function Home() {
           여성 <span className="gcount">({products.filter((p) => isWomen(p)).length})</span>
         </button>
         <button className="gtab gtab-fit" onClick={() => setShowFitModal(true)}>
-          {fitProfile ? `내 핏: ${fitProfile.size}${fitProfile.fit ? " · " + ({A:"스탠다드",B:"세미오버",C:"오버핏"}[fitProfile.fit as "A"|"B"|"C"] ?? "") : ""} ⚙` : "스마트 핏 설정 ⚙"}
+          {fitProfile ? `Smart Fit — ${fitProfile.size}${fitProfile.fit ? " · " + ({A:"Standard",B:"Semi-Over",C:"Overfit"}[fitProfile.fit as "A"|"B"|"C"] ?? "") : ""}` : "Smart Fit"}
         </button>
       </nav>
 
