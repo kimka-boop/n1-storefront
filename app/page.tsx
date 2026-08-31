@@ -268,10 +268,10 @@ export default function Home() {
   };
   // 필터링 — 시트 성별 컬럼 기준 (남성/여성/남여공용). 상품명/ID로 판정하지 않음.
   const genderOf = (p: Product): "male" | "female" | "genderless" => {
-    const g = (p as Product & { gender?: string }).gender || "";
-    if (g === "남성") return "male";
-    if (g === "여성") return "female";
-    return "genderless"; // 남여공용 및 미지정 → 젠더리스
+    const g = ((p as Product & { gender?: string }).gender || "").trim().toUpperCase();
+    if (g === "MALE" || g === "남성") return "male";
+    if (g === "FEMALE" || g === "여성") return "female";
+    return "genderless"; // GENDERLESS/남여공용/미지정 → 젠더리스
   };
   const filteredProducts = products.filter((p) => {
     if (genderTab === "all") return true;
