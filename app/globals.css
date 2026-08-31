@@ -190,15 +190,16 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   padding: 8px 10px; margin: 8px 0 0; line-height: 1.6;
 }
 
-/* ── CS 채팅 위젯 ── */
+/* ── CS 채팅 위젯 (V2 미니멀: 벡터 아이콘, 잉크 원형) ── */
 .cs-fab {
-  position: fixed; right: 20px; bottom: 20px; z-index: 999;
-  width: 54px; height: 54px; border-radius: 50%;
-  background: #111; color: #fff; font-size: 22px;
-  border: none; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-  transition: transform 0.15s;
+  position: fixed; right: 28px; bottom: 28px; z-index: 999;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: #0a0a0a; color: #fff;
+  border: 1px solid #0a0a0a; cursor: pointer;
+  box-shadow: 0 6px 24px rgba(10,10,10,0.18);
+  transition: transform 0.25s cubic-bezier(.22,.61,.36,1), box-shadow 0.25s;
 }
-.cs-fab:hover { transform: scale(1.08); }
+.cs-fab:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(10,10,10,0.24); }
 .cs-window {
   position: fixed; right: 20px; bottom: 20px; z-index: 1000;
   width: 320px; max-width: calc(100vw - 32px); height: 440px;
@@ -349,17 +350,18 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 .pending-icon { font-size: 44px; margin-bottom: 12px; }
 .pending-text { font-size: 14px; line-height: 1.9; color: #555; margin-bottom: 24px; }
 
-/* ═══ 좌측 플로팅 바 ═══ */
+/* ═══ 좌측 플로팅 바 (V2: 벡터 쇼핑백 아이콘, 미니멀) ═══ */
 .float-bar {
-  position: fixed; left: 16px; bottom: 20px; z-index: 900;
-  width: 50px; height: 50px; border-radius: 50%;
-  background: #fff; color: #111; border: 1px solid #e5e5e5;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+  position: fixed; left: 28px; bottom: 28px; z-index: 900;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: #fff; color: #0a0a0a; border: 1px solid var(--line, #e8e8e5);
+  box-shadow: 0 4px 18px rgba(10,10,10,0.10);
   display: flex; align-items: center; justify-content: center;
-  font-size: 20px; cursor: pointer; transition: transform 0.15s;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.25s cubic-bezier(.22,.61,.36,1);
 }
-.float-bar:hover { transform: scale(1.08); }
-.float-bar .float-icon { line-height: 1; }
+.float-bar:hover { border-color: #0a0a0a; transform: translateY(-2px); }
+.float-bar .float-icon { line-height: 1; display: flex; }
 .float-bar .float-status {
   position: absolute; top: -4px; right: -4px;
   font-size: 9.5px; font-weight: 700; padding: 2px 6px;

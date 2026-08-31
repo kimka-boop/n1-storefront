@@ -6,6 +6,7 @@
  * - 클릭 시 현재 주문/입금 계좌 팝업
  */
 import { useState, useEffect } from "react";
+import { CartIcon, CardIcon } from "./Icons";
 
 const DEPOSIT = { bank: "케이뱅크", account: "100127890230", holder: "김성빈" };
 
@@ -36,9 +37,13 @@ export default function FloatingOrderTracker() {
   return (
     <>
       <div className="float-bar" onClick={() => order && setOpen(true)}>
-        <span className="float-icon">🛒</span>
+        <span className="float-icon">
+          <CartIcon className="w-5 h-5" />
+        </span>
         {status && (
-          <span className={`float-status ${status.includes("완료") ? "done" : ""}`}>💳 {status}</span>
+          <span className={`float-status ${status.includes("완료") ? "done" : ""}`}>
+            <CardIcon className="w-3 h-3 inline-block mr-1 align-[-2px]" /> {status}
+          </span>
         )}
       </div>
 

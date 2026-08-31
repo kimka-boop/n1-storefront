@@ -6,6 +6,7 @@
  * - 상담원 답변 → /api/cs GET 폴링 (3초 간격)
  */
 import { useState, useRef, useEffect } from "react";
+import { ChatIcon } from "./Icons";
 
 interface Msg { role: "customer" | "agent" | "bot"; text: string; }
 
@@ -78,7 +79,7 @@ export default function CsWidget() {
           onClick={() => setOpen(true)}
           aria-label="고객센터 채팅"
         >
-          💬
+          <ChatIcon className="w-5 h-5" />
         </button>
       )}
 
