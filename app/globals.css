@@ -41,7 +41,7 @@ body {
 }
 .card.revealed { opacity: 1; transform: none; filter: blur(0); }
 .card.clickable { cursor: pointer; }
-.card.clickable:hover { background: rgba(255,255,255,.75); }
+/* P1-A: hover bg 변경 제거 */
 .card .tryon { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; margin-bottom: 0; border-radius: 0; }
 .card .placeholder { width: 100%; aspect-ratio: 3/4; background: linear-gradient(160deg, #f1f1ee, #e5e5e1); display: flex; align-items: center; justify-content: center; color: #d4d4d0; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0; border-radius: 0; }
 .card-body { padding: 13px 14px 18px; background: #fff; }
@@ -545,8 +545,8 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 /* ═══ COTTON PERFUME BOTTLE × LIQUID GLASS — product card material (STEP 4) ═══ */
 /* Blotter: hover 시 공간이 열림 — scale/lift/shadow 없음 */
 .card .tryon, .card .placeholder { transition: margin .6s var(--n1-ease), filter 1.2s var(--n1-ease); }
-.card.clickable:hover .tryon, .card.clickable:hover .placeholder { margin: 0 -5px; }
-.card .price { transition: opacity .6s var(--n1-ease); opacity: .82; }
+/* P1-A: hover movement 제거 */
+/* P1-A: price 항상 선명 */
 .card.clickable:hover .price { opacity: 1; }
 
 /* Liquid Light: pointer 주변 공간의 미세한 luminosity (Desktop only, JS에서 활성) */
@@ -578,83 +578,65 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 .low-data .card::after { display: none; }
 
 /* ═══════════════════════════════════════════════════════════
-   N°1 MATERIAL FIELD v3 — FINAL
-   LIQUID GLASS = BEHAVIOR / COTTON = FEELING / BLOTTER = DISCOVERY
-   PRODUCT > SPACE > INFORMATION > PERSONALIZATION > INTERACTION
+   N°1 — P1-A STATIC WORLD (Constitution v2)
+   Space before object · Time before information · Attention before commerce
+   정지 화면만으로 방이 성립한다. interaction 레이어는 이후 단계에서 층으로 추가.
    ═══════════════════════════════════════════════════════════ */
 
-/* ── MATERIAL FIELD: 모든 카드가 동일한 field 위에 놓임 ── */
-.card {
-  background: linear-gradient(178deg, #f7f7f5, #f2f2ef);
-  position: relative; overflow: hidden;
-  opacity: 0; transform: translateY(8px);
-  transition: opacity .6s var(--n1-ease), transform .6s var(--n1-ease), background .6s var(--n1-ease), opacity .5s var(--n1-ease);
+/* ── 시간 필드: 페이지가 하루의 온기를 가진다 (band 아님, tonal continuity) ── */
+body {
+  background: linear-gradient(180deg, #FAF7F1 0%, #FAFAF8 42%, #F6F5F1 78%, #EFECE5 100%) fixed;
 }
-.card.revealed { opacity: 1; transform: none; }
 
-/* ── APPROACH: 공간의 온도 (상품이 아니라 field가 반응) ── */
-.card.clickable:hover { background: linear-gradient(178deg, #fbfbfa, #f6f6f3); }
+/* ── GRID: E LOCK (4col / gap 0.35 / entry 22vh) ── */
+.grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  column-gap: clamp(44px, 5.5vw, 80px); row-gap: clamp(84px, 10vh, 116px);
+}
+@media (max-width: 1000px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 640px) {
+  .grid { grid-template-columns: repeat(2, 1fr); column-gap: 28px; row-gap: 64px; }
+}
 
-/* ── DISCOVER: 정보의 농도 ── */
-/* Essential: 항상 읽을 수 있음 */
+/* ── OBJECT: 경계·배경·그림자 없음 — 공기 위에 놓임 ── */
+.card {
+  background: transparent; border: none; border-radius: 0;
+  position: relative;
+}
+.card .tryon, .card .placeholder {
+  width: 100%; aspect-ratio: 3/4; object-fit: contain;
+  display: block; margin: 0; border-radius: 0;
+}
+.card .placeholder { position: relative; }
+.card .placeholder::after {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 1px; height: 24px; background: #DDDAD4;
+  transform: translate(-50%, -50%);
+}
+.card-body { padding: 14px 0 0; background: transparent; min-height: 118px; }
 .card-body h2 {
   font-size: 12.5px; line-height: 1.5; font-weight: 400;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-.card .price { opacity: 1; transition: none; }
-/* Discovery: 접근 시 발견 */
-.card-body .category { opacity: 0; transform: translateY(3px); transition: opacity .45s var(--n1-ease), transform .45s var(--n1-ease); }
-.card.clickable:hover .category { opacity: .75; transform: none; }
-/* Personalize: 마지막에 조용히 */
-.card .stock { opacity: 0; transform: translateY(3px); transition: opacity .45s var(--n1-ease) .08s, transform .45s var(--n1-ease) .08s; }
-.card.clickable:hover .stock { opacity: 1; transform: none; }
-.card .price { margin-top: 7px; }
+.card .price { opacity: 1; margin-top: 4px; }
+.card-body .category { opacity: .75; }
+.card .stock { opacity: .75; }
+.card.clickable { cursor: pointer; }
+.card.clickable:hover { background: transparent; }
 
-/* ── 정보 영역 높이 고정 (2줄 clamp, 1줄 상품은 여백으로 소화) ── */
-.card-body { padding: 13px 14px 18px; background: transparent; min-height: 132px; }
+/* ── ENTRY: 조용한 시작 (시간 필드의 가장 따뜻한 지점) ── */
 
-/* ── MEDIA FIELD: 이미지/placeholder 동일 구조 (crop/왜곡 없음) ── */
-.card .tryon {
-  width: 100%; aspect-ratio: 3/4; object-fit: contain; display: block;
-  border-radius: 0; margin: 0;
-  transition: margin .6s var(--n1-ease), filter 1.2s var(--n1-ease);
+/* ── FOOTER: 방의 깊은 곳 (band 아님 — 필드의 끝) ── */
+
+/* ── Mobile: 안정 탐색 우선 ── */
+@media (max-width: 640px) {
+  .card-body .category, .card .stock { opacity: 1; }
 }
-.card .placeholder {
-  width: 100%; aspect-ratio: 3/4; position: relative;
-  background: transparent; /* field 자체가 배경 */
-}
-/* 빈 시향지 마크: 조용한 세로선 */
-.card .placeholder::after {
-  content: ""; position: absolute; left: 50%; top: 50%;
-  width: 1px; height: 24px; background: #d9d8d3;
-  transform: translate(-50%, -50%);
-}
-.card.clickable:hover .tryon, .card.clickable:hover .placeholder { margin: 0; }
-
-/* ── LIQUID LIGHT: 공간의 luminosity가 pointer에 반응 (desktop mouse) ── */
-.card::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1;
-  background: radial-gradient(300px circle at var(--lx, 50%) var(--ly, 50%), rgba(255,255,255,.45), transparent 62%);
-  opacity: 0; transition: opacity .8s var(--n1-ease);
-}
-.card.clickable:hover::after { opacity: 1; }
-
-/* ── ATMOSPHERE: 주변 공간이 아주 미세하게 물러남 (dimming 아님) ── */
-.grid.hovering .card:not(:hover) { opacity: .92; }
-.grid.hovering .card.revealed:not(:hover) { opacity: .92; }
-
-/* ── Mobile: pointer 없음 → Discovery 정보 상시, light/atmosphere 비활성 ── */
-@media (max-width: 760px) {
-  .card::after { display: none; }
-  .grid.hovering .card:not(:hover) { opacity: 1; }
-  .card-body .category, .card .stock { opacity: 1; transform: none; }
-  .card { transform: translateY(6px); }
-}
-
-/* ── reduced-motion: 즉시 최종 상태 ── */
 @media (prefers-reduced-motion: reduce) {
-  .card { opacity: 1; transform: none; transition: none; }
-  .card-body .category, .card .stock { opacity: 1; transform: none; transition: none; }
-  .card::after { transition: none; }
-  .grid.hovering .card:not(:hover) { opacity: 1; }
+  .card-body .category, .card .stock { opacity: 1; }
 }
+/* ── ENTRY 22vh — quiet start ── */
+.entry { height: 22vh; }
+@media (max-width: 640px) { .entry { height: 14vh; } }

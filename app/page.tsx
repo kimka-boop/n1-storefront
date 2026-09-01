@@ -365,31 +365,10 @@ export default function Home() {
     pending.slice(0, 4).forEach((p) => loadThumb(p));
   }, [products, thumbs, loadThumb]);
 
+  /* LIQUID LIGHT — P2 단계에서 재추가 (I-C ATTENTION) */
+
   // 스크롤 리빌
   useEffect(() => {
-    /* LIQUID LIGHT — 공간의 luminosity가 pointer 접근에 반응 (desktop mouse only) */
-    const grid = gridRef.current;
-    if (!grid || !window.matchMedia("(min-width: 761px)").matches) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let raf = 0;
-    const onMove = (e: PointerEvent) => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        const card = (e.target as HTMLElement).closest(".card");
-        if (!card) return;
-        const media = card.querySelector<HTMLElement>(".placeholder, .tryon");
-        if (!media) return;
-        const r = media.getBoundingClientRect();
-        media.style.setProperty("--lx", ((e.clientX - r.left) / r.width * 100) + "%");
-        media.style.setProperty("--ly", ((e.clientY - r.top) / r.height * 100) + "%");
-      });
-    };
-    grid.addEventListener("pointermove", onMove);
-    return () => { grid.removeEventListener("pointermove", onMove); if (raf) cancelAnimationFrame(raf); };
-  }, []);
-
-useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
@@ -571,11 +550,10 @@ useEffect(() => {
         </button>
       </nav>
 
+      <div className="entry" aria-hidden="true" />
       <section
         ref={gridRef}
-        className={`grid ${gridHover ? "hovering" : ""}`}
-        onPointerEnter={(e) => { if (e.pointerType === "mouse") setGridHover(true); }}
-        onPointerLeave={() => setGridHover(false)}
+        className="grid"
       >
         {filteredProducts.map((p, idx) => {
           const ready = p.lookbookStatus === "생성완료";

@@ -1,0 +1,518 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>N1 — P2-3 AFTERGLOW</title>
+<style>
+:root{--ink:#1a1917;--muted:#8f8b84;--ease:cubic-bezier(.22,.61,.36,1)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:ui-sans-serif,-apple-system,"Apple SD Gothic Neo",sans-serif;color:var(--ink);
+  background:linear-gradient(180deg,#FAF7F1 0%,#FAFAF8 42%,#F6F5F1 78%,#EFECE5 100%)}
+header{padding:30px clamp(20px,5vw,64px) 0}
+.logo{font-size:16px;font-weight:600}
+.tag{font-size:9.5px;letter-spacing:.3em;color:var(--muted);margin-top:5px}
+.tabs{display:flex;gap:22px;margin-top:24px;font-size:12px;color:var(--muted)}
+.tab.on{color:var(--ink)}
+.entry{height:22vh}
+.grid{max-width:1280px;margin:0 auto;padding:24px clamp(20px,5vw,64px) 150px;
+  display:grid;grid-template-columns:repeat(4,1fr);column-gap:clamp(44px,5.5vw,80px);row-gap:clamp(84px,10vh,116px)}
+.row{display:contents}
+.obj{position:relative}
+.media{aspect-ratio:3/4;position:relative}
+.empty{position:absolute;inset:0}
+.empty::after{content:"";position:absolute;left:50%;top:50%;width:1px;height:22px;background:#DDDAD4;transform:translate(-50%,-50%)}
+.info{padding-top:14px}
+.cat{font-size:8.5px;letter-spacing:.28em;color:var(--muted);text-transform:uppercase;margin-bottom:7px}
+.nm{font-size:12.5px;line-height:1.5;font-weight:400;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pr{font-size:12.5px;margin-top:4px;color:#2a2926}
+footer{padding:60px clamp(20px,5vw,64px) 90px;text-align:center;font-size:10px;letter-spacing:.25em;color:#8f8b84}
+
+/* P2-1 I-C: 온도 필드 + 정보 농도 (상품 불변) */
+.obj::before{content:"";position:absolute;inset:-12% -18%;
+  background:radial-gradient(420px circle at var(--px,50%) var(--py,40%), rgba(250,248,242,.9), transparent 68%);
+  opacity:0;transition:opacity .8s var(--ease);pointer-events:none;z-index:-1}
+.obj.near::before{opacity:1}
+.obj .cat{opacity:.75;transition:opacity .6s var(--ease)}
+.obj.near .cat{opacity:1}
+.obj .pr{opacity:.85;transition:opacity .6s var(--ease)}
+.obj.near .pr{opacity:1}
+
+/* P2-2 DWELL: 체류 시 온기 가중 (.6 → 1) */
+.obj::before{transition:opacity .8s var(--ease)}
+.obj.near::before{opacity:.6}
+.obj.near.dwelled::before{opacity:1;transition:opacity 1.6s var(--ease)}
+
+/* P2-3 AFTERGLOW: 이탈 후 2.5s에 걸쳐 식음 (비대칭 소멸) */
+.obj::before{transition:opacity .8s var(--ease)}
+.obj.leaving::before{opacity:0;transition:opacity 2.5s var(--ease)}
+
+@media(max-width:640px){
+  .grid{grid-template-columns:repeat(2,1fr);column-gap:28px;row-gap:64px;padding:16px 20px 110px}
+  .entry{height:14vh}
+  .cell{margin-top:0!important}.row{margin-top:0!important;transform:none!important}
+  .cat,.pr{opacity:1!important}
+  .obj{opacity:1!important}
+  .obj::before{display:none!important}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important} .cat,.pr{opacity:1!important} .obj::before{display:none!important}}
+:focus-visible{outline:1px solid #b9b6af;outline-offset:4px}
+</style></head><body>
+<header><p class="logo">N°1</p><p class="tag">20 PIECES · SELECTED BY AI</p>
+<nav class="tabs"><span class="tab on">전체</span><span class="tab">남성</span><span class="tab">여성</span><span class="tab">젠더리스</span></nav></header>
+<div class="entry"></div>
+<section class="grid" id="grid">
+<div class="row" style="margin-top:0px;transform:translateX(0%)"><div class="cell" style="margin-top:0px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">남성 봄 가을 패션 ins 옥스포드 베이직 긴팔 셔츠 심플한 캐주얼 신상 나른함</p>
+        <p class="pr">₩12,300</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:14px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">긴팔 티셔츠 남성 이너 남성 이너 루즈핏 맨투맨</p>
+        <p class="pr">₩12,500</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:28px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">남자 골프티 긴팔 카라티셔츠 무지 카라티 봄티셔츠 기본 티셔츠</p>
+        <p class="pr">₩24,500</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:42px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">남자 봄 가을 무지 기본 긴팔티 레이어드 V넥 면 긴팔 티셔츠 쭉티</p>
+        <p class="pr">₩14,200</p>
+      </div>
+    </div></div></div><div class="row" style="margin-top:28px;transform:translateX(2%)"><div class="cell" style="margin-top:0px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">남성 고퀄 기모 맨투맨</p>
+        <p class="pr">₩28,300</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:14px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">남자빅사이즈맨투맨 남자오버핏맨투맨 남성맨투맨 오버핏맨투맨 남자맨투맨오버핏 남성오버핏맨투맨 남자맨</p>
+        <p class="pr">₩59,800</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:28px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">남자 셔츠 남자링클프리셔츠 남자셔츠 남자옥스포드셔츠</p>
+        <p class="pr">₩27,200</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:42px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">남성흰색셔츠 남자옥스포드셔츠 남자 셔츠</p>
+        <p class="pr">₩29,200</p>
+      </div>
+    </div></div></div><div class="row" style="margin-top:16px;transform:translateX(-2%)"><div class="cell" style="margin-top:0px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">후드 남자 후드나시 민소매후드 캐주얼 남성런닝 루즈핏 후드티 KK926</p>
+        <p class="pr">₩10,300</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:14px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">기모 오버핏 후드티 남자 남자후드티오버핏 남자빅사이즈후드티 남자기모후드티 남자겨울후드티 남성티셔츠</p>
+        <p class="pr">₩27,700</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:28px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">남자 봄 가을 세미 와이드 청바지 밴딩 데님 팬츠 흑청 블랙진</p>
+        <p class="pr">₩17,900</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:42px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">남자 코듀로이 팬츠 골덴바지 밴딩 플리츠 와이드팬츠</p>
+        <p class="pr">₩20,900</p>
+      </div>
+    </div></div></div><div class="row" style="margin-top:32px;transform:translateX(1%)"><div class="cell" style="margin-top:0px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">홀리데이 와이드 밴딩 슬랙스 와이드팬츠 정장 캐주얼 바지</p>
+        <p class="pr">₩13,900</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:14px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">남자 카고 와이드 청바지 통큰 데님 팬츠 진청 흑청</p>
+        <p class="pr">₩29,900</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:28px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">남성 데일리 화이트 와이드 데님 팬츠 롱 와이드핏 크림진</p>
+        <p class="pr">₩25,900</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:42px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">남자울사각패턴와이드팬츠 와이드밴딩팬츠 울바지 세미와이드팬츠</p>
+        <p class="pr">₩13,300</p>
+      </div>
+    </div></div></div><div class="row" style="margin-top:0px;transform:translateX(0%)"><div class="cell" style="margin-top:0px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">남자세미와이드팬츠 남자슬랙스팬츠 세미와이드팬츠 블랙팬츠 슬랙스팬츠 와이드팬츠 세미</p>
+        <p class="pr">₩19,200</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:14px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">셀렉온즈 와이드팬츠 남성여름바지 카고바지 카고팬츠 남자와이드팬츠 냉감바지 트랙팬츠</p>
+        <p class="pr">₩20,000</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:28px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">사방스판 여름 남자 카고 조거 바지 기능성 냉감 소재 슬림핏 조거팬츠</p>
+        <p class="pr">₩18,900</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:42px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">사방스판 여름 남자 카고 조거 바지 기능성 냉감 소재 슬림핏 조거팬츠</p>
+        <p class="pr">₩18,900</p>
+      </div>
+    </div></div></div><div class="row" style="margin-top:28px;transform:translateX(2%)"><div class="cell" style="margin-top:0px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">여자 실크 새틴 블라우스 베이지 오피스 하객룩</p>
+        <p class="pr">₩27,900</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:14px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">로맨틱 레이스 퍼프 블라우스 꽃무늬 크림 셔츠</p>
+        <p class="pr">₩22,900</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:28px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">모네스트 클래식 니트 투피스 와이드 세트 베이지</p>
+        <p class="pr">₩59,900</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:42px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">시원한 레이어드 블랙 레이스셔츠 여성 블라우스 셔츠</p>
+        <p class="pr">₩13,300</p>
+      </div>
+    </div></div></div><div class="row" style="margin-top:16px;transform:translateX(-2%)"><div class="cell" style="margin-top:0px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">레이스 페이크카라 여성 셔츠 레이스카라</p>
+        <p class="pr">₩13,700</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:14px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">2L-CBB 1064 여자시스루펀칭반팔니트</p>
+        <p class="pr">₩11,200</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:28px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">LND 반폴라 풀오버 니트티 티셔츠 긴팔 겨울 간절기 스웨터</p>
+        <p class="pr">₩15,000</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:42px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">긴팔 여자니트스웨터 여자스웨터 니트 라운드넥 여자예쁜니트 여자 오버핏</p>
+        <p class="pr">₩34,000</p>
+      </div>
+    </div></div></div><div class="row" style="margin-top:32px;transform:translateX(1%)"><div class="cell" style="margin-top:0px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">여자니트스웨터 여자캐주얼니트 여자니트티 긴팔 루즈핏 베이직 라운드넥 여자</p>
+        <p class="pr">₩33,200</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:14px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">스웨터 여성긴팔니트 니트풀오버 여자니트스웨터 여성라운드니트 여자</p>
+        <p class="pr">₩45,500</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:28px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">여자 봄 가을 밴딩 와이드 슬랙스 통바지 와이드팬츠 코듀로이톤</p>
+        <p class="pr">₩27,900</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:42px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">여자 봄 가을 밴딩 와이드 슬랙스 통바지 팬츠</p>
+        <p class="pr">₩29,900</p>
+      </div>
+    </div></div></div><div class="row" style="margin-top:0px;transform:translateX(0%)"><div class="cell" style="margin-top:0px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">여성 여자 하이웨스트 일자 세미 와이드핏 데님 팬츠 진청</p>
+        <p class="pr">₩39,900</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:14px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">겨울 니트 골지 와이드팬츠 따뜻한 밴딩 바지 크림</p>
+        <p class="pr">₩12,900</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:28px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">여름 쿨플리츠 밴딩팬츠 까실이 여성 와이드팬츠 주름바지 데일리 홈웨어 냉감바지</p>
+        <p class="pr">₩6,300</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:42px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">KSS 9957 여자핀턱주름플리츠스커트</p>
+        <p class="pr">₩39,500</p>
+      </div>
+    </div></div></div><div class="row" style="margin-top:28px;transform:translateX(2%)"><div class="cell" style="margin-top:0px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">여자하의 허리밴딩 골지 니트 팬츠 와이드팬츠 데일리패션</p>
+        <p class="pr">₩35,300</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:14px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">여성 의류 하의 밴딩 와이드 골지 니트 팬츠 DHH-A46</p>
+        <p class="pr">₩38,000</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:28px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">하이웨스트 블랙 플리츠 미니스커트</p>
+        <p class="pr">₩13,500</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:42px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">꽃자수 8부 린넨 배기 팬츠 여성 봄 여름 냉장고 아이스 밴딩 슬랙스 여자 마바지</p>
+        <p class="pr">₩13,100</p>
+      </div>
+    </div></div></div><div class="row" style="margin-top:16px;transform:translateX(-2%)"><div class="cell" style="margin-top:0px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">베이직 슬림 골지 하이넥 니트</p>
+        <p class="pr">₩19,800</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:14px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">페이크카라 페이크카라 남녀 터틀넥 공용 페이크카라 한국판 옥스포드 셔츠카라 가을 </p>
+        <p class="pr">₩7,500</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:28px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">가을 신상 기브업 투톤 맨투맨 남여공용 여성 티셔츠 남성 커플 긴팔</p>
+        <p class="pr">₩31,200</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:42px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">여름 남성 여성 티셔츠 에어로쿨 쿨론 카라티 반팔 기능성티 남여공용 사계절</p>
+        <p class="pr">₩17,100</p>
+      </div>
+    </div></div></div><div class="row" style="margin-top:32px;transform:translateX(1%)"><div class="cell" style="margin-top:0px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">여성후드티 겨울철 후드티 가을후드티 남녀공용 여자후드티 남여공용후드티</p>
+        <p class="pr">₩37,000</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:14px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">남여공용후드티 가을후드티 후드티 남자 여자후드티 남성후드티 남자후드티</p>
+        <p class="pr">₩37,000</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:28px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">트랜디아이 남녀공용 수입 가을 겨울 후드 캥거루 포켓 캐주얼 니트 스웨터</p>
+        <p class="pr">₩151,800</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:42px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">오버핏 케이블 니트 스웨터 남녀공용 소프트그레이 데일리룩</p>
+        <p class="pr">₩36,500</p>
+      </div>
+    </div></div></div><div class="row" style="margin-top:0px;transform:translateX(0%)"><div class="cell" style="margin-top:0px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">반목폴라 터틀넥 니트티 남녀공용 니트티셔츠 반폴라니트</p>
+        <p class="pr">₩29,900</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:14px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-상의</p>
+        <p class="nm">니트 반목폴라 목티 목폴라 겨울 하프넥 터틀넥 티셔츠 이너 폴라 남여공용 반폴라</p>
+        <p class="pr">₩23,400</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:28px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">부드러운 코튼면스판 사각바지/통넓은 바지/항아리바지/통바지/와이드 팬츠/엄마바지/</p>
+        <p class="pr">₩13,300</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:42px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">밴딩 9부 팬츠 세미와이드팬츠 8부와이드팬츠</p>
+        <p class="pr">₩13,300</p>
+      </div>
+    </div></div></div><div class="row" style="margin-top:28px;transform:translateX(2%)"><div class="cell" style="margin-top:0px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">LND (당일출고) 겨울 니트 골지 와이드팬츠 따뜻한 밴딩 트레이닝 홈웨어 바지</p>
+        <p class="pr">₩13,300</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:14px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">데일리핏 카고 유니섹스 하프포켓팬츠 남녀공용 와이드 트레이닝 반바지 운동복 5부 </p>
+        <p class="pr">₩8,600</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:28px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">카고 팬츠 마운틴 풀밴딩 면팬츠 조거 캐주얼바지 유니섹스팬츠 조거팬츠</p>
+        <p class="pr">₩19,000</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:42px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">남여공용 스트링카고 7부 와이드 버뮤다 팬츠 JEB-1007236</p>
+        <p class="pr">₩65,300</p>
+      </div>
+    </div></div></div><div class="row" style="margin-top:16px;transform:translateX(-2%)"><div class="cell" style="margin-top:0px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">남여 공용 스트링 카고 7부 와이드 버뮤다 팬츠</p>
+        <p class="pr">₩68,000</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:14px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">데일리핏 유니섹스 하프팬츠 남녀공용 와이드 트레이닝 반바지 운동복 5부 팬츠 밴딩</p>
+        <p class="pr">₩7,400</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:28px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">모자 남여공용 데님버킷 BB083</p>
+        <p class="pr">₩23,600</p>
+      </div>
+    </div></div><div class="cell" style="margin-top:42px"><div class="obj">
+      <div class="media"><div class="empty" aria-hidden="true"></div></div>
+      <div class="info">
+        <p class="cat">의류-하의</p>
+        <p class="nm">버뮤다 캐주얼 워싱 데일리 밴딩 오버핏 청바지 남여공용 데님 스냅</p>
+        <p class="pr">₩75,200</p>
+      </div>
+    </div></div></div>
+</section>
+<footer>N°1 — SELECTED BY AI · WEEKLY</footer>
+<script>
+const io = new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting && e.intersectionRatio > 0.35) e.target.classList.remove('far'); });
+},{rootMargin:'0px 0px -18% 0px'});
+document.querySelectorAll('.obj').forEach(o=>{ o.classList.add('far'); io.observe(o); });
+</script><script>
+if (matchMedia('(min-width:761px)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const grid = document.getElementById('grid');
+  let raf = 0, cur = null;
+  grid.addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse') return;
+    const o = e.target.closest('.obj');
+    if (o !== cur) {
+      if (cur) {
+        clearTimeout(cur._dwell); cur.classList.remove('near','dwelled');
+        cur.classList.add('leaving');
+        const c0 = cur; setTimeout(() => c0.classList.remove('leaving'), 2600);
+      }
+      cur = o;
+      if (cur) {
+        cur.classList.add('near');
+        cur._dwell = setTimeout(() => { if (cur === o) cur.classList.add('dwelled'); }, 2000);
+      }
+    }
+    if (!raf && cur) raf = requestAnimationFrame(() => {
+      raf = 0;
+      const r = cur.getBoundingClientRect();
+      cur.style.setProperty('--px', ((e.clientX-r.left)/r.width*100).toFixed(1)+'%');
+      cur.style.setProperty('--py', ((e.clientY-r.top)/r.height*100).toFixed(1)+'%');
+    });
+  });
+  grid.addEventListener('pointerleave', () => { if (cur){clearTimeout(cur._dwell);cur.classList.remove('near','dwelled');cur.classList.add('leaving');const c0=cur;setTimeout(()=>c0.classList.remove('leaving'),2600);cur=null;} });
+  window.addEventListener('scroll', () => { if (cur){clearTimeout(cur._dwell);cur.classList.remove('near','dwelled');cur.classList.add('leaving');const c1=cur;setTimeout(()=>c1.classList.remove('leaving'),2600);cur=null;} }, {passive:true});
+}
+</script>
+</body></html>
