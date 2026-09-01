@@ -379,7 +379,7 @@ export default function Home() {
       if (e.pointerType !== "mouse") return;
       const o = (e.target as HTMLElement).closest(".card");
       if (o !== cur) {
-        if (cur) { cur.classList.remove("near"); cur.style.removeProperty("--w"); const r0 = rafMap.get(cur); if (r0) cancelAnimationFrame(r0); }
+        if (cur) { fadeOut(cur); }
         cur = o as HTMLElement;
         if (cur) { cur.classList.add("near"); enterAt = performance.now(); rafMap.set(cur, requestAnimationFrame(tick)); }
       }
@@ -405,11 +405,31 @@ export default function Home() {
       }
       rafMap.set(cur, requestAnimationFrame(tick));
     };
+    // P2-3 AFTERGLOW: 떠난 자리의 온기를 현재 W에서 시작해 2.7s간 식힘(연속 감쇠, 반드시 0)
+    const fadeOut = (el: HTMLElement) => {
+      el.classList.remove("near");
+      el.classList.add("leaving");
+      const r = rafMap.get(el);
+      if (r) cancelAnimationFrame(r);
+      const decayStart = performance.now();
+      const decay = () => {
+        const t = (performance.now() - decayStart) / 2700;
+        if (t >= 1) {
+          el.style.setProperty("--w", "0");
+          el.classList.remove("leaving");
+          rafMap.delete(el);
+          return;
+        }
+        const w0 = parseFloat(el.style.getPropertyValue("--w") || "0.6");
+        const next = w0 * Math.pow(0.05, 1 / 60);  // 지수 감쇠 — "식는 온기"
+        el.style.setProperty("--w", Math.max(0, next).toFixed(4));
+        rafMap.set(el, requestAnimationFrame(decay));
+      };
+      rafMap.set(el, requestAnimationFrame(decay));
+    };
     const clear = () => {
       if (cur) {
-        cur.classList.remove("near");
-        cur.style.removeProperty("--w");
-        const r0 = rafMap.get(cur); if (r0) cancelAnimationFrame(r0);
+        fadeOut(cur);
         cur = null;
       }
       enterAt = 0;

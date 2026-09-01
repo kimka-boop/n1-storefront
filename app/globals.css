@@ -676,8 +676,9 @@ body {
   opacity: 0; transition: opacity .8s var(--n1-ease);
   pointer-events: none;
 }
-/* APPROACH: W 0 → 0.6 / DWELL: 체류가 이어지면 rAF가 --w로 연속 상승 (threshold 없음) */
-.card.near::before { opacity: var(--w, .6); }
+/* APPROACH: W 0 → 0.6 / DWELL: 체류가 이어지면 rAF가 --w로 연속 상승 / EXIT: JS 감쇠로 식음 (P2-3) */
+.card.near::before, .card.warm::before { opacity: var(--w, .6); }
+.card.leaving::before { opacity: var(--w, 0); }
 @media (max-width: 640px) {
   .card::before { display: none; }
 }
