@@ -365,7 +365,46 @@ export default function Home() {
     pending.slice(0, 4).forEach((p) => loadThumb(p));
   }, [products, thumbs, loadThumb]);
 
-  /* LIQUID LIGHT — P2 단계에서 재추가 (I-C ATTENTION) */
+  /* LIQUID GLASS v2 — P2-1 I-C: POINTER = PRESENCE (W 단일 변수) */
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia("(min-width: 761px)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const grid = gridRef.current;
+    if (!grid) return;
+    let raf = 0;
+    let cur: HTMLElement | null = null;
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") return;
+      const o = (e.target as HTMLElement).closest(".card");
+      if (o !== cur) {
+        if (cur) cur.classList.remove("near");
+        cur = o as HTMLElement;
+        if (cur) cur.classList.add("near");
+      }
+      if (!raf && cur) {
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          if (!cur) return;
+          const r = cur.getBoundingClientRect();
+          cur.style.setProperty("--px", ((e.clientX - r.left) / r.width * 100).toFixed(1) + "%");
+          cur.style.setProperty("--py", ((e.clientY - r.top) / r.height * 100).toFixed(1) + "%");
+        });
+      }
+    };
+    const clear = () => { if (cur) { cur.classList.remove("near"); cur = null; } };
+    grid.addEventListener("pointermove", onMove);
+    grid.addEventListener("pointerleave", clear);
+    window.addEventListener("scroll", clear, { passive: true });
+    return () => {
+      grid.removeEventListener("pointermove", onMove);
+      grid.removeEventListener("pointerleave", clear);
+      window.removeEventListener("scroll", clear);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+
 
   // P1-B FOG DEPTH — 스크롤 접근 시 정보가 명확해짐 (SCROLL = DISCOVERY)
   useEffect(() => {

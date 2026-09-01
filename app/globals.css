@@ -663,3 +663,23 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .card .tryon, .card .placeholder, .card .category, .card .price, .card .stock { transition: none; }
 }
+/* ═══════════════════════════════════════════════════════════
+   P2-1 — LIQUID GLASS / I-C ATTENTION
+   POINTER = PRESENCE. 공간이 존재를 감지하면 그 자리의 온도가 변한다.
+   W 단일 변수: 온기 opacity (REST 0 → APPROACH 0.6)
+   상품·layout·이미지 불변. 빛(광원) 아님 — 온도.
+   ═══════════════════════════════════════════════════════════ */
+.card::before {
+  content: ""; position: absolute; inset: -12% -18%; z-index: -1;
+  background: radial-gradient(420px circle at var(--px, 50%) var(--py, 40%),
+    rgba(250, 247, 240, .85), transparent 68%);
+  opacity: 0; transition: opacity .8s var(--n1-ease);
+  pointer-events: none;
+}
+.card.near::before { opacity: .6; }   /* APPROACH: W 0 → 0.6 */
+@media (max-width: 640px) {
+  .card::before { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card::before { display: none; }
+}
