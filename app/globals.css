@@ -640,3 +640,26 @@ body {
 /* ── ENTRY 22vh — quiet start ── */
 .entry { height: 22vh; }
 @media (max-width: 640px) { .entry { height: 14vh; } }
+/* ═══════════════════════════════════════════════════════════
+   P1-B — FOG DEPTH (정보의 계층적 접근 · SCROLL = DISCOVERY)
+   blur/glow/overlay 아님. 거리 = 정보의 농도.
+   멀리 있음: 존재는 확실(이미지 .94), 상세 정보는 아직 읽히지 않음(2차 정보 .55)
+   접근함: 정보가 자연스럽게 명확해짐(1.0). 상품 중요도·크기 불변.
+   ═══════════════════════════════════════════════════════════ */
+.card.far .tryon, .card.far .placeholder { opacity: .94; }
+.card.far .category { opacity: .45; }
+.card.far .price { opacity: .72; }
+.card.far .stock { opacity: 0; }
+.card .tryon, .card .placeholder { transition: opacity 1.1s var(--n1-ease); }
+.card .category, .card .price, .card .stock { transition: opacity 1.1s var(--n1-ease); }
+/* lift 후: 완전한 농도 (E lock의 REST 체계와 동일) */
+.card:not(.far) .tryon, .card:not(.far) .placeholder { opacity: 1; }
+.card:not(.far) .category { opacity: .75; }
+.card:not(.far) .price { opacity: 1; }
+@media (max-width: 640px) {
+  .card.far .category, .card.far .price { opacity: .8; }  /* 모바일: 정보 상시 원칙 — fog는 옅게만 */
+  .card.far .stock { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card .tryon, .card .placeholder, .card .category, .card .price, .card .stock { transition: none; }
+}

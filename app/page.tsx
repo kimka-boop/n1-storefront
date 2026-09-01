@@ -367,6 +367,25 @@ export default function Home() {
 
   /* LIQUID LIGHT — P2 단계에서 재추가 (I-C ATTENTION) */
 
+  // P1-B FOG DEPTH — 스크롤 접근 시 정보가 명확해짐 (SCROLL = DISCOVERY)
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting && e.intersectionRatio > 0.35) {
+            e.target.classList.remove("far");
+          }
+        });
+      },
+      { rootMargin: "0px 0px -18% 0px" }
+    );
+    const grid = gridRef.current;
+    if (!grid) return;
+    const cards = grid.querySelectorAll(".card");
+    cards.forEach((c) => { c.classList.add("far"); io.observe(c); });
+    return () => io.disconnect();
+  }, [products]);
+
   // 스크롤 리빌
   useEffect(() => {
     const observer = new IntersectionObserver(
