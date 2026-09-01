@@ -30,25 +30,29 @@ const FITS = [
 
 type Phase = "q1" | "q2" | "q3" | "result" | "account" | "done";
 
+export interface PendingCredentials { email: string; password: string; }
+
 export default function SmartFitFlow({
   initial,
   isLoggedIn,
   userEmail,
-  onSave,              // (profile) → localStorage 저장 + 기존 로직 (계산/키 변경 없음)
-  onRegister,          // (email, pw, profile) → 기존 /api/auth register 호출
-  onRegistered,        // (token, email, profile) → AuthProvider.login
+  pendingCredentials,   // 회원가입 먼저 입력한 계정 정보 (메모리 보관 — localStorage/URL 저장 금지)
+  onSave,
+  onRegister,
+  onRegistered,
   onClose,
 }: {
   initial: FitProfile | null;
   isLoggedIn: boolean;
   userEmail: string | null;
+  pendingCredentials?: PendingCredentials | null;
   onSave: (p: FitProfile) => void;
   onRegister: (email: string, pw: string, profile: FitProfile) => Promise<{ ok: boolean; error?: string; token?: string; profile?: FitProfile }>;
   onRegistered: (token: string, email: string, profile: FitProfile) => void;
   onClose: () => void;
 }) {
   // 재진입자(프로필 보유)는 RESULT부터 — 3문항 무반복
-  const [phase, setPhase] = useState<Phase>(initial ? "result" : "q1");
+  const [phase, setPhase] = useState<Phase>(pendingCredentials ? "q1" : initial ? "result" : "q1");
   const [gender, setGender] = useState(initial?.gender || "");
   const [category, setCategory] = useState<"top" | "bottom">("top");
   const [size, setSize] = useState(initial?.size || "");
@@ -235,18 +239,43 @@ export default function SmartFitFlow({
               </p>
               {recExample && <p className="sf-rec-example">{recExample}</p>}
               <div className="sf-actions">
-                <button className="sf-primary" onClick={() => { onSave(profile); setPhase(isLoggedIn ? "done" : "account"); }}>
-                  {isLoggedIn ? "이 프로필로 저장" : "이 경험을 저장할게요"}
-                </button>
-                <button className="sf-ghost" onClick={() => setPhase("q1")}>다시 설정</button>
+                {pendingCredentials ? (
+                  /* 회원가입 먼저 — RESULT에서 최종 가입 */
+                  <button className="sf-primary" disabled={busy}
+                    onClick={async () => {
+                      setBusy(true); setErr("");
+                      try {
+                        const data = await onRegister(pendingCredentials.email, pendingCredentials.password, profile);
+                        if (data.ok && data.token) {
+                          onRegistered(data.token, pendingCredentials.email, data.profile || profile);
+                          setPhase("done");
+                        } else setErr(data.error || "가입 처리 중 오류가 발생했습니다");
+                      } catch { setErr("서버 연결 실패"); }
+                      setBusy(false);
+                    }}>
+                    {busy ? "가입 중…" : "가입 완료하기"}
+                  </button>
+                ) : (
+                  <>
+                    <button className="sf-primary" onClick={() => { onSave(profile); setPhase(isLoggedIn ? "done" : "account"); }}>
+                      이대로 시작하기
+                    </button>
+                    {!isLoggedIn && (
+                      <button className="sf-ghost" onClick={() => { onSave(profile); setPhase("account"); }}>
+                        내 Smart Fit을 저장할게요
+                      </button>
+                    )}
+                    <button className="sf-ghost" onClick={() => setPhase("q1")}>다시 설정</button>
+                    {!isLoggedIn && (
+                      <p className="sf-alt">다른 기기에서도 내 추천을 이어갈 수 있어요.</p>
+                    )}
+                  </>
+                )}
               </div>
-              {!isLoggedIn && (
-                <p className="sf-alt">계정 없이도 이 설정은 이 브라우저에 저장됩니다.</p>
-              )}
             </div>
           )}
 
-          {/* ═══ ACCOUNT — 이 경험을 저장할게요 ═══ */}
+          {/* ═══ ACCOUNT — 내 Smart Fit을 저장할게요 ═══ */}
           {phase === "account" && (
             <div className="sf-step sf-account">
               <p className="sf-result-label">SAVE YOUR PROFILE</p>
@@ -278,7 +307,12 @@ export default function SmartFitFlow({
                 </svg>
               </div>
               <p className="sf-result-label">SAVED</p>
-              <p className="sf-care">준비됐어요. 상품을 보러 가볼까요?</p>
+              {userEmail && (
+                <p className="sf-care" style={{ fontWeight: 700 }}>
+                  {userEmail.split("@")[0]}님에게 맞는 추천을 준비했어요.
+                </p>
+              )}
+              <p className="sf-care">이제 상품을 보여드릴 때<br />추천 사이즈를 먼저 알려드릴게요.</p>
               <button className="sf-primary" onClick={onClose}>N°1 상품 탐색 →</button>
             </div>
           )}

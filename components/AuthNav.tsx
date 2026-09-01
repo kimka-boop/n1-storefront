@@ -5,6 +5,7 @@
  */
 import { useEffect, useState } from "react";
 import { useAuth, FitProfile } from "./AuthProvider";
+import SmartFitFlow from "./SmartFitFlow";
 
 export default function AuthNav({ onOpenSmartFit }: { onOpenSmartFit?: () => void } = {}) {
   const { token, email, profile, login, logout, updateProfile } = useAuth();
@@ -16,6 +17,8 @@ export default function AuthNav({ onOpenSmartFit }: { onOpenSmartFit?: () => voi
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [hasFitProfile, setHasFitProfile] = useState(false);
+  const [pendingCreds, setPendingCreds] = useState<{ email: string; password: string } | null>(null);
+  const [showSF, setShowSF] = useState(false); // 회원가입 → SmartFitFlow
   useEffect(() => {
     try { const p = JSON.parse(localStorage.getItem("n1_fit_profile") || "null"); setHasFitProfile(!!p?.gender); } catch {}
   }, [modal]);
@@ -24,20 +27,12 @@ export default function AuthNav({ onOpenSmartFit }: { onOpenSmartFit?: () => voi
   const BOTTOM = ["28~29", "30~31", "32~33", "34~35", "FREE"];
 
   const doRegister = async () => {
-    // SMART FIT 프로필: localStorage(SmartFitFlow 선경험)에서 사용 — SF 중복 문항 제거
-    let profile: any = null;
-    try { profile = JSON.parse(localStorage.getItem("n1_fit_profile") || "null"); } catch {}
-    if (!profile?.gender || !profile?.size || !profile?.fit) { setErr("먼저 Smart Fit을 설정해 주세요"); return; }
-    setBusy(true); setErr("");
-    try {
-      const res = await fetch("/api/auth", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "register", email: regEmail, password: pw, profile }),
-      });
-      const data = await res.json();
-      if (data.ok) { login(data.token, regEmail, data.profile); setModal(null); }
-      else setErr(data.error);
-    } catch { setErr("서버 오류"); } finally { setBusy(false); }
+    // 계정 정보만 확인 후 SmartFitFlow로 — Smart Fit 없는 가입 경로 제거
+    if (pw.length < 6) { setErr("비밀번호는 6자 이상"); return; }
+    // 계정 정보를 메모리에 보관(로컬스토리지/URL 저장 금지)하고 Smart Fit 시작
+    setPendingCreds({ email: regEmail, password: pw });
+    setModal(null);
+    setShowSF(true);
   };
 
   const doLogin = async () => {
@@ -53,14 +48,12 @@ export default function AuthNav({ onOpenSmartFit }: { onOpenSmartFit?: () => voi
     } catch { setErr("서버 오류"); } finally { setBusy(false); }
   };
 
-  const fitLabel = profile ? `${profile.size} · ${{A: "정핏", B: "세미오버", C: "오버핏"}[profile.fit as "A"|"B"|"C"] || profile.fit}` : "";
-
   return (
     <>
       <div className="auth-nav">
         {token && email ? (
           <>
-            <span className="auth-user">{email.split("@")[0]}님{profile && ` (${fitLabel})`} ⚙️</span>
+            <span className="auth-user">{email.split("@")[0]}님</span>
             <button className="auth-link" onClick={logout}>로그아웃</button>
           </>
         ) : (
@@ -97,15 +90,37 @@ export default function AuthNav({ onOpenSmartFit }: { onOpenSmartFit?: () => voi
                 {err && <p className="stock-alert">{err}</p>}
                 <button className="fit-next" disabled={busy || !regEmail || !pw || pw !== pw2}
                   onClick={doRegister}>
-                  {busy ? "가입 중…" : "회원가입 + FIT PROFILE 저장"}
+                  {busy ? "확인 중…" : "다음 — Smart Fit 설정 →"}
                 </button>
-                {!hasFitProfile && (
-                  <p className="fit-alt">💡 먼저 <button onClick={() => { setModal(null); onOpenSmartFit?.(); }} className="sf-link">Smart Fit</button>을 설정하면 가입 시 자동 저장됩니다.</p>
-                )}
+                <p className="fit-alt">다음 단계에서 Smart Fit(3문항)을 설정하면 가입이 완료됩니다.</p>
               </>
             )}
           </div>
         </div>
+      )}
+
+      {/* 회원가입 → Smart Fit 강제 연결 (FLOW B) */}
+      {showSF && pendingCreds && (
+        <SmartFitFlow
+          initial={null}
+          isLoggedIn={false}
+          userEmail={pendingCreds.email}
+          pendingCredentials={pendingCreds}
+          onSave={() => {}}
+          onRegister={async (email, pw, profile) => {
+            const res = await fetch("/api/auth", {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ action: "register", email, password: pw, profile }),
+            });
+            return res.json();
+          }}
+          onRegistered={(token, email, profile) => {
+            login(token, email, profile);
+            setShowSF(false);
+            setPendingCreds(null);
+          }}
+          onClose={() => { setShowSF(false); setPendingCreds(null); }}
+        />
       )}
     </>
   );

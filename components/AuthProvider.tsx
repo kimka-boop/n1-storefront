@@ -39,10 +39,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = (tk: string, em: string, p: FitProfile) => {
-    setToken(tk); setEmail(em); setProfile(p);
+    setToken(tk); setEmail(em);
     localStorage.setItem("n1_auth_token", tk);
     localStorage.setItem("n1_auth_email", em);
-    localStorage.setItem("n1_fit_profile", JSON.stringify(p));
+    // 계정별 profile 분리 보장: 서버 profile이 유효할 때만 덮어씀
+    // (서버 profile이 비어있으면 이전 계정의 프로필이 남지 않도록 clear)
+    if (p && p.gender && p.size && p.fit) {
+      setProfile(p);
+      localStorage.setItem("n1_fit_profile", JSON.stringify(p));
+    } else {
+      setProfile(null);
+      localStorage.removeItem("n1_fit_profile");
+    }
   };
 
   const logout = () => {
