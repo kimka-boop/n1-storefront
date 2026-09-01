@@ -373,14 +373,15 @@ export default function Home() {
     const grid = gridRef.current;
     if (!grid) return;
     let raf = 0;
+    const rafMap = new WeakMap<HTMLElement, number>();
     let cur: HTMLElement | null = null;
     const onMove = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
       const o = (e.target as HTMLElement).closest(".card");
       if (o !== cur) {
-        if (cur) cur.classList.remove("near");
+        if (cur) { cur.classList.remove("near"); cur.style.removeProperty("--w"); const r0 = rafMap.get(cur); if (r0) cancelAnimationFrame(r0); }
         cur = o as HTMLElement;
-        if (cur) cur.classList.add("near");
+        if (cur) { cur.classList.add("near"); enterAt = performance.now(); rafMap.set(cur, requestAnimationFrame(tick)); }
       }
       if (!raf && cur) {
         raf = requestAnimationFrame(() => {
@@ -392,7 +393,27 @@ export default function Home() {
         });
       }
     };
-    const clear = () => { if (cur) { cur.classList.remove("near"); cur = null; } };
+    // P2-2 DWELL: 체류 시간이 온기가 되는 연속 함수 (threshold/pop 없음)
+    // W: APPROACH .8s로 0.6 도달 → 체류가 이어지면 rAF가 --w를 소폭 상승 (1s~3.8s에 걸쳐 0.6→1.0)
+    let enterAt = 0;
+    const tick = () => {
+      if (!cur) return;
+      const elapsed = (performance.now() - enterAt) / 1000;
+      if (elapsed > 1.0) {
+        const dwell = Math.min(1, (elapsed - 1.0) / 2.8);
+        cur.style.setProperty("--w", (0.6 + 0.4 * dwell).toFixed(3));
+      }
+      rafMap.set(cur, requestAnimationFrame(tick));
+    };
+    const clear = () => {
+      if (cur) {
+        cur.classList.remove("near");
+        cur.style.removeProperty("--w");
+        const r0 = rafMap.get(cur); if (r0) cancelAnimationFrame(r0);
+        cur = null;
+      }
+      enterAt = 0;
+    };
     grid.addEventListener("pointermove", onMove);
     grid.addEventListener("pointerleave", clear);
     window.addEventListener("scroll", clear, { passive: true });
