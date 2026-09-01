@@ -77,10 +77,34 @@ export default function SmartFitFlow({
 
   const pick = (fn: () => void, delay = 450) => {
     fn();
-    if (!animated) return;
+    if (!animated) { setPhase((ph) => (ph === "q1" ? "q2" : ph === "q2" ? "q3" : ph === "q3" ? "result" : ph) as Phase); return; }
     // 선택 → 카드 반응을 잠깐 보여준 뒤 다음 단계 (narrative 800ms 내 완결)
     setTimeout(() => setPhase((ph) => (ph === "q1" ? "q2" : ph === "q2" ? "q3" : ph === "q3" ? "result" : ph) as Phase), delay);
   };
+
+  // ── 수정1: Q3 전용 전환 — 선택 반응(실루엣 변형)이 800ms silhouette transition 완료 후
+  //    안정 구간까지 보이도록 RESULT 전환을 연장. LOW DATA/reduced-motion은 즉시.
+  const pickFit = (v: string) => {
+    setFit(v);
+    if (!animated) { setPhase("result"); return; }
+    // silhouette transition .8s + 안정 구간 → 총 1,450ms 후 RESULT
+    setTimeout(() => setPhase((ph) => (ph === "q3" ? "result" : ph) as Phase), 1450);
+  };
+
+  // ── 수정5: RESULT 추천 예시 — smartFitPreset과 동일한 SIZE_ORDER/보정 규칙으로 실계산
+  // (아우터 기준 예시: B=+1치수, C=+2치수 — page.tsx smartFitPreset의 규칙과 동일)
+  const SIZE_ORDER = ["S", "M", "L", "XL", "2XL", "3XL"];
+  const NUM_TO_ALPHA: Record<string, string> = { "95": "S", "100": "L", "105": "XL", "110": "2XL" };
+  const recExample = (() => {
+    if (!size || !fit || size === "FREE") return "";
+    const baseAlpha = NUM_TO_ALPHA[size.replace(/\(.*\)/, "")] || size.replace(/\(.*\)/, "");
+    let baseIdx = SIZE_ORDER.indexOf(baseAlpha);
+    if (baseIdx === -1) return "";
+    // 아우터 예시: B=+1, C=+2 (smartFitPreset 규칙과 동일)
+    const targetIdx = fit === "B" ? baseIdx + 1 : fit === "C" ? baseIdx + 2 : baseIdx;
+    const final = SIZE_ORDER[Math.max(0, Math.min(targetIdx, SIZE_ORDER.length - 1))];
+    return `예: 아우터는 ${final}을 추천해 드려요`;
+  })();
 
   const chips = [
     gender && { k: "GENDER", v: gender === "남성" ? "MALE" : "FEMALE" },
@@ -132,7 +156,7 @@ export default function SmartFitFlow({
             <div className="sf-step" role="radiogroup" aria-label="성별 선택">
               <div className="sf-blueprint"><Bp state={bp} /></div>
               <h3 className="sf-q">성별을 알려주세요</h3>
-              <p className="sf-why">상·하의 사이즈 체계를 결정하는 데 사용됩니다.</p>
+              <p className="sf-why">성별에 따라 사이즈 체계가 달라져서, 정확한 추천을 위해 필요해요.</p>
               <div className="sf-tiles">
                 {["남성", "여성"].map((g) => (
                   <button key={g} role="radio" aria-checked={gender === g}
@@ -183,7 +207,7 @@ export default function SmartFitFlow({
                 {FITS.map((o) => (
                   <button key={o.v} role="radio" aria-checked={fit === o.v}
                     className={`sf-fit ${fit === o.v ? "on" : ""}`}
-                    onClick={() => pick(() => setFit(o.v), 650)}>
+                    onClick={() => pickFit(o.v)}>
                     <b>{o.kr}</b><span>{o.d}</span>
                   </button>
                 ))}
@@ -209,6 +233,7 @@ export default function SmartFitFlow({
               <p className="sf-care">
                 이제 N°1이 상품을 보여드릴 때,<br />당신에게 맞는 사이즈를 먼저 알려드릴게요.
               </p>
+              {recExample && <p className="sf-rec-example">{recExample}</p>}
               <div className="sf-actions">
                 <button className="sf-primary" onClick={() => { onSave(profile); setPhase(isLoggedIn ? "done" : "account"); }}>
                   {isLoggedIn ? "이 프로필로 저장" : "이 경험을 저장할게요"}

@@ -519,7 +519,7 @@ export default function Home() {
 
       {error && <p className="error">⚠️ {error}</p>}
 
-      <AuthNav />
+      <AuthNav onOpenSmartFit={() => setShowFitModal(true)} />
       {/* ── 주간 드롭 마감 (초경량 1라인) ── */}
       <p className="drop-line">Weekly Drop — Collection closes in [{dDay}] · Refresh every Sunday 00:00</p>
 
