@@ -9,8 +9,9 @@ import { useEffect, useState, useCallback } from "react";
 import ProtoDetail from "@/components/ProtoDetail";
 import { isLowData, prefersReducedMotion } from "@/lib/proto";
 import FitProfileModal from "@/components/FitProfileModal";
-import AuthNav from "@/components/AuthNav";
+import SmartFitFlow from "@/components/SmartFitFlow";
 import { useAuth } from "@/components/AuthProvider";
+import AuthNav from "@/components/AuthNav";
 
 interface FitInfo { thickness: string; stretch: string; sheer: string; lining: string; shape: string; }
 interface NoticeInfo { manufacturer: string; madeAt: string; colorSize: string; quality: string; as: string; }
@@ -230,7 +231,7 @@ function driveImg(fileId: string, w = 1000) {
 }
 
 export default function Home() {
-  const { profile: authProfile } = useAuth();
+  const { profile: authProfile, token: authToken, email: authEmail, login: authLogin } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [thumbs, setThumbs] = useState<Record<string, string>>({}); // pid → 대표 이미지 URL
   const [error, setError] = useState("");
@@ -292,6 +293,8 @@ export default function Home() {
   const [fitProfile, setFitProfile] = useState<{gender: string; size: string; fit: string} | null>(null);
   const fitLabel = fitProfile?.fit ? ({A:"스탠다드", B:"세미오버", C:"오버핏"} as Record<string,string>)[fitProfile.fit] || "" : "";
   const [showFitModal, setShowFitModal] = useState(false);
+  const [sfLegacy, setSfLegacy] = useState(false); // fallback: ?sflegacy=1
+  useEffect(() => { if (new URLSearchParams(window.location.search).get("sflegacy") === "1") setSfLegacy(true); }, []);
   useEffect(() => {
     try {
       const raw = localStorage.getItem("n1_fit_profile");
@@ -301,7 +304,7 @@ export default function Home() {
   const saveFitProfile = (p: {gender: string; size: string; fit: string}) => {
     setFitProfile(p);
     localStorage.setItem("n1_fit_profile", JSON.stringify(p));
-    setShowFitModal(false);
+    // SmartFitFlow의 ACCOUNT 단계에서 계속 진행하므로 여기서 모달을 닫지 않음 (fallback FitProfileModal은 자체 onClose 사용)
   };
   // auth 프로필 동기화 (로그인 시 프로필 표시)
   useEffect(() => { if (authProfile) setFitProfile(authProfile); }, [authProfile]);
@@ -573,13 +576,34 @@ export default function Home() {
 
 
       {/* ── STEP 2: 스마트 핏 온보딩 모달 (15초 3문 3답) ── */}
-      {showFitModal && (
+      {showFitModal && (sfLegacy ? (
+        /* ── FALLBACK: 기존 FitProfileModal 보존 (?sflegacy=1) ── */
         <FitProfileModal
           initial={fitProfile}
           onSave={saveFitProfile}
           onClose={() => setShowFitModal(false)}
         />
-      )}
+      ) : (
+        /* ── NEW: SMART FIT First Meeting Flow ── */
+        <SmartFitFlow
+          initial={fitProfile}
+          isLoggedIn={!!authToken}
+          userEmail={authEmail}
+          onSave={saveFitProfile}
+          onRegister={async (email, pw, profile) => {
+            const res = await fetch("/api/auth", {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ action: "register", email, password: pw, profile }),
+            });
+            return res.json();
+          }}
+          onRegistered={(token, email2, profile) => {
+            authLogin(token, email2, profile);
+            setFitProfile(profile);
+          }}
+          onClose={() => setShowFitModal(false)}
+        />
+      ))}
 
       {/* ── STEP 1 PROTOTYPE: PRD-M-55 전용 Scroll Exploration ──
           기존 모달은 그대로 보존. flag: protoOn && selected.id === "PRD-M-55" */}
