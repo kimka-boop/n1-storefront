@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N°1 — 20 Pieces</title>
+<style>
+:root{--ink:#1a1917;--paper:#FAFAF8;--mist:#E8E8E4;--muted:#8a8680;--bezier:cubic-bezier(.22,.61,.36,1)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:ui-sans-serif,-apple-system,"Apple SD Gothic Neo",sans-serif;background:var(--paper);color:var(--ink)}
+.wrap{max-width:1180px;margin:0 auto;padding:36px clamp(16px,4vw,48px) 80px}
+header{margin-bottom:14px}
+.logo{font-size:17px;letter-spacing:1px;font-weight:600}
+.tagline{font-size:10px;letter-spacing:.3em;color:var(--muted);margin-top:4px}
+/* tabs — loading 중 count 비표시 재현 */
+.tabs{display:flex;gap:18px;margin:22px 0 8px;font-size:12px}
+.tab{background:none;border:none;color:var(--muted);cursor:pointer;font-family:inherit}
+.tab.on{color:var(--ink)}
+/* ═══ GRID — MATERIAL FIELD ═══ */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;transition:opacity .5s var(--bezier)}
+/* ATMOSPHERE: hover 시 주변이 아주 미세하게 물러남 (0.92) */
+.grid.hovering .mf:not(:hover){opacity:.92}
+.mf{position:relative;cursor:pointer;overflow:hidden;background:linear-gradient(178deg,#F7F7F5,#F2F2EF);transition:background .6s var(--bezier)}
+.mf:hover{background:linear-gradient(178deg,#FBFBFA,#F6F6F3)}
+/* APPROACH: 공간의 luminosity가 접근에 반응 (상품이 아닌 field가) */
+.mf::before{content:"";position:absolute;inset:0;background:radial-gradient(300px circle at var(--lx,50%) var(--ly,30%),rgba(255,255,255,.45),transparent 62%);opacity:0;transition:opacity .8s var(--bezier);pointer-events:none;z-index:1}
+.mf:hover::before{opacity:1}
+.mf-media{aspect-ratio:3/4;position:relative;overflow:hidden}
+.mf-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+/* placeholder = 미디어 준비 중인 빈 시향지: 조용한 세로 마크 */
+.mf-media .empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.mf-media .empty::after{content:"";width:1px;height:24px;background:#D9D8D3}
+/* 정보: 고정 높이 — 그리드 통일 */
+.mf-info{padding:15px 16px 18px;min-height:96px;position:relative;z-index:2}
+.mf-info .cat{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;opacity:0;transform:translateY(3px);transition:all .45s var(--bezier)}
+.mf-info .nm{font-size:12.5px;line-height:1.5}
+.mf-info .pr{font-size:12.5px;letter-spacing:.04em;margin-top:3px}
+.mf-info .fit{font-size:10.5px;margin-top:6px;opacity:0;transform:translateY(3px);transition:all .45s var(--bezier) .08s}
+/* DISCOVER: 접근 시 초점이 맞는 느낌으로 등장 */
+.mf:hover .cat{opacity:.75;transform:none}
+.mf:hover .fit{opacity:.85;transform:none}
+/* 스크롤 reveal: 조용한 등장 (opacity + 아주 작은 spatial movement) */
+.mf{opacity:0;transform:translateY(8px)}
+.mf.seen{opacity:1;transform:none;transition:opacity .6s var(--bezier),transform .6s var(--bezier)}
+.mf.seen{transition:opacity .6s var(--bezier),transform .6s var(--bezier),background .6s var(--bezier)}
+@media(max-width:760px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .mf::before{display:none}
+  .grid.hovering .mf:not(:hover){opacity:1}
+  .mf-info .cat,.mf-info .fit{opacity:1;transform:none}
+  .mf{transform:translateY(6px)}
+}
+@media(prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+  .mf{opacity:1;transform:none}
+  .mf-info .cat,.mf-info .fit{opacity:1;transform:none}
+  .grid.hovering .mf:not(:hover){opacity:1}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <p class="logo">N°1</p>
+  <p class="tagline">20 PIECES · SELECTED BY AI</p>
+</header>
+<nav class="tabs">
+  <button class="tab on">전체</button>
+  <button class="tab">남성</button>
+  <button class="tab">여성</button>
+  <button class="tab">젠더리스</button>
+</nav>
+<div class="grid" id="g"></div>
+</div>
+<script>
+// 실제 Production 조건 재현: 24개 상품 (1~3줄 상품명 혼합, 이미지 2개 + placeholder 22개)
+const IMG = "https://drive.google.com/thumbnail?id=1e-kp2ZLeOGn-Jh2bug9dc96UyGmV-aRl&sz=w600";
+const items = [
+  {n:"남성 봄 가을 패션 ins 옥스포드 긴팔 셔츠", p:"₩29,200", c:"의류-상의", img:1},
+  {n:"긴팔 티셔츠 남성 이너 루즈핏", p:"₩12,900", c:"의류-상의"},
+  {n:"남자 골프티 긴팔 카라티셔츠 무지", p:"₩15,900", c:"의류-상의"},
+  {n:"남성 고퀄 기모 맨투맨", p:"₩20,900", c:"의류-상의", img:1},
+  {n:"남자빅사이즈맨투맨 남자오버핏 기모 프린팅 맨투맨", p:"₩19,800", c:"의류-상의"},
+  {n:"와이드 밴딩 슬랙스", p:"₩27,900", c:"의류-하의"},
+  {n:"세미 와이드 데님", p:"₩17,900", c:"의류-하의"},
+  {n:"남성 포멀 경량 바람막이 블루종 카라 자켓", p:"₩39,900", c:"의류-아우터"},
+  {n:"여성 레이스 숄 블라우스", p:"₩22,500", c:"의류-상의"},
+  {n:"플리츠 미니스커트", p:"₩18,200", c:"의류-하의"},
+  {n:"골지 와이드 니트 팬츠", p:"₩16,800", c:"의류-하의"},
+  {n:"여성 하이넥 니트", p:"₩24,000", c:"의류-상의", img:1},
+  {n:"크롭 자켓", p:"₩31,000", c:"의류-아우터"},
+  {n:"쿼터집 티셔츠", p:"₩14,500", c:"의류-상의"},
+  {n:"피그먼트 워싱 후드", p:"₩26,500", c:"의류-상의"},
+  {n:"플리츠 스커트 롱", p:"₩21,900", c:"의류-하의"},
+  {n:"젠더리스 오버핏 셔츠", p:"₩23,900", c:"의류-상의"},
+  {n:"무지 반팔티 화이트", p:"₩9,900", c:"의류-상의"},
+  {n:"젠더리스 트레이닝 세트 상의", p:"₩18,900", c:"의류-상의"},
+  {n:"젠더리스 조거 팬츠", p:"₩19,900", c:"의류-하의"},
+  {n:"여성 로퍼 슈즈", p:"₩28,000", c:"슈즈"},
+  {n:"남성 캐주얼 스니커즈", p:"₩32,000", c:"슈즈"},
+  {n:"베이스볼 캡 블랙", p:"₩11,000", c:"액세서리"},
+  {n:"메탈 프레임 선글라스", p:"₩15,500", c:"액세서리"},
+];
+const g = document.getElementById("g");
+g.innerHTML = items.map((it,i)=>`
+  <div class="mf" data-i="${i}">
+    <div class="mf-media">${it.img?`<img src="${IMG}" alt="">`:`<div class="empty"></div>`}</div>
+    <div class="mf-info">
+      <p class="cat">${it.c}</p>
+      <p class="nm">${it.n}</p>
+      <p class="pr">${it.p}</p>
+      <p class="fit">SMART FIT — ${["100 · SEMI","105 · SEMI","95 · REG","110 · OVER"][i%4]}</p>
+    </div>
+  </div>`).join("");
+// reveal: IntersectionObserver (조용한 등장)
+const io = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("seen");io.unobserve(e.target)}}),{threshold:.15});
+document.querySelectorAll(".mf").forEach(el=>io.observe(el));
+// atmosphere: grid hovering
+g.addEventListener("pointerover",()=>g.classList.add("hovering"));
+g.addEventListener("pointerout",()=>g.classList.remove("hovering"));
+// luminosity: pointer 위치 따라 field가 반응 (desktop)
+if(matchMedia("(min-width:761px)").matches){
+  let raf=0;
+  g.addEventListener("pointermove",e=>{
+    if(raf)return;
+    raf=requestAnimationFrame(()=>{
+      raf=0;
+      const card=e.target.closest(".mf");
+      if(!card)return;
+      const m=card.querySelector(".mf-media"),r=m.getBoundingClientRect();
+      m.style.setProperty("--lx",((e.clientX-r.left)/r.width*100)+"%");
+      m.style.setProperty("--ly",((e.clientY-r.top)/r.height*100)+"%");
+    });
+  });
+}
+</script>
+</body>
+</html>

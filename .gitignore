@@ -12,3 +12,4 @@ lookbook/
 
 .vercel
 .env*
+token.json

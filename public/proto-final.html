@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N°1 — Final Refinement Prototype</title>
+<style>
+:root{--ink:#1a1917;--paper:#FAFAF8;--mist:#E8E8E4;--muted:#8a8680;--bezier:cubic-bezier(.22,.61,.36,1)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:ui-sans-serif,-apple-system,"Apple SD Gothic Neo",sans-serif;background:var(--paper);color:var(--ink);padding:48px clamp(20px,6vw,80px)}
+h1{font-size:15px;letter-spacing:4px;margin-bottom:6px}
+.sub{font-size:11px;color:var(--muted);margin-bottom:48px;line-height:1.8}
+section{margin-bottom:80px}
+h2{font-size:12px;letter-spacing:2px;margin-bottom:6px}
+.desc{font-size:11.5px;color:var(--muted);line-height:1.85;margin-bottom:22px;max-width:660px}
+.frame{border:1px solid var(--mist);background:#fff;padding:28px clamp(16px,4vw,44px)}
+/* ═══ MATERIAL FIELD ═══
+   이미지 유무·배경색 무관하게 동일 field.
+   field = N°1 material. image = contents.
+   이미지는 object-fit:contain으로 crop/왜곡 없이 field 안에 놓임. */
+.mf{position:relative;cursor:pointer;overflow:hidden;background:linear-gradient(178deg,#F7F7F5,#F2F2EF);transition:background .6s var(--bezier)}
+.mf-media{aspect-ratio:3/4;position:relative;overflow:hidden}
+.mf-media img,.mf-media .empty{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:flex;align-items:center;justify-content:center}
+.mf-media .empty::after{content:"";width:1px;height:24px;background:#D9D8D3;position:absolute;left:50%;top:50%}
+/* 표면 반응: 접근 시 field 전체가 아주 옅게 밝아짐 (image가 아니라 field가) */
+.mf::before{content:"";position:absolute;inset:0;background:radial-gradient(300px circle at var(--lx,50%) var(--ly,30%),rgba(255,255,255,.45),transparent 62%);opacity:0;transition:opacity .8s var(--bezier);pointer-events:none;z-index:1}
+.mf:hover::before{opacity:1}
+/* hover 시 field가 미세하게 밝은 톤으로 */
+.mf:hover{background:linear-gradient(178deg,#FBFBFA,#F6F6F3)}
+.mf-info{padding:15px 16px 18px;min-height:92px;position:relative;z-index:2}
+.mf-info .nm{font-size:12.5px;line-height:1.5}
+/* ═══ INFORMATION DENSITY ═══
+   Essential(가격) = 항상 보임. Discovery(cat, fit) = 접근 시 발견. */
+.mf-info .pr{font-size:12.5px;letter-spacing:.04em;margin-top:3px}       /* Essential: 항상 */
+.mf-info .cat{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;opacity:0;transform:translateY(3px);transition:all .45s var(--bezier)}
+.mf-info .fit{font-size:10.5px;margin-top:6px;opacity:0;transform:translateY(3px);transition:all .45s var(--bezier) .08s}
+.mf:hover .cat{opacity:.75;transform:none}
+.mf:hover .fit{opacity:.85;transform:none}
+/* ═══ GRID (MATERIAL FIELD 위) ═══ */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}
+/* ═══ ATMOSPHERE (intensity 실험) ═══
+   hover 시 주변 카드가 미세하게 물러남 — 4단계 비교 */
+.g92.hovering .mf:not(:hover){opacity:.92}
+.g85.hovering .mf:not(:hover){opacity:.85}
+.g75.hovering .mf:not(:hover){opacity:.75}
+.g55.hovering .mf:not(:hover){opacity:.55}
+.g92,.g85,.g75,.g55{transition:opacity .5s var(--bezier)}
+@media(max-width:760px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .mf::before{display:none}
+  .mf-info .cat,.mf-info .fit{opacity:1;transform:none}
+  .g92.hovering .mf:not(:hover),.g85.hovering .mf:not(:hover),.g75.hovering .mf:not(:hover),.g55.hovering .mf:not(:hover){opacity:1}
+}
+@media(prefers-reduced-motion:reduce){
+  *{transition:none!important}
+  .mf-info .cat,.mf-info .fit{opacity:1;transform:none}
+  .g92.hovering .mf:not(:hover),.g85.hovering .mf:not(:hover),.g75.hovering .mf:not(:hover),.g55.hovering .mf:not(:hover){opacity:1}
+}
+</style>
+</head>
+<body>
+<h1>N°1 — FINAL REFINEMENT</h1>
+<p class="sub">Material Field · Atmosphere (4단계 intensity) · Information Density · Discovery Rhythm</p>
+
+<!-- ATMOSPHERE INTENSITY 비교: 동일 카드 4개씩, 강도만 다름 -->
+<section>
+  <h2>ATMOSPHERE INTENSITY — 주변 물러남 강도 비교</h2>
+  <p class="desc">각 그리드에 마우스를 올려보세요. "주변이 어두워졌다"고 인식되면 과한 것. "공간이 미세하게 반응한다" 정도가 성공.</p>
+
+  <div class="frame" style="margin-bottom:28px">
+    <p style="font-size:10px;letter-spacing:.2em;color:var(--muted);margin-bottom:14px">A — OPACITY 0.92 (가장 미세)</p>
+    <div class="grid g92" data-g>
+      <div class="mf"><div class="mf-media"><div class="empty"></div></div><div class="mf-info"><p class="cat">의류-상의</p><p class="nm">남성 흰색 옥스포드 셔츠</p><p class="pr">₩29,200</p><p class="fit">SMART FIT — 100 · SEMI</p></div></div>
+      <div class="mf"><div class="mf-media"><div class="empty"></div></div><div class="mf-info"><p class="cat">의류-하의</p><p class="nm">와이드 밴딩 슬랙스</p><p class="pr">₩27,900</p><p class="fit">SMART FIT — 100 · SEMI</p></div></div>
+      <div class="mf"><div class="mf-media"><img src="https://drive.google.com/thumbnail?id=1e-kp2ZLeOGn-Jh2bug9dc96UyGmV-aRl&sz=w600" alt=""></div><div class="mf-info"><p class="cat">의류-상의</p><p class="nm">화이트 옥스포드 셔츠</p><p class="pr">₩29,200</p><p class="fit">SMART FIT — 100 · SEMI</p></div></div>
+      <div class="mf"><div class="mf-media"><div class="empty"></div></div><div class="mf-info"><p class="cat">의류-아우터</p><p class="nm">경량 블루종 자켓</p><p class="pr">₩39,900</p><p class="fit">SMART FIT — 105 · SEMI</p></div></div>
+    </div>
+  </div>
+
+  <div class="frame" style="margin-bottom:28px">
+    <p style="font-size:10px;letter-spacing:.2em;color:var(--muted);margin-bottom:14px">B — OPACITY 0.85</p>
+    <div class="grid g85" data-g>
+      <div class="mf"><div class="mf-media"><div class="empty"></div></div><div class="mf-info"><p class="cat">의류-상의</p><p class="nm">남성 흰색 옥스포드 셔츠</p><p class="pr">₩29,200</p><p class="fit">SMART FIT — 100 · SEMI</p></div></div>
+      <div class="mf"><div class="mf-media"><div class="empty"></div></div><div class="mf-info"><p class="cat">의류-하의</p><p class="nm">와이드 밴딩 슬랙스</p><p class="pr">₩27,900</p><p class="fit">SMART FIT — 100 · SEMI</p></div></div>
+      <div class="mf"><div class="mf-media"><img src="https://drive.google.com/thumbnail?id=1e-kp2ZLeOGn-Jh2bug9dc96UyGmV-aRl&sz=w600" alt=""></div><div class="mf-info"><p class="cat">의류-상의</p><p class="nm">화이트 옥스포드 셔츠</p><p class="pr">₩29,200</p><p class="fit">SMART FIT — 100 · SEMI</p></div></div>
+      <div class="mf"><div class="mf-media"><div class="empty"></div></div><div class="mf-info"><p class="cat">의류-아우터</p><p class="nm">경량 블루종 자켓</p><p class="pr">₩39,900</p><p class="fit">SMART FIT — 105 · SEMI</p></div></div>
+    </div>
+  </div>
+
+  <div class="frame" style="margin-bottom:28px">
+    <p style="font-size:10px;letter-spacing:.2em;color:var(--muted);margin-bottom:14px">C — OPACITY 0.75</p>
+    <div class="grid g75" data-g>
+      <div class="mf"><div class="mf-media"><div class="empty"></div></div><div class="mf-info"><p class="cat">의류-상의</p><p class="nm">남성 흰색 옥스포드 셔츠</p><p class="pr">₩29,200</p><p class="fit">SMART FIT — 100 · SEMI</p></div></div>
+      <div class="mf"><div class="mf-media"><div class="empty"></div></div><div class="mf-info"><p class="cat">의류-하의</p><p class="nm">와이드 밴딩 슬랙스</p><p class="pr">₩27,900</p><p class="fit">SMART FIT — 100 · SEMI</p></div></div>
+      <div class="mf"><div class="mf-media"><img src="https://drive.google.com/thumbnail?id=1e-kp2ZLeOGn-Jh2bug9dc96UyGmV-aRl&sz=w600" alt=""></div><div class="mf-info"><p class="cat">의류-상의</p><p class="nm">화이트 옥스포드 셔츠</p><p class="pr">₩29,200</p><p class="fit">SMART FIT — 100 · SEMI</p></div></div>
+      <div class="mf"><div class="mf-media"><div class="empty"></div></div><div class="mf-info"><p class="cat">의류-아우터</p><p class="nm">경량 블루종 자켓</p><p class="pr">₩39,900</p><p class="fit">SMART FIT — 105 · SEMI</p></div></div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <p style="font-size:10px;letter-spacing:.2em;color:var(--muted);margin-bottom:14px">D — OPACITY 0.55 (기존 v3 — 비교용)</p>
+    <div class="grid g55" data-g>
+      <div class="mf"><div class="mf-media"><div class="empty"></div></div><div class="mf-info"><p class="cat">의류-상의</p><p class="nm">남성 흰색 옥스포드 셔츠</p><p class="pr">₩29,200</p><p class="fit">SMART FIT — 100 · SEMI</p></div></div>
+      <div class="mf"><div class="mf-media"><div class="empty"></div></div><div class="mf-info"><p class="cat">의류-하의</p><p class="nm">와이드 밴딩 슬랙스</p><p class="pr">₩27,900</p><p class="fit">SMART FIT — 100 · SEMI</p></div></div>
+      <div class="mf"><div class="mf-media"><img src="https://drive.google.com/thumbnail?id=1e-kp2ZLeOGn-Jh2bug9dc96UyGmV-aRl&sz=w600" alt=""></div><div class="mf-info"><p class="cat">의류-상의</p><p class="nm">화이트 옥스포드 셔츠</p><p class="pr">₩29,200</p><p class="fit">SMART FIT — 100 · SEMI</p></div></div>
+      <div class="mf"><div class="mf-media"><div class="empty"></div></div><div class="mf-info"><p class="cat">의류-아우터</p><p class="nm">경량 블루종 자켓</p><p class="pr">₩39,900</p><p class="fit">SMART FIT — 105 · SEMI</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MATERIAL FIELD 검증: 서로 다른 배경의 이미지 -->
+<section>
+  <h2>MATERIAL FIELD — 서로 다른 이미지, 동일 field</h2>
+  <p class="desc">이미지 배경이 흰색/회색/투명이어도 crop·왜곡 없이 동일한 N°1 field 안에 놓임. 이미지 없는 카드도 동일 구조(조용한 세로 마크).</p>
+  <div class="frame">
+    <div class="grid g92" data-g>
+      <div class="mf"><div class="mf-media"><div class="empty"></div></div><div class="mf-info"><p class="cat">의류-상의</p><p class="nm">빈 시향지 (미디어 준비)</p><p class="pr">₩—</p><p class="fit"></p></div></div>
+      <div class="mf"><div class="mf-media"><img src="https://drive.google.com/thumbnail?id=1e-kp2ZLeOGn-Jh2bug9dc96UyGmV-aRl&sz=w600" alt=""></div><div class="mf-info"><p class="cat">의류-상의</p><p class="nm">화이트 옥스포드 (흰배경)</p><p class="pr">₩29,200</p><p class="fit">SMART FIT — 100</p></div></div>
+      <div class="mf"><div class="mf-media"><div class="empty"></div></div><div class="mf-info"><p class="cat">의류-하의</p><p class="nm">빈 시향지 (미디어 준비)</p><p class="pr">₩—</p><p class="fit"></p></div></div>
+      <div class="mf"><div class="mf-media"><div class="empty"></div></div><div class="mf-info"><p class="cat">의류-아우터</p><p class="nm">빈 시향지 (미디어 준비)</p><p class="pr">₩—</p><p class="fit"></p></div></div>
+    </div>
+  </div>
+</section>
+
+<script>
+// ATMOSPHERE: grid hovering (pointer가 grid 위에 있는 동안만)
+document.querySelectorAll('[data-g]').forEach(g => {
+  g.addEventListener('pointerover', () => g.classList.add('hovering'));
+  g.addEventListener('pointerout', () => g.classList.remove('hovering'));
+});
+// 표면 반응: pointer 위치 따라 field luminosity 이동 (desktop)
+if (matchMedia('(min-width:761px)').matches) {
+  let raf = 0;
+  document.querySelectorAll('.mf').forEach(card => {
+    card.addEventListener('pointermove', e => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const m = card.querySelector('.mf-media');
+        const r = m.getBoundingClientRect();
+        m.style.setProperty('--lx', ((e.clientX - r.left) / r.width * 100) + '%');
+        m.style.setProperty('--ly', ((e.clientY - r.top) / r.height * 100) + '%');
+      });
+    });
+  });
+}
+</script>
+</body>
+</html>

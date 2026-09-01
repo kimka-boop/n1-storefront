@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N°1 — Product Discovery Prototypes v2 (Distant → Approach → Discover → Personalize)</title>
+<style>
+:root {
+  --ink: #1a1917;
+  --paper: #FAFAF8;
+  --air: #F7F7F5;
+  --cotton: #F2F2EF;
+  --mist: #E8E8E4;
+  --muted: #8a8680;
+  --bezier: cubic-bezier(.22,.61,.36,1);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: ui-sans-serif, -apple-system, "Apple SD Gothic Neo", sans-serif; background: var(--paper); color: var(--ink); padding: 48px clamp(20px,6vw,80px); }
+h1 { font-size:15px; letter-spacing:4px; font-weight:600; margin-bottom:6px; }
+.sub { font-size:11px; color:var(--muted); letter-spacing:1px; margin-bottom:56px; line-height:1.8; }
+.proto { margin-bottom:88px; }
+.proto-title { font-size:12px; letter-spacing:2px; margin-bottom:6px; }
+.proto-title b { color:var(--ink); }
+.proto-desc { font-size:11.5px; color:var(--muted); line-height:1.8; margin-bottom:28px; max-width:640px; }
+.state-label { display:inline-block; font-size:9px; letter-spacing:.25em; color:var(--muted); text-transform:uppercase; margin: 18px 0 10px; }
+.stage-frame { border:1px solid var(--mist); padding:36px clamp(16px,4vw,48px); background:#fff; }
+.grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; }
+.grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:32px; }
+.ph { aspect-ratio:3/4; background:linear-gradient(168deg,#F2F2EF 0%,#EBEBE7 50%,#E2E2DE 100%); display:flex; align-items:center; justify-content:center; font-size:10px; letter-spacing:.32em; color:#CBCAC5; text-transform:uppercase; }
+.cat { font-size:9px; letter-spacing:.25em; color:var(--muted); text-transform:uppercase; }
+.name { font-size:12.5px; font-weight:400; line-height:1.55; }
+.price { font-size:12.5px; letter-spacing:.04em; }
+.fit-note { font-size:11px; color:var(--ink); }
+
+/* ═══════════════════════════════════════════
+   PROTOTYPE α — "BREATHING SURFACE"
+   카드가 아니라 하나의 숨쉬는 공간.
+   REST: 상품+이름만, 가격/재고/카테고리 비표시(공간에 잠김)
+   APPROACH(hover): 공간이 밝아지며 카테고리·가격이 서서히 떠오름
+   DISCOVER(click 진입 시 상세): Smart Fit이 마지막에 나타남
+   Liquid Glass 번역: 표면 luminosity가 pointer를 따라 미세하게 이동
+   ═══════════════════════════════════════════ */
+.br-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:3px; }
+.br {
+  position:relative; padding:0; cursor:pointer;
+  background:linear-gradient(178deg, #F7F7F5 0%, #F1F1EE 100%);
+  overflow:hidden;
+}
+.br-media { aspect-ratio:3/4; position:relative; overflow:hidden; }
+.br-media .ph { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+/* Liquid light: pointer를 따라다니는 미세한 빛 (표면 반응) */
+.br-media::before {
+  content:""; position:absolute; inset:0;
+  background: radial-gradient(260px circle at var(--lx,50%) var(--ly,30%), rgba(255,255,255,.65), transparent 60%);
+  opacity:0; transition: opacity .7s var(--bezier);
+}
+.br:hover .br-media::before { opacity:1; }
+/* 공간이 열림: 이미지가 아주 살짝 확장 (scale이 아닌 clip 확장) */
+.br-media .ph { transition: all .7s var(--bezier); }
+.br:hover .br-media .ph { letter-spacing:.42em; color:#BDBCB6; }
+/* 정보: REST에서는 이름만. APPROACH에서 나머지가 떠오름 */
+.br-info { padding:18px 18px 22px; min-height:86px; position:relative; }
+.br-info .name { margin-bottom:0; transition: margin .5s var(--bezier); }
+.br-info .cat, .br-info .price {
+  opacity:0; transform:translateY(4px);
+  transition: opacity .55s var(--bezier), transform .55s var(--bezier);
+}
+.br:hover .br-info .cat { opacity:1; transform:none; transition-delay:.08s; }
+.br:hover .br-info .price { opacity:1; transform:none; transition-delay:.16s; }
+.br:hover .br-info .name { margin-bottom:7px; }
+/* fit badge: DISCOVER 이후 — 카드에선 생략, 상세에서만 */
+
+/* ═══════════════════════════════════════════
+   PROTOTYPE β — "BLOTTER STRIP"
+   시향지 = 좁고 긴 종이. 카드를 세로로 긴 시향지 형태로.
+   REST: 좁은 스트립에 상품 실루엣만. 정보는 스트립 하단에 최소.
+   APPROACH: 스트립이 옆으로 살짝 펼쳐지며(너비 확장) 정보 서서히 드러남.
+   DISCOVER: 클릭 시 전체 정보.
+   Liquid Glass: 스트립 표면의 미세한 빛 이동.
+   ═══════════════════════════════════════════ */
+.bt-strip { display:flex; flex-direction:column; gap:14px; max-width:560px; }
+.bt {
+  display:flex; align-items:center; gap:0;
+  background:linear-gradient(90deg, #F7F7F5, #F2F2EF 60%, #EFEFEC);
+  cursor:pointer; position:relative; overflow:hidden;
+  transition: all .65s var(--bezier);
+  min-height:88px;
+}
+.bt-media { width:88px; min-width:88px; aspect-ratio:3/4; background:linear-gradient(165deg,#EDEDEA,#E4E4E0); position:relative; overflow:hidden; }
+.bt-media::before {
+  content:""; position:absolute; inset:0;
+  background: radial-gradient(140px circle at var(--lx,40%) var(--ly,50%), rgba(255,255,255,.6), transparent 65%);
+  opacity:0; transition: opacity .6s var(--bezier);
+}
+.bt:hover .bt-media::before { opacity:1; }
+.bt-body { padding:0 20px; flex:1; opacity:.45; transition: all .6s var(--bezier); }
+.bt:hover .bt-body { opacity:1; }
+.bt-body .name { font-size:12.5px; margin-bottom:4px; }
+.bt-body .meta { display:flex; gap:14px; font-size:11px; color:var(--muted); }
+.bt-body .meta .price { color:var(--ink); }
+.bt-fit { font-size:10.5px; color:var(--ink); opacity:0; transform:translateX(8px); transition: all .55s var(--bezier) .1s; white-space:nowrap; padding-right:20px; }
+.bt:hover .bt-fit { opacity:.85; transform:none; }
+/* hover 시 스트립이 살짝 펼쳐짐(너비 확장) */
+.bt:hover { min-height:96px; background:linear-gradient(90deg, #FBFBFA, #F5F5F2 60%, #F1F1EE); }
+
+/* ═══════════════════════════════════════════
+   PROTOTYPE γ — "SCENT TRAIL" (Mobile-first quiet reveal)
+   REST: 공간+상품. 스크롤로 다가가면 → 정보가 순차적으로 "향처럼" 퍼짐.
+   각 요소가 개별 애니메이션이 아니라, 하나의 opacity 필드가 넓어지는 느낌.
+   ═══════════════════════════════════════════ */
+.st-list { display:flex; flex-direction:column; gap:44px; max-width:360px; margin:0 auto; }
+.st {
+  opacity:0; transform:translateY(14px);
+  transition: opacity 1s var(--bezier), transform 1s var(--bezier);
+}
+.st.seen { opacity:1; transform:none; }
+.st-media { aspect-ratio:3/4; background:linear-gradient(168deg,#F2F2EF,#E8E8E4); display:flex; align-items:center; justify-content:center; margin-bottom:18px; position:relative; }
+.st-media .ph { font-size:10px; letter-spacing:.32em; color:#CBCAC5; }
+.st-media::after {
+  content:""; position:absolute; inset:0;
+  background: radial-gradient(300px circle at 50% 20%, rgba(255,255,255,.4), transparent 60%);
+}
+.st .cat, .st .name, .st .price, .st .fit {
+  opacity:0; transition: opacity .9s var(--bezier);
+}
+.st.seen .cat { opacity:.7; transition-delay:.25s; }
+.st.seen .name { opacity:1; transition-delay:.4s; }
+.st.seen .price { opacity:.85; transition-delay:.55s; }
+.st.seen .fit { opacity:.75; transition-delay:.75s; }
+.st .cat { font-size:9px; letter-spacing:.25em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+.st .name { font-size:13.5px; margin-bottom:6px; }
+.st .price { font-size:12.5px; margin-bottom:10px; }
+.st .fit { font-size:11px; border-top:1px solid var(--mist); padding-top:10px; }
+
+/* reduced-motion 전역 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition:none !important; animation:none !important; }
+  .br-info .cat, .br-info .price { opacity:1; transform:none; }
+  .bt-body { opacity:1; }
+  .bt-fit { opacity:.85; transform:none; }
+  .st { opacity:1; transform:none; }
+  .st .cat, .st .name, .st .price, .st .fit { opacity:1; }
+}
+@media (max-width:760px) {
+  .br-grid { grid-template-columns:repeat(2,1fr); }
+  .grid4 { grid-template-columns:repeat(2,1fr); }
+  .br-media::before { display:none; } /* mobile pointer 없음 */
+  .br-info .cat, .br-info .price { opacity:1; transform:none; } /* mobile: 정보 항상 표시 */
+}
+</style>
+</head>
+<body>
+<h1>N°1 — PRODUCT DISCOVERY PROTOTYPES v2</h1>
+<p class="sub">
+  Distant → Approach → Discover → Personalize<br>
+  Light like Glass · Soft like Cotton · Discovered like Scent
+</p>
+
+<!-- ═══ PROTOTYPE α ═══ -->
+<section class="proto">
+  <p class="proto-title"><b>Prototype α</b> — BREATHING SURFACE</p>
+  <p class="proto-desc">
+    카드가 아니라 <b>숨쉬는 공간</b>. REST 상태에서는 상품+이름만 보이고, 가격·카테고리는 공간 속에 잠겨 있다.
+    사용자가 다가가면(hover) 공간이 밝아지며 잠겨 있던 정보가 순차적으로 떠오른다.
+    Liquid Glass 번역: 표면 luminosity가 pointer를 따라 미세하게 이동 (Liquid Light).
+    hover를 떼면 다시 조용해진다 — 카드는 항상 REST로 돌아간다.
+  </p>
+  <span class="state-label">State 01 — Distant (REST)</span>
+  <div class="stage-frame">
+    <div class="br-grid">
+      <div class="br">
+        <div class="br-media"><div class="ph"><span>Product</span></div></div>
+        <div class="br-info">
+          <p class="cat">의류-상의</p>
+          <p class="name">남성 흰색 옥스포드 셔츠</p>
+          <p class="price">₩29,200</p>
+        </div>
+      </div>
+      <div class="br">
+        <div class="br-media"><div class="ph"><span>Product</span></div></div>
+        <div class="br-info">
+          <p class="cat">의류-하의</p>
+          <p class="name">와이드 밴딩 슬랙스</p>
+          <p class="price">₩27,900</p>
+        </div>
+      </div>
+      <div class="br">
+        <div class="br-media"><div class="ph"><span>Product</span></div></div>
+        <div class="br-info">
+          <p class="cat">의류-아우터</p>
+          <p class="name">포멀 경량 블루종 자켓</p>
+          <p class="price">₩39,900</p>
+        </div>
+      </div>
+      <div class="br">
+        <div class="br-media"><div class="ph"><span>Product</span></div></div>
+        <div class="br-info">
+          <p class="cat">의류-하의</p>
+          <p class="name">세미 와이드 데님 팬츠</p>
+          <p class="price">₩17,900</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="state-label">State 02-03 — Approach / Discover : 카드에 hover해 보세요</span>
+</section>
+
+<!-- ═══ PROTOTYPE β ═══ -->
+<section class="proto">
+  <p class="proto-title"><b>Prototype β</b> — BLOTTER STRIP</p>
+  <p class="proto-desc">
+    시향지는 좁고 긴 종이입니다. 카드를 4분할 그리드 대신 <b>세로로 긴 스트립 리스트</b>로 재해석.
+    REST: 스트립 왼쪽에 상품 이미지, 정보는 반투명으로 잠김. hover하면 스트립이 살짝 펼쳐지며(높이 확장)
+    정보가 선명해지고, 우측에 Smart Fit 추천이 조용히 나타난다. Liquid Glass: 스트립 표면의 빛이 이동.
+  </p>
+  <span class="state-label">State 01 — Distant → hover로 Approach</span>
+  <div class="stage-frame">
+    <div class="bt-strip">
+      <div class="bt">
+        <div class="bt-media"></div>
+        <div class="bt-body">
+          <p class="name">남성 흰색 옥스포드 셔츠</p>
+          <div class="meta"><span class="cat">의류-상의</span><span class="price">₩29,200</span><span>판매중</span></div>
+        </div>
+        <div class="bt-fit">SMART FIT — 100 · SEMI-OVER</div>
+      </div>
+      <div class="bt">
+        <div class="bt-media"></div>
+        <div class="bt-body">
+          <p class="name">와이드 밴딩 슬랙스</p>
+          <div class="meta"><span class="cat">의류-하의</span><span class="price">₩27,900</span><span>판매중</span></div>
+        </div>
+        <div class="bt-fit">SMART FIT — 100 · SEMI-OVER</div>
+      </div>
+      <div class="bt">
+        <div class="bt-media"></div>
+        <div class="bt-body">
+          <p class="name">포멀 경량 블루종 자켓</p>
+          <div class="meta"><span class="cat">의류-아우터</span><span class="price">₩39,900</span><span>판매중</span></div>
+        </div>
+        <div class="bt-fit">SMART FIT — 105 · SEMI-OVER</div>
+      </div>
+    </div>
+  </div>
+  <span class="state-label">State 04 — Personalize : hover 시 우측 Smart Fit이 마지막에 나타남</span>
+</section>
+
+<!-- ═══ PROTOTYPE γ ═══ -->
+<section class="proto">
+  <p class="proto-title"><b>Prototype γ</b> — SCENT TRAIL (Mobile-first)</p>
+  <p class="proto-desc">
+    Mobile: pointer가 없으므로 <b>스크롤 자체가 approach</b>.
+    카드가 화면에 들어오면 하나의 opacity 필드가 넓어지며 정보가 순차적으로 "향처럼" 퍼진다.
+    개별 요소 애니메이션이 아니라 전체가 한 번에 서서히 나타나는 느낌. Smart Fit은 카드 하단 구분선 아래 마지막에.
+  </p>
+  <span class="state-label">Scroll to see: seen → quiet reveal</span>
+  <div class="stage-frame">
+    <div class="st-list">
+      <div class="st seen">
+        <div class="st-media"><span class="ph">Product</span></div>
+        <p class="cat">의류-상의</p>
+        <p class="name">남성 흰색 옥스포드 셔츠</p>
+        <p class="price">₩29,200</p>
+        <p class="fit">SMART FIT — 100 · SEMI-OVER 추천</p>
+      </div>
+      <div class="st seen">
+        <div class="st-media"><span class="ph">Product</span></div>
+        <p class="cat">의류-하의</p>
+        <p class="name">와이드 밴딩 슬랙스</p>
+        <p class="price">₩27,900</p>
+        <p class="fit">SMART FIT — 100 · SEMI-OVER 추천</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// Prototype α: liquid light pointer tracking (desktop only)
+if (window.matchMedia('(min-width:761px)').matches) {
+  let raf = 0;
+  document.querySelectorAll('.br').forEach(card => {
+    card.addEventListener('pointermove', (e) => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const media = card.querySelector('.br-media');
+        if (!media) return;
+        const r = media.getBoundingClientRect();
+        media.style.setProperty('--lx', ((e.clientX - r.left) / r.width * 100) + '%');
+        media.style.setProperty('--ly', ((e.clientY - r.top) / r.height * 100) + '%');
+      });
+    });
+  });
+}
+// Prototype β: strip light
+if (window.matchMedia('(min-width:761px)').matches) {
+  let raf = 0;
+  document.querySelectorAll('.bt').forEach(strip => {
+    strip.addEventListener('pointermove', (e) => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const media = strip.querySelector('.bt-media');
+        if (!media) return;
+        const r = media.getBoundingClientRect();
+        media.style.setProperty('--lx', ((e.clientX - r.left) / r.width * 100) + '%');
+        media.style.setProperty('--ly', ((e.clientY - r.top) / r.height * 100) + '%');
+      });
+    });
+  });
+}
+// Prototype γ: IntersectionObserver
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('seen'); });
+}, { threshold: 0.25 });
+document.querySelectorAll('.st').forEach(s => io.observe(s));
+</script>
+</body>
+</html>

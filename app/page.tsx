@@ -233,6 +233,8 @@ function driveImg(fileId: string, w = 1000) {
 export default function Home() {
   const { profile: authProfile, token: authToken, email: authEmail, login: authLogin } = useAuth();
   const [products, setProducts] = useState<Product[] | null>(null);
+  const [gridHover, setGridHover] = useState(false);
+  const gridRef = useRef<HTMLElement>(null);
   const [thumbs, setThumbs] = useState<Record<string, string>>({}); // pid → 대표 이미지 URL
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<Product | null>(null);
@@ -365,6 +367,29 @@ export default function Home() {
 
   // 스크롤 리빌
   useEffect(() => {
+    /* LIQUID LIGHT — 공간의 luminosity가 pointer 접근에 반응 (desktop mouse only) */
+    const grid = gridRef.current;
+    if (!grid || !window.matchMedia("(min-width: 761px)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0;
+    const onMove = (e: PointerEvent) => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const card = (e.target as HTMLElement).closest(".card");
+        if (!card) return;
+        const media = card.querySelector<HTMLElement>(".placeholder, .tryon");
+        if (!media) return;
+        const r = media.getBoundingClientRect();
+        media.style.setProperty("--lx", ((e.clientX - r.left) / r.width * 100) + "%");
+        media.style.setProperty("--ly", ((e.clientY - r.top) / r.height * 100) + "%");
+      });
+    };
+    grid.addEventListener("pointermove", onMove);
+    return () => { grid.removeEventListener("pointermove", onMove); if (raf) cancelAnimationFrame(raf); };
+  }, []);
+
+useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
@@ -546,7 +571,12 @@ export default function Home() {
         </button>
       </nav>
 
-      <section className="grid">
+      <section
+        ref={gridRef}
+        className={`grid ${gridHover ? "hovering" : ""}`}
+        onPointerEnter={(e) => { if (e.pointerType === "mouse") setGridHover(true); }}
+        onPointerLeave={() => setGridHover(false)}
+      >
         {filteredProducts.map((p, idx) => {
           const ready = p.lookbookStatus === "생성완료";
           const thumb = thumbs[p.id];
@@ -563,12 +593,16 @@ export default function Home() {
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img src={thumb} alt={p.name} className="tryon" loading="lazy" />
               ) : (
-                <div className="placeholder"><span>{ready ? "LOADING" : "PREPARING"}</span></div>
+                /* 빈 시향지: 조용한 세로 마크 (Material Field 통일) */
+                <div className="placeholder" aria-hidden="true"></div>
               )}
               <div className="card-body">
+                {/* DISCOVER — 접근 시 발견되는 정보 */}
                 <p className="category">{p.category}</p>
+                {/* ESSENTIAL — 항상 읽을 수 있는 정보 */}
                 <h2>{p.name}</h2>
                 <p className="price">₩{p.price.toLocaleString("ko-KR")}</p>
+                {/* PERSONALIZE — 마지막에 조용히 */}
                 <div className="card-foot">
                   <span className="stock">{p.stockStatus}</span>
                 </div>
