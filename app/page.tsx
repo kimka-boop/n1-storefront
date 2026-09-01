@@ -232,7 +232,7 @@ function driveImg(fileId: string, w = 1000) {
 
 export default function Home() {
   const { profile: authProfile, token: authToken, email: authEmail, login: authLogin } = useAuth();
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[] | null>(null);
   const [thumbs, setThumbs] = useState<Record<string, string>>({}); // pid → 대표 이미지 URL
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<Product | null>(null);
@@ -282,12 +282,12 @@ export default function Home() {
     if (g === "FEMALE" || g === "여성") return "female";
     return "genderless"; // GENDERLESS/남여공용/미지정 → 젠더리스
   };
-  const filteredProducts = products.filter((p) => {
+  const filteredProducts = (products ?? []).filter((p) => {
     if (genderTab === "all") return true;
     return genderOf(p) === genderTab;
   });
   const genderCount = (g: "male" | "female" | "genderless") =>
-    products.filter((p) => genderOf(p) === g).length;
+    products === null ? null : products.filter((p) => genderOf(p) === g).length;
 
   // ── STEP 2/3: 스마트 핏 프로필 (localStorage) ──
   const [fitProfile, setFitProfile] = useState<{gender: string; size: string; fit: string} | null>(null);
@@ -359,7 +359,7 @@ export default function Home() {
 
   // 생성완료 제품의 대표이미지 순차 로딩
   useEffect(() => {
-    const pending = products.filter((p) => p.lookbookStatus === "생성완료" && !thumbs[p.id]);
+    const pending = (products ?? []).filter((p) => p.lookbookStatus === "생성완료" && !thumbs[p.id]);
     pending.slice(0, 4).forEach((p) => loadThumb(p));
   }, [products, thumbs, loadThumb]);
 
@@ -530,16 +530,16 @@ export default function Home() {
       {/* ── STEP 1: 성별 퀵 필터 탭바 ── */}
       <nav className="gender-tabs">
         <button className={`gtab ${genderTab === "all" ? "active" : ""}`} onClick={() => changeTab("all")}>
-          전체 <span className="gcount">({products.length})</span>
+          전체 {products !== null && <span className="gcount">({products.length})</span>}
         </button>
         <button className={`gtab ${genderTab === "male" ? "active" : ""}`} onClick={() => changeTab("male")}>
-          남성 <span className="gcount">({genderCount("male")})</span>
+          남성 {genderCount("male") !== null && <span className="gcount">({genderCount("male")})</span>}
         </button>
         <button className={`gtab ${genderTab === "female" ? "active" : ""}`} onClick={() => changeTab("female")}>
-          여성 <span className="gcount">({genderCount("female")})</span>
+          여성 {genderCount("female") !== null && <span className="gcount">({genderCount("female")})</span>}
         </button>
         <button className={`gtab ${genderTab === "genderless" ? "active" : ""}`} onClick={() => changeTab("genderless")}>
-          젠더리스 <span className="gcount">({genderCount("genderless")})</span>
+          젠더리스 {genderCount("genderless") !== null && <span className="gcount">({genderCount("genderless")})</span>}
         </button>
         <button className="gtab gtab-fit" onClick={() => setShowFitModal(true)}>
           {fitProfile ? `Smart Fit — ${fitProfile.size}${fitProfile.fit ? " · " + ({A:"Standard",B:"Semi-Over",C:"Overfit"}[fitProfile.fit as "A"|"B"|"C"] ?? "") : ""}` : "Smart Fit"}
