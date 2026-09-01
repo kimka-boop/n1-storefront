@@ -237,6 +237,12 @@ export default function Home() {
   const [selected, setSelected] = useState<Product | null>(null);
   const [slide, setSlide] = useState(0);
   const [slideIds, setSlideIds] = useState<string[]>([]);
+  const [scrollGate, setScrollGate] = useState(false); // MEDIA QA 4/4 PASS gate
+  // production gate용 슬롯 순서→타입 매핑 (lib/media PROTO와 동일 규격)
+  const need2Type: Record<string, string> = {
+    "01": "AI_MODEL_FRONT", "02": "AI_MODEL_45DEG",
+    "03": "AI_MODEL_90DEG", "04": "AI_MODEL_BACK",
+  };
   const [revealed, setRevealed] = useState<Set<number>>(new Set());
   // ── 주간 드롭 카운트다운 (매주 일요일 자정 마감) ──
   const [dDay, setDDay] = useState("");
@@ -381,6 +387,26 @@ export default function Home() {
       const data = await res.json();
       if (data.ok) {
         setSlideIds(data.files.map((f: any) => f.id));
+        // ── PRODUCTION GATE: MEDIA QA 4/4 PASS만 Scroll Detail 활성화 ──
+        // QA 상태는 Product Media 시트(/api/media)가 유일한 근거. 파일 존재만으로 판정하지 않음.
+        let qaPass = false;
+        try {
+          const mres = await fetch(`/api/media?pid=${encodeURIComponent(p.id)}`);
+          const mdata = await mres.json();
+          if (mdata.ok) {
+            const need = ["01", "02", "03", "04"]; // FRONT / 45 / 90 / BACK
+            qaPass = need.every((order) =>
+              mdata.slots?.some(
+                (s: any) =>
+                  (String(s.mediaOrder).padStart(2, "0") === order ||
+                    s.mediaType === need2Type[order]) &&
+                  s.qaStatus === "MEDIA_QA_PASS" &&
+                  s.mediaUrl
+              )
+            );
+          }
+        } catch {}
+        setScrollGate(qaPass);
         setSelected(p);
         setSlide(0);
         // 옵션 초기화 — 단일 옵션이면 자동 선택
@@ -557,7 +583,7 @@ export default function Home() {
 
       {/* ── STEP 1 PROTOTYPE: PRD-M-55 전용 Scroll Exploration ──
           기존 모달은 그대로 보존. flag: protoOn && selected.id === "PRD-M-55" */}
-      {selected && protoOn && selected.id === "PRD-M-55" && slideIds.length >= 4 && (() => {
+      {selected && protoOn && scrollGate && slideIds.length >= 4 && (() => {
         const protoDetails = (
           <>
             {/* DETAILS — 소재/핏/사이즈 */}
