@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N°1 — Liquid Glass × Cotton × Blotter Prototypes</title>
+<style>
+:root {
+  --ink: #1a1917;
+  --paper: #FAFAF8;
+  --air: #F7F7F5;
+  --cotton: #F2F2EF;
+  --mist: #E8E8E4;
+  --muted: #8a8680;
+  --bezier: cubic-bezier(.22,.61,.36,1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: ui-sans-serif, -apple-system, "Apple SD Gothic Neo", sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 48px clamp(20px, 6vw, 80px);
+}
+h1 { font-size: 15px; letter-spacing: 4px; font-weight: 600; margin-bottom: 6px; }
+.sub { font-size: 11px; color: var(--muted); letter-spacing: 1px; margin-bottom: 48px; }
+.proto-section { margin-bottom: 72px; }
+.proto-title { font-size: 11px; letter-spacing: 2.5px; color: var(--muted); text-transform: uppercase; margin-bottom: 24px; border-top: 1px solid var(--mist); padding-top: 20px; }
+.proto-title b { color: var(--ink); }
+
+/* ═══════════════════════════════════════════
+   PROTOTYPE 1 — BLOTTER CARD (시향지 카드)
+   여백 속에 놓인 하나의 object
+   ═══════════════════════════════════════════ */
+.blotter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  background: var(--paper);
+}
+.blotter {
+  background: transparent;
+  padding: 28px 20px 26px;
+  cursor: pointer;
+  position: relative;
+  transition: background .6s var(--bezier);
+}
+.blotter-media {
+  aspect-ratio: 3/4;
+  background: linear-gradient(165deg, #F2F2EF 0%, #EBEBE7 55%, #E3E3DF 100%);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 22px;
+  position: relative;
+  overflow: hidden;
+}
+.blotter-media::after {
+  /* air layer — hover 시 미세하게 밝아지는 유리 표면 */
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(200deg, rgba(255,255,255,.5) 0%, transparent 45%);
+  opacity: .3;
+  transition: opacity .8s var(--bezier);
+}
+.blotter:hover .blotter-media::after { opacity: .75; }
+.blotter-media .ph {
+  font-size: 10px; letter-spacing: .35em; color: #CFCEC9; text-transform: uppercase;
+}
+.blotter-info .cat { font-size: 9px; letter-spacing: .25em; color: var(--muted); text-transform: uppercase; margin-bottom: 7px; }
+.blotter-info .name { font-size: 12.5px; font-weight: 400; line-height: 1.55; margin-bottom: 8px; }
+.blotter-info .price { font-size: 12.5px; font-weight: 500; letter-spacing: .04em; opacity: .55; transition: opacity .6s var(--bezier); }
+.blotter:hover .blotter-info .price { opacity: 1; }
+/* Blotter hover: 공간이 열림 — 카드가 아니라 여백이 늘어남 */
+.blotter:hover { background: rgba(255,255,255,.7); }
+.blotter:hover .blotter-media { margin: 0 -6px; }  /* 이미지가 옆으로 살짝 숨쉼 */
+.blotter .blotter-media { transition: margin .6s var(--bezier); }
+
+/* ═══════════════════════════════════════════
+   PROTOTYPE 2 — SOFT FOCUS REVEAL (frost-off)
+   ═══════════════════════════════════════════ */
+.reveal-demo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.rv-item { text-align: center; }
+.rv-media {
+  aspect-ratio: 3/4; background: var(--cotton);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 12px;
+}
+.rv-media .ph { font-size: 10px; letter-spacing: .3em; color: #CFCEC9; }
+.rv-1 .rv-media { opacity: 0; filter: blur(6px); transform: translateY(12px); }
+.rv-2 .rv-media { opacity: .45; filter: blur(2px); transform: translateY(6px); }
+.rv-3 .rv-media { opacity: 1; filter: blur(0); transform: none; }
+/* 실제 애니메이션: 아래 버튼으로 트리거 */
+.rv-animate .rv-media {
+  animation: frostOff 1.4s var(--bezier) forwards;
+}
+@keyframes frostOff {
+  0%   { opacity: 0; filter: blur(5px); transform: translateY(10px); }
+  40%  { opacity: .55; filter: blur(1.8px); transform: translateY(4px); }
+  100% { opacity: 1; filter: blur(0); transform: none; }
+}
+.rv-label { font-size: 10px; letter-spacing: .2em; color: var(--muted); text-transform: uppercase; }
+
+/* ═══════════════════════════════════════════
+   PROTOTYPE 3 — LIQUID LIGHT (Desktop hover)
+   pointer가 있는 곳의 공간이 살짝 밝아짐
+   ═══════════════════════════════════════════ */
+.liquid-stage {
+  position: relative;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
+  background: var(--paper);
+}
+.liq {
+  background: transparent; padding: 24px 18px 22px;
+  position: relative; overflow: hidden;
+  transition: background .5s var(--bezier);
+}
+.liq-media {
+  aspect-ratio: 3/4; background: linear-gradient(165deg, var(--cotton), var(--mist));
+  margin-bottom: 14px; position: relative;
+}
+.liq::before {
+  /* liquid light layer — pointer를 따라다니는 아주 옅은 빛 */
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(420px circle at var(--lx, 50%) var(--ly, 50%), rgba(255,255,255,.55), transparent 65%);
+  opacity: 0;
+  transition: opacity .6s var(--bezier);
+  pointer-events: none;
+}
+.liquid-stage:hover .liq::before { opacity: 1; }
+.liq:hover { background: rgba(255,255,255,.55); }
+.liq-info .cat { font-size: 9px; letter-spacing: .25em; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+.liq-info .name { font-size: 12px; line-height: 1.5; margin-bottom: 6px; }
+.liq-info .price { font-size: 12px; opacity: .55; transition: opacity .5s var(--bezier); }
+.liq:hover .liq-info .price { opacity: 1; }
+
+/* ═══════════════════════════════════════════
+   PROTOTYPE 4 — QUIET SCROLL REVEAL (Mobile)
+   이미지 → 이름 → 가격 순차 등장 (stagger 80ms)
+   ═══════════════════════════════════════════ */
+.quiet-wrap { display: flex; flex-direction: column; gap: 40px; max-width: 340px; }
+.quiet {
+  border-bottom: 1px solid var(--mist);
+  padding-bottom: 28px;
+}
+.q-img { aspect-ratio: 3/4; background: var(--cotton); display:flex; align-items:center; justify-content:center; margin-bottom: 16px; }
+.q-img .ph { font-size: 10px; letter-spacing: .3em; color: #CFCEC9; }
+.q-name { font-size: 13px; margin-bottom: 6px; }
+.q-price { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.q-fit { font-size: 11px; color: var(--ink); opacity: 0; transition: opacity .8s var(--bezier) .3s; }
+.quiet.seen .q-img { animation: qImg 1s var(--bezier) both; }
+.quiet.seen .q-name { animation: qText .6s var(--bezier) .15s both; }
+.quiet.seen .q-price { animation: qText .6s var(--bezier) .25s both; }
+.quiet.seen .q-fit { opacity: .8; }
+@keyframes qImg { from { opacity: 0; filter: blur(4px); transform: translateY(8px); } to { opacity: 1; filter: blur(0); transform: none; } }
+@keyframes qText { from { opacity: 0; } to { opacity: 1; } }
+.quiet .q-img, .quiet .q-name, .quiet .q-price { opacity: 0; }
+.quiet.seen .q-img { opacity: 1; }
+.quiet.seen .q-name { opacity: 1; }
+.quiet.seen .q-price { opacity: 1; }
+/* reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .rv-animate .rv-media, .quiet.seen .q-img, .quiet.seen .q-name, .quiet.seen .q-price { animation: none; opacity: 1; filter: none; transform: none; }
+  .blotter .blotter-media, .blotter-info .price, .liq::before { transition: none; }
+  .blotter:hover .blotter-media { margin: 0; }
+}
+.demo-btn {
+  padding: 9px 20px; font-size: 11px; letter-spacing: 1.5px;
+  background: var(--ink); color: #fff; border: none; border-radius: 4px;
+  cursor: pointer; margin-bottom: 20px; font-family: inherit;
+}
+.note { font-size: 11px; color: var(--muted); line-height: 1.7; margin-top: 16px; max-width: 560px; }
+@media (max-width: 900px) {
+  .blotter-grid, .liquid-stage { grid-template-columns: repeat(2, 1fr); }
+  .reveal-demo { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<h1>N°1 — LIQUID GLASS × COTTON × BLOTTER</h1>
+<p class="sub">Light like Glass · Soft like Cotton · Discovered like Scent — Prototype 1~4</p>
+
+<!-- PROTOTYPE 1 -->
+<section class="proto-section">
+  <p class="proto-title"><b>Prototype 1</b> — Blotter Card : 여백 속에 놓인 시향지 (hover 시 공간이 열림)</p>
+  <div class="blotter-grid">
+    <div class="blotter">
+      <div class="blotter-media"><span class="ph">Product</span></div>
+      <div class="blotter-info">
+        <p class="cat">의류-상의</p>
+        <p class="name">남성 흰색 옥스포드 셔츠</p>
+        <p class="price">₩29,200</p>
+      </div>
+    </div>
+    <div class="blotter">
+      <div class="blotter-media"><span class="ph">Product</span></div>
+      <div class="blotter-info">
+        <p class="cat">의류-하의</p>
+        <p class="name">와이드 밴딩 슬랙스</p>
+        <p class="price">₩27,900</p>
+      </div>
+    </div>
+    <div class="blotter">
+      <div class="blotter-media"><span class="ph">Product</span></div>
+      <div class="blotter-info">
+        <p class="cat">의류-아우터</p>
+        <p class="name">포멀 경량 블루종 자켓</p>
+        <p class="price">₩39,900</p>
+      </div>
+    </div>
+    <div class="blotter">
+      <div class="blotter-media"><span class="ph">Product</span></div>
+      <div class="blotter-info">
+        <p class="cat">의류-하의</p>
+        <p class="name">세미 와이드 데님 팬츠</p>
+        <p class="price">₩17,900</p>
+      </div>
+    </div>
+  </div>
+  <p class="note">hover: 카드 배경이 아주 옅게 밝아지고, 이미지가 좌우로 6px씩 숨쉬며, 가격 opacity가 0.55→1로 선명해짐. scale/shadow/lift 없음.</p>
+</section>
+
+<!-- PROTOTYPE 2 -->
+<section class="proto-section">
+  <p class="proto-title"><b>Prototype 2</b> — Soft Focus Reveal : 서리가 걷히듯 선명해지는 등장</p>
+  <button class="demo-btn" onclick="replayReveal()">REPLAY</button>
+  <div class="reveal-demo" id="rvWrap">
+    <div class="rv-item rv-1"><div class="rv-media"><span class="ph">Step 1</span></div><p class="rv-label">very low opacity</p></div>
+    <div class="rv-item rv-2"><div class="rv-media"><span class="ph">Step 2</span></div><p class="rv-label">subtle softness</p></div>
+    <div class="rv-item rv-3"><div class="rv-media"><span class="ph">Step 3</span></div><p class="rv-label">clear image</p></div>
+  </div>
+  <p class="note">최초 로드 시: blur(5px)+opacity 0 → blur(1.8px) 중간 → 완전 선명. blur 노출은 순간적(0.4초 이내), 최종은 반드시 선명. translateY 24px→10px로 절반 축소. [REPLAY]로 실제 1.4s 애니메이션 확인.</p>
+</section>
+
+<!-- PROTOTYPE 3 -->
+<section class="proto-section">
+  <p class="proto-title"><b>Prototype 3</b> — Liquid Light : pointer를 따라다니는 미세한 빛 (Desktop only)</p>
+  <div class="liquid-stage" id="liqStage">
+    <div class="liq"><div class="liq-media"></div><div class="liq-info"><p class="cat">의류-상의</p><p class="name">옥스포드 셔츠</p><p class="price">₩29,200</p></div></div>
+    <div class="liq"><div class="liq-media"></div><div class="liq-info"><p class="cat">의류-하의</p><p class="name">와이드 슬랙스</p><p class="price">₩27,900</p></div></div>
+    <div class="liq"><div class="liq-media"></div><div class="liq-info"><p class="cat">의류-아우터</p><p class="name">블루종 자켓</p><p class="price">₩39,900</p></div></div>
+    <div class="liq"><div class="liq-media"></div><div class="liq-info"><p class="cat">의류-하의</p><p class="name">데님 팬츠</p><p class="price">₩17,900</p></div></div>
+  </div>
+  <p class="note">pointer 좌표에 radial-gradient(420px, white .55)가 떠 있음 — 상품이 아니라 공간이 반응. opacity .6s로 부드럽게. 마우스를 올리지 않으면 완전히 투명. Mobile에서는 비활성(포인터 없음).</p>
+</section>
+
+<!-- PROTOTYPE 4 -->
+<section class="proto-section">
+  <p class="proto-title"><b>Prototype 4</b> — Quiet Scroll Reveal (Mobile) : 이미지→이름→가격→Smart Fit 순차 등장</p>
+  <div class="quiet-wrap">
+    <div class="quiet seen">
+      <div class="q-img"><span class="ph">Product</span></div>
+      <p class="q-name">남성 흰색 옥스포드 셔츠</p>
+      <p class="q-price">₩29,200</p>
+      <p class="q-fit">SMART FIT — 100 · SEMI-OVER 추천</p>
+    </div>
+    <div class="quiet seen">
+      <div class="q-img"><span class="ph">Product</span></div>
+      <p class="q-name">와이드 밴딩 슬랙스</p>
+      <p class="q-price">₩27,900</p>
+      <p class="q-fit">SMART FIT — 100 · SEMI-OVER 추천</p>
+    </div>
+  </div>
+  <p class="note">IntersectionObserver로 .seen 부여 시: 이미지(frost-off 1s) → 이름(.6s, +150ms) → 가격(.6s, +250ms) → Smart Fit(opacity .8, +300ms). stagger로 조용히 순차 등장. Smart Fit은 항상 노출하지 않고 카드 하단에 조용히.</p>
+</section>
+
+<script>
+function replayReveal() {
+  const wrap = document.getElementById('rvWrap');
+  wrap.classList.remove('rv-animate');
+  void wrap.offsetWidth; // reflow
+  wrap.classList.add('rv-animate');
+}
+// Liquid Light: pointer tracking
+document.getElementById('liqStage').addEventListener('pointermove', (e) => {
+  for (const card of document.querySelectorAll('.liq')) {
+    const r = card.getBoundingClientRect();
+    card.style.setProperty('--lx', ((e.clientX - r.left) / r.width * 100) + '%');
+    card.style.setProperty('--ly', ((e.clientY - r.top) / r.height * 100) + '%');
+  }
+});
+// Prototype 4: IntersectionObserver (실제와 동일)
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('seen'); });
+}, { threshold: 0.3 });
+document.querySelectorAll('.quiet').forEach(q => io.observe(q));
+</script>
+</body>
+</html>

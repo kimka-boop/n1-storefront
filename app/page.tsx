@@ -5,7 +5,7 @@
  * 대표이미지: 드라이브 01_full (서버 API로 file_id 조회)
  * 클릭: 구매 상세 + 5장 슬라이드
  */
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import ProtoDetail from "@/components/ProtoDetail";
 import { isLowData, prefersReducedMotion } from "@/lib/proto";
 import FitProfileModal from "@/components/FitProfileModal";
@@ -381,6 +381,10 @@ export default function Home() {
     document.querySelectorAll("[data-reveal], [data-phase]").forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, [products, selected]);
+
+
+  // Liquid Light: 이번 단계 제외 — hydration 안정화 후 재적용 (헌법 19조: 실패 시 축소)
+
 
   const openDetail = useCallback(async (p: Product) => {
     const fid = folderIdFromUrl(p.lookbookImage);
