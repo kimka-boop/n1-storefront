@@ -363,7 +363,21 @@ export default function Home() {
 
   const openDetail = useCallback(async (p: Product) => {
     const fid = folderIdFromUrl(p.lookbookImage);
-    if (!fid) return;
+    if (!fid) {
+      // 신형 룩북(fashn.ai 직접 URL): Drive 폴더가 없어 대표 이미지 단일 슬라이드로 개방
+      setSelected(p);
+      setSlide(0);
+      setSlideIds([]);
+      setSelColor(p.colorOptions?.length === 1 ? p.colorOptions[0] : "");
+      // STEP 3: 스마트 핏 프리셋 — 프로필이 있으면 사이즈 자동 선택
+      const presetSize = smartFitPreset(p, () => authProfile);
+      setSelSize(presetSize || (p.sizeOptions?.length === 1 ? p.sizeOptions[0] : ""));
+      setOptTouched(false);
+      setOrderStage("options");
+      setOrderResult(null);
+      setOrderError("");
+      return;
+    }
     try {
       const res = await fetch(`/api/lookbook-files?folder=${fid}`);
       const data = await res.json();
@@ -382,7 +396,19 @@ export default function Home() {
         setOrderError("");
       }
     } catch {}
-  }, []);
+  }, [authProfile]);
+
+  // 상세 페이지(/product/[id]) 구매 CTA → /?product=<id> 진입 시 상세 모달 자동 오픈
+  useEffect(() => {
+    if (!products.length) return;
+    const pid = new URLSearchParams(window.location.search).get("product");
+    if (!pid) return;
+    const p = products.find((x) => x.id === pid);
+    if (p) {
+      openDetail(p);
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  }, [products, openDetail]);
 
   // 선택된 옵션의 재고 수 — 신형 키(색상_사이즈) 우선, 구형 키(사이즈) 폴백
   const selectedStock = (() => {
@@ -549,7 +575,7 @@ export default function Home() {
           <div className="modal-body" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close" onClick={closeDetail}>✕</button>
             <div className="slider">
-              {slideIds[slide] && (
+              {slideIds[slide] ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   key={slide}
@@ -557,10 +583,21 @@ export default function Home() {
                   alt={`${selected.name} — ${SHOT_LABELS[slide]}`}
                   className="slide-img"
                 />
-              )}
+              ) : selected.lookbookImage ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={selected.lookbookImage}
+                  alt={`${selected.name} — 대표컷`}
+                  className="slide-img"
+                />
+              ) : null}
               <button className="nav prev" onClick={prevSlide} aria-label="이전">‹</button>
               <button className="nav next" onClick={nextSlide} aria-label="다음">›</button>
-              <div className="slide-label">{SHOT_LABELS[slide]} ({slide + 1}/{slideIds.length})</div>
+              <div className="slide-label">
+                {slideIds.length
+                  ? `${SHOT_LABELS[slide]} (${slide + 1}/${slideIds.length})`
+                  : "대표컷"}
+              </div>
             </div>
             <div className="detail-info">
               <p className="category">{selected.category}</p>
