@@ -30,7 +30,7 @@ export function colorLabel(color: string): string {
 
 /** 교환·반품 문구 (Owner 승인 표기 — 시트 값이 새 문구면 그대로 통과) */
 const QUALITY_NEW =
-  "수령 후 7일 이내 청약철회 요청이 가능합니다(사용·훼손된 경우 제외). 전자상거래법상 소비자 청약철회 가능 범위를 준수합니다.";
+  "수령 후 7일 이내에 청약철회를 요청하실 수 있습니다. 이미 사용했거나 훼손된 상품은 청약철회 대상에서 제외됩니다. 전자상거래법상 소비자 청약철회 가능 범위를 준수합니다.";
 const QUALITY_OLD =
   "전자상거래 법에 규정되어 있는 소비자 청약철회 가능 범위를 준수합니다.";
 
@@ -38,6 +38,21 @@ export function noticeQualityText(value?: string): string {
   const v = (value || "").trim();
   if (!v || v === QUALITY_OLD) return QUALITY_NEW;
   return v;
+}
+
+/** 세탁 안내 — "상세 페이지 및 고객센터 문의" 보일러플레이트 문장 제거 (Owner 지시 2026-09-08) */
+const WASH_BOILER =
+  "세탁 관련 상세 정보는 상품 상세 페이지 및 고객센터로 문의 바랍니다.";
+
+export function washingText(value?: string): string {
+  const v = (value || "").trim();
+  if (!v || v.toUpperCase() === "UNKNOWN") return "";
+  return v
+    .split(WASH_BOILER)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .join(" ")
+    .replace(/\s{2,}/g, " ");
 }
 
 /** 문의 안내 문구 (Owner 승인 표기 — 말풍선 아이콘 위치 안내) */

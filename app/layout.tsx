@@ -3,6 +3,7 @@ import "./globals.css";
 import FloatingOrderTracker from "@/components/FloatingOrderTracker";
 import { AuthProvider } from "@/components/AuthProvider";
 import CsWidget from "@/components/CsWidget";
+import SiteHeader from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
   title: "N°1 — 20 Pieces. Selected by AI.",
@@ -14,6 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <body>
         <AuthProvider>
+        <SiteHeader />
         {children}
         </AuthProvider>
         <FloatingOrderTracker />

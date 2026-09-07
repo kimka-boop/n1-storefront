@@ -31,6 +31,7 @@ import {
   noticeQualityText,
   noticeAsText,
   sizeSummary,
+  washingText,
 } from "@/lib/display";
 import styles from "./product.module.css";
 
@@ -151,7 +152,7 @@ export default function ProductPage() {
   const fit = product.fit ?? {};
   const origin = clean(product.origin);
   const manufacturer = clean(product.notice?.manufacturer);
-  const washing = clean(product.washingInfo);
+  const washing = washingText(product.washingInfo);
   const sizes = sizeSummary(product.sizeChart);
   const genderLabel = genderKo(product.gender);
   const categoryLabel = categoryShort(product.category);
@@ -426,12 +427,6 @@ export default function ProductPage() {
             <>
               <dt>문의</dt>
               <dd>{noticeAsText(product.notice.as)}</dd>
-            </>
-          ) : null}
-          {!manufacturer && !product.notice?.madeAt ? (
-            <>
-              <dt>제조자·제조연월</dt>
-              <dd>확인 중 — 고객센터로 문의해 주세요</dd>
             </>
           ) : null}
         </dl>

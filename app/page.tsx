@@ -17,7 +17,6 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import FitProfileModal from "@/components/FitProfileModal";
-import AuthNav from "@/components/AuthNav";
 import { useAuth } from "@/components/AuthProvider";
 import { mediaFor } from "@/lib/media";
 import {
@@ -32,6 +31,7 @@ import {
   noticeQualityText,
   noticeAsText,
   materialText,
+  washingText,
 } from "@/lib/display";
 
 interface FitInfo { thickness: string; stretch: string; sheer: string; lining: string; shape: string; }
@@ -480,8 +480,6 @@ export default function Home() {
 
   return (
     <main>
-      <AuthNav />
-
       <header className="hero">
         <div className="hero-brand">
           <h1>N°1</h1>
@@ -530,8 +528,8 @@ export default function Home() {
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="컬렉션 안에서 찾기"
-              aria-label="컬렉션 검색"
+              placeholder="검색"
+              aria-label="검색"
             />
             {query ? (
               <button type="button" onClick={() => setQuery("")}>초기화</button>
@@ -581,7 +579,8 @@ export default function Home() {
 
         {upcomingCount > 0 && (
           <p className="collection-upcoming">
-            다음 컬렉션 {upcomingCount}벌은 확인을 마치는 대로 순서대로 공개됩니다.
+            이번 주 컬렉션은 남성 20 · 여성 20 · 젠더리스 20, 총 60벌입니다 —
+            지금은 확인을 마친 {readyAll.length}벌이 공개되어 있습니다.
           </p>
         )}
       </section>
@@ -590,9 +589,9 @@ export default function Home() {
       <section className="story">
         <h2 className="story-title">괜찮은 것만 보여드립니다</h2>
         <p className="story-body">
-          N°1은 모든 상품을 한자리에 쏟아놓지 않습니다. 소재와 치수를 하나씩 확인하고,
-          남을 만한 것만 컬렉션에 올립니다. 사진은 직접 만든 착용컷으로, 정보는 확인한
-          것만 적습니다 — 눈이 편한 쇼핑을 위해서입니다.
+          N°1은 모든 상품을 한자리에 쏟아놓지 않습니다.
+          <br />
+          눈이 편한 쇼핑을 위해서입니다.
         </p>
         <button className="story-cta" onClick={() => setShowFitModal(true)}>
           내 핏 프로필 만들기 →
@@ -754,8 +753,8 @@ export default function Home() {
                     ))}
                   </div>
                 )}
-                {orRef(selected.washingInfo) ? (
-                  <div className="info-row"><span>세탁/취급</span><b>{orRef(selected.washingInfo)}</b></div>
+                {washingText(selected.washingInfo) ? (
+                  <div className="info-row"><span>세탁/취급</span><b>{washingText(selected.washingInfo)}</b></div>
                 ) : null}
                 <SizeChartTable chart={selected.sizeChart} />
                 {orRef(selected.modelInfo) ? (
@@ -788,16 +787,13 @@ export default function Home() {
                   <div className="info-row">
                     <span>품질보증기준</span>
                     <b className="quality-tip">
-                      수령 후 7일 이내 청약철회 가능(사용·훼손 제외)
+                      수령 후 7일 이내 청약철회 가능
                       <span className="tooltip">
-                        수령 후 7일 이내 청약철회 요청이 가능합니다(사용·훼손된 경우 제외). 전자상거래법상 소비자 청약철회 가능 범위를 준수합니다.
+                        수령 후 7일 이내에 청약철회를 요청하실 수 있습니다. 이미 사용했거나 훼손된 상품은 청약철회 대상에서 제외됩니다. 전자상거래법상 소비자 청약철회 가능 범위를 준수합니다.
                       </span>
                     </b>
                   </div>
                   <div className="info-row"><span>A/S 책임자</span><b>{noticeAsText(selected.notice?.as) || "N°1 고객센터"}</b></div>
-                  {(!orRef(selected.notice?.manufacturer) || !orRef(selected.notice?.madeAt)) ? (
-                    <p className="notice-unconfirmed">제조자·제조연월 등 일부 항목은 확인 중입니다 — 고객센터로 문의해 주세요.</p>
-                  ) : null}
                 </div>
               </div>
 
