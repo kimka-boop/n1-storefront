@@ -1,24 +1,38 @@
 "use client";
 
 /**
- * N°1 — 메인 페이지 (2026-09-07 Redesign)
+ * N°1 — 메인 페이지 (Editorial Experience V2, 2026-09-08)
+ * 스펙: N1_ASTRA_TO_ZCODE_HANDOFF.md · docs/N1_REDESIGN_MISSION.md
  *
- * 감사 판정 (KEEP/REFINE/REBUILD/REMOVE):
- * - KEEP: 인증 네비, Smart Fit(모달·프리셋), 빠른 주문 모달+주문 플로우, 스크롤 리빌, 페이퍼 팔레트
- * - REFINE: 히어로(한국어 태그라인+마감 안내 통합), 성별 탭(스티키 글래스 내비+enum 버그 수정),
- *           상품 카드(편집형 2열 디스커버리 — PDP 라우트 연결)
- * - REBUILD: 상품 탐색 섹션(준비된 컬렉션만 공개 + 준비 중 카운트), 브랜드 스토리 섹션
- * - REMOVE: 60장 placeholder 벽(미생성 상품 카드), "[D-x]" 괄호 카운트다운
- *
- * Liquid Glass 원칙: 유리는 장식이 아니라 행동 — 스티키 내비가 스크롤에 반응해 나타나고,
- * 나머지 영역은 여백과 콘텐츠가 지배한다.
+ * V2:
+ * - 에디토리얼 위계: LEAD(대형) → SUPPORTING(2) → QUIET(잔잔) — 동일 카드 벽 제거
+ * - selectCollection(준비된 상품만·정확 성별 enum·컬렉션 내 검색)
+ * - 미디어: 로컬 에디토리얼 샷 우선(public/editorial-media) → 폴백 체인
+ * - 구매 상태: purchaseState(ready/choose/soldout/unconfirmed) — 재고 미확정은
+ *   구매 가능처럼 보이지 않고 CS 문의로 안내 (미션 §10·§16)
+ * - 색상 원시 값이 PDP → 모달 → 주문까지 전달 (quickBuyUrl)
+ * - 고시 기본값 판성 데이터 제거 — 확인된 사실만 표기
+ * - 모션: fog depth(접근 전 opacity .93) + 상태 전이 크로스페이드만
  */
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import FitProfileModal from "@/components/FitProfileModal";
 import AuthNav from "@/components/AuthNav";
 import { useAuth } from "@/components/AuthProvider";
-import { genderKo, genderTabOf, categoryShort, colorLabel, noticeQualityText, noticeAsText, materialText } from "@/lib/display";
+import { mediaFor } from "@/lib/media";
+import {
+  productColors,
+  purchaseState,
+  selectCollection,
+} from "@/lib/experience";
+import { PRODUCT_STORY } from "@/lib/productContent";
+import {
+  genderKo,
+  categoryShort,
+  noticeQualityText,
+  noticeAsText,
+  materialText,
+} from "@/lib/display";
 
 interface FitInfo { thickness: string; stretch: string; sheer: string; lining: string; shape: string; }
 interface NoticeInfo { manufacturer: string; madeAt: string; colorSize: string; quality: string; as: string; }
@@ -43,13 +57,9 @@ interface Product {
   optionStock?: Record<string, number>;
 }
 
-
-// ═══ STEP 3: 스마트 핏 사이즈 프리셋 엔진 ═══
-// B유형(세미오버): 아우터류 +1치수 / C유형(오버핏): +1~2 / A유형: 기준 그대로
+// ═══ 스마트 핏 사이즈 프리셋 엔진 (기존 로직 유지) ═══
 const OUTER_KW = /(블루종|자켓|점퍼|가디건|코트|아우터|항공점퍼|패딩|야상)/i;
 const SIZE_ORDER = ["S", "M", "L", "XL", "2XL", "3XL"];
-
-// 숫자(95/100/105/110) → 문자(S/M/L/XL) 환산
 const NUM_TO_ALPHA: Record<string, string> = { "95": "S", "100": "L", "105": "XL", "110": "2XL" };
 
 function smartFitPreset(product: Product, getProfile: () => any): string {
@@ -57,54 +67,32 @@ function smartFitPreset(product: Product, getProfile: () => any): string {
   if (!profile || !product.sizeOptions?.length) return "";
   const { size: rawSize, fit } = profile;
   if (!rawSize) return "";
-
   const opts = product.sizeOptions;
   const isOuter = OUTER_KW.test(product.name);
-
   let baseAlpha = NUM_TO_ALPHA[rawSize] || rawSize;
   let baseIdx = SIZE_ORDER.indexOf(baseAlpha);
-  if (baseIdx === -1) {
-    return "";
-  }
-
+  if (baseIdx === -1) return "";
   let targetIdx = baseIdx;
-  if (fit === "B" && isOuter) targetIdx = baseIdx + 1;          // 세미오버 + 아우터: +1
-  else if (fit === "C") targetIdx = baseIdx + (isOuter ? 2 : 1); // 오버핏: +1~2
-
+  if (fit === "B" && isOuter) targetIdx = baseIdx + 1;
+  else if (fit === "C") targetIdx = baseIdx + (isOuter ? 2 : 1);
   targetIdx = Math.max(0, Math.min(targetIdx, SIZE_ORDER.length - 1));
-  const targetAlpha = SIZE_ORDER[targetIdx];
-
-  const hit = opts.find((o) => o.toUpperCase() === targetAlpha);
-  if (hit) return hit;
-  return "";
+  return opts.find((o) => o.toUpperCase() === SIZE_ORDER[targetIdx]) ?? "";
 }
 
-// 프리셋 사유 뱃지 텍스트
 function fitBadge(product: Product, profile: any): string {
   if (!profile) return "";
   const isOuter = OUTER_KW.test(product.name);
-  const label = { A: "스탠다드", B: "세미오버", C: "오버핏" }[profile.fit as "A"|"B"|"C"] || "";
   if (profile.fit === "B" && isOuter) return `${profile.size} 기준 — 자켓 여유핏 +1추천`;
   if (profile.fit === "C") return `${profile.size} 기준 — 오버핏 +${isOuter ? 2 : 1}추천`;
   return `${profile.size} 기준 추천`;
 }
 
-// 상품정보제공고시 — 빈값 기본 강제 매핑 ('상세페이지 참조' 문구 시스템적 금지)
-const DEFAULTS: Record<string, string> = {
-  제조연월: "2026년 1월 이후 상시제조",
-  제품소재: "혼용률 상세 문의는 고객센터",
-  색상: "단일 색상",
-  치수: "단일 사이즈",
-  제조자: "N°1 협력업체",
-  원산지: "상담 문의",
-};
-function orRef(v?: string, key?: string): string {
+function orRef(v?: string): string {
   const s = (v || "").trim();
   if (s && s !== "상세페이지 참조") return s;
-  return (key && DEFAULTS[key]) || "고객센터 문의";
+  return "";
 }
 
-/** 실측사이즈 문자열 → 가독용 표 */
 function parseSizeChart(chart: string): { cols: string[]; rows: { label: string; vals: string[] }[] } | null {
   if (!chart || !chart.trim()) return null;
   const cleaned = chart.replace(/\s*\((?:한국사이즈|단위)[\s\S]*$/, "").trim();
@@ -126,8 +114,7 @@ function parseSizeChart(chart: string): { cols: string[]; rows: { label: string;
   parsed.forEach((p) => p.items.forEach(([k]) => colSet.add(k)));
   const cols = Array.from(colSet);
   parsed.forEach((p) => {
-    const vals = cols.map((c) => p.items.find(([k]) => k === c)?.[1] ?? "-");
-    rows.push({ label: p.label, vals });
+    rows.push({ label: p.label, vals: cols.map((c) => p.items.find(([k]) => k === c)?.[1] ?? "-") });
   });
   return { cols, rows };
 }
@@ -135,9 +122,8 @@ function parseSizeChart(chart: string): { cols: string[]; rows: { label: string;
 function SizeChartTable({ chart }: { chart?: string }) {
   const parsed = parseSizeChart(chart || "");
   if (!parsed) {
-    return (
-      <div className="info-row"><span className="nowrap">실측 사이즈</span><b>{orRef(chart)}</b></div>
-    );
+    const v = orRef(chart);
+    return v ? <div className="info-row"><span className="nowrap">실측 사이즈</span><b>{v}</b></div> : null;
   }
   return (
     <div className="size-table-wrap">
@@ -159,7 +145,6 @@ function SizeChartTable({ chart }: { chart?: string }) {
   );
 }
 
-/** 배송/교환/반품 탭 안내 */
 function PolicyTabs() {
   const [tab, setTab] = useState<"shipping" | "exchange" | "return">("shipping");
   const TABS = [
@@ -172,11 +157,7 @@ function PolicyTabs() {
       <h3 className="spec-title">배송 · 교환 · 반품 안내</h3>
       <div className="policy-tabs">
         {TABS.map((t) => (
-          <button
-            key={t.key}
-            className={`policy-tab ${tab === t.key ? "active" : ""}`}
-            onClick={() => setTab(t.key)}
-          >
+          <button key={t.key} className={`policy-tab ${tab === t.key ? "active" : ""}`} onClick={() => setTab(t.key)}>
             {t.label}
           </button>
         ))}
@@ -221,23 +202,35 @@ function driveImg(fileId: string, w = 1000) {
   return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${w}&v=${Math.floor(Date.now() / 600000)}`;
 }
 
+type GenderKey = "all" | "male" | "female" | "genderless";
+const GENDER_API: Record<Exclude<GenderKey, "all">, string> = {
+  male: "MALE", female: "FEMALE", genderless: "GENDERLESS",
+};
+
+/** 에디토리얼 순서: 스토리 보유 → 색상 풍부함 (편집적 강약의 근거) */
+function editorialWeight(p: Product): number {
+  const hasStory = PRODUCT_STORY[p.id] ? 1 : 0;
+  const colors = productColors(p.colorOptions).length;
+  return hasStory * 100 + colors;
+}
+
 export default function Home() {
   const { profile: authProfile } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
-  const [thumbs, setThumbs] = useState<Record<string, string>>({}); // pid → 대표 이미지 URL
+  const [thumbs, setThumbs] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<Product | null>(null);
   const [slide, setSlide] = useState(0);
   const [slideIds, setSlideIds] = useState<string[]>([]);
-  // ── 주간 드롭 카운트다운 (매주 일요일 자정 마감) ──
   const [dDay, setDDay] = useState("");
+
   useEffect(() => {
     const calc = () => {
       const now = new Date();
-      const next = new Date(now);
-      const day = now.getDay(); // 0=일
+      const day = now.getDay();
       let daysLeft = (7 - day) % 7;
-      if (daysLeft === 0) daysLeft = 7; // 일요일 당일은 마감일로 D-Day
+      if (daysLeft === 0) daysLeft = 7;
+      const next = new Date(now);
       next.setDate(now.getDate() + daysLeft);
       next.setHours(24, 0, 0, 0);
       const diff = Math.floor((next.getTime() - now.getTime()) / 86400000);
@@ -248,31 +241,36 @@ export default function Home() {
     return () => clearInterval(t);
   }, []);
 
-  // ── STEP 1: 성별 퀵 필터 (localStorage 기억) ──
-  const [genderTab, setGenderTab] = useState<"all" | "male" | "female" | "genderless">("all");
+  // ── 컬렉션 필터: 성별(정확 enum) + 컬렉션 내 검색 ──
+  const [genderTab, setGenderTab] = useState<GenderKey>("all");
+  const [query, setQuery] = useState("");
   useEffect(() => {
     const saved = localStorage.getItem("n1_gender_tab");
     if (saved === "male" || saved === "female" || saved === "genderless") setGenderTab(saved);
   }, []);
-  const changeTab = (t: "all" | "male" | "female" | "genderless") => {
+  const changeTab = (t: GenderKey) => {
     setGenderTab(t);
     if (t === "all") localStorage.removeItem("n1_gender_tab");
     else localStorage.setItem("n1_gender_tab", t);
   };
 
-  // ── 컬렉션: 이미지가 준비된 상품만 공개 (미생성은 카드 벽 대신 카운트로) ──
-  const readyProducts = products.filter(
-    (p) => p.lookbookStatus === "생성완료" && (p.lookbookImage || "").trim() !== ""
-  );
-  const upcomingCount = products.length - readyProducts.length;
+  const readyAll = selectCollection(products, "all");
+  const collection = selectCollection(
+    products,
+    genderTab === "all" ? "all" : GENDER_API[genderTab],
+    query
+  ).sort((a, b) => editorialWeight(b) - editorialWeight(a));
+  const upcomingCount = products.length - readyAll.length;
+  const genderCount = (g: Exclude<GenderKey, "all">) =>
+    selectCollection(products, GENDER_API[g]).length;
 
-  const filteredProducts = genderTab === "all"
-    ? readyProducts
-    : readyProducts.filter((p) => genderTabOf(p.gender) === genderTab);
-  const genderCount = (g: "male" | "female" | "genderless") =>
-    readyProducts.filter((p) => genderTabOf(p.gender) === g).length;
+  // 에디토리얼 역할 배분: 첫 편성 = LEAD, 다음 2 = SUPPORTING, 나머지 = QUIET
+  const withRoles = collection.map((p, i) => ({
+    product: p,
+    role: (i === 0 ? "lead" : i <= 2 ? "supporting" : "quiet") as "lead" | "supporting" | "quiet",
+  }));
 
-  // ── STEP 2/3: 스마트 핏 프로필 (localStorage) ──
+  // ── 스마트 핏 ──
   const [fitProfile, setFitProfile] = useState<{gender: string; size: string; fit: string} | null>(null);
   const [showFitModal, setShowFitModal] = useState(false);
   useEffect(() => {
@@ -286,14 +284,12 @@ export default function Home() {
     localStorage.setItem("n1_fit_profile", JSON.stringify(p));
     setShowFitModal(false);
   };
-  // auth 프로필 동기화 (로그인 시 프로필 표시)
   useEffect(() => { if (authProfile) setFitProfile(authProfile); }, [authProfile]);
 
-  // ── 옵션 선택 상태 (D2C 구매 UI) ──
+  // ── 빠른 주문 상태 (원시 색상/사이즈 값) ──
   const [selColor, setSelColor] = useState("");
   const [selSize, setSelSize] = useState("");
   const [optTouched, setOptTouched] = useState(false);
-  // ── 주문 폼 상태 (모듈 2: 계좌이체) ──
   const [orderStage, setOrderStage] = useState<"options" | "form" | "done">("options");
   const [orderForm, setOrderForm] = useState({ name: "", phone: "", address: "", depositor: "" });
   const [orderResult, setOrderResult] = useState<{ order_id: string; total: number; type: string; notice?: string; bank: string; account: string; holder: string } | null>(null);
@@ -311,16 +307,13 @@ export default function Home() {
     }
   }, []);
 
-  // 대표이미지 로딩 (Drive 폴더형만 — FASHN 직접 URL은 lookbookImage를 그대로 사용)
   const loadThumb = useCallback(async (p: Product) => {
     const fid = folderIdFromUrl(p.lookbookImage);
     if (!fid || thumbs[p.id]) return;
     try {
       const res = await fetch(`/api/lookbook-files?folder=${fid}`);
       const data = await res.json();
-      if (data.ok && data.thumb) {
-        setThumbs((prev) => ({ ...prev, [p.id]: data.thumb }));
-      }
+      if (data.ok && data.thumb) setThumbs((prev) => ({ ...prev, [p.id]: data.thumb }));
     } catch {}
   }, [thumbs]);
 
@@ -330,24 +323,23 @@ export default function Home() {
     return () => clearInterval(t);
   }, [fetchProducts]);
 
-  // Drive 폴더형 제품의 대표이미지 순차 로딩
   useEffect(() => {
-    const pending = readyProducts.filter((p) => !thumbs[p.id] && folderIdFromUrl(p.lookbookImage));
+    const pending = readyAll.filter((p) => !thumbs[p.id] && folderIdFromUrl(p.lookbookImage));
     pending.slice(0, 4).forEach((p) => loadThumb(p));
-  }, [readyProducts, thumbs, loadThumb]);
+  }, [readyAll, thumbs, loadThumb]);
 
-  // 카드 이미지 소스 — Drive 썸네일 우선, 없으면 FASHN 원본 URL 직접
-  const imageOf = (p: Product): string | null => thumbs[p.id] || p.lookbookImage || null;
+  // 카드 이미지: 에디토리얼 로컬 샷 → Drive 썸네일 → API 원본
+  const imageOf = (p: Product): string | null =>
+    mediaFor(p.id, p.lookbookImage)?.front || thumbs[p.id] || p.lookbookImage || null;
 
-  // 스크롤 리빌
+  // fog depth — 접근 전엔 살짝 옅게, 가까워지면 또렷하게 (Liquid Glass 문법)
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
-            const el = e.target as HTMLElement;
-            el.classList.add("revealed");
-            observer.unobserve(el);
+            e.target.classList.add("revealed");
+            observer.unobserve(e.target);
           }
         });
       },
@@ -355,58 +347,58 @@ export default function Home() {
     );
     document.querySelectorAll("[data-reveal]:not(.revealed)").forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [filteredProducts.length]);
+  }, [collection.length]);
 
-  const openDetail = useCallback(async (p: Product) => {
+  const openDetail = useCallback(async (p: Product, preset?: { color?: string; size?: string }) => {
     const fid = folderIdFromUrl(p.lookbookImage);
-    if (!fid) {
-      // 신형 룩북(fashn.ai 직접 URL): Drive 폴더가 없어 대표 이미지 단일 슬라이드로 개방
-      setSelected(p);
-      setSlide(0);
-      setSlideIds([]);
-      setSelColor(p.colorOptions?.length === 1 ? colorLabel(p.colorOptions[0]) : "");
-      // STEP 3: 스마트 핏 프리셋 — 프로필이 있으면 사이즈 자동 선택
+    const colors = productColors(p.colorOptions);
+    const apply = () => {
+      setSelColor(preset?.color || (colors.length === 1 ? colors[0].value : ""));
       const presetSize = smartFitPreset(p, () => authProfile);
-      setSelSize(presetSize || (p.sizeOptions?.length === 1 ? p.sizeOptions[0] : ""));
+      setSelSize(preset?.size || presetSize || (p.sizeOptions?.length === 1 ? p.sizeOptions[0] : ""));
       setOptTouched(false);
       setOrderStage("options");
       setOrderResult(null);
       setOrderError("");
+    };
+    if (!fid) {
+      setSelected(p);
+      setSlide(0);
+      setSlideIds([]);
+      apply();
       return;
     }
     try {
       const res = await fetch(`/api/lookbook-files?folder=${fid}`);
       const data = await res.json();
-      if (data.ok) {
-        setSlideIds(data.files.map((f: any) => f.id));
-        setSelected(p);
-        setSlide(0);
-        setSelColor(p.colorOptions?.length === 1 ? colorLabel(p.colorOptions[0]) : "");
-        const presetSize = smartFitPreset(p, () => authProfile);
-        setSelSize(presetSize || (p.sizeOptions?.length === 1 ? p.sizeOptions[0] : ""));
-        setOptTouched(false);
-        setOrderStage("options");
-        setOrderResult(null);
-        setOrderError("");
-      }
-    } catch {}
+      if (data.ok) setSlideIds(data.files.map((f: any) => f.id));
+      setSelected(p);
+      setSlide(0);
+      apply();
+    } catch {
+      setSelected(p);
+      setSlide(0);
+      setSlideIds([]);
+      apply();
+    }
   }, [authProfile]);
 
-  // PDP 구매 CTA → /?product=<id> 진입 시 상세 모달 자동 오픈
+  // PDP 구매 CTA → /?product=<id>&color=<raw>&size=<raw> 진입 시 모달 자동 오픈 + 원시값 선선택
   useEffect(() => {
     if (!products.length) return;
-    const pid = new URLSearchParams(window.location.search).get("product");
+    const sp = new URLSearchParams(window.location.search);
+    const pid = sp.get("product");
     if (!pid) return;
     const p = products.find((x) => x.id === pid);
     if (p) {
-      openDetail(p);
+      openDetail(p, { color: sp.get("color") || undefined, size: sp.get("size") || undefined });
       window.history.replaceState(null, "", window.location.pathname);
     }
   }, [products, openDetail]);
 
-  // 선택된 옵션의 재고 수 — 신형 키(색상_사이즈) 우선, 구형 키(사이즈) 폴백
-  const colorOptionsLabeled = (selected?.colorOptions || []).map(colorLabel);
-  const selectedStock = (() => {
+  const colorPairs = selected ? productColors(selected.colorOptions) : [];
+  const buyState = selected ? purchaseState(selected, selColor, selSize) : "choose";
+  const variantStock = (() => {
     if (!selected?.optionStock) return null;
     const os = selected.optionStock;
     const pairKey = selColor && selSize ? `${selColor}_${selSize}` : "";
@@ -415,13 +407,10 @@ export default function Home() {
     if (pairKeyNs && os[pairKeyNs] !== undefined) return os[pairKeyNs];
     if (selSize && os[selSize] !== undefined) return os[selSize];
     if (selColor && os[selColor] !== undefined) return os[selColor];
-    const vals = Object.values(os);
-    return vals.length ? Math.min(...vals) : null;
+    return null;
   })();
-  const lowStock = selectedStock !== null && selectedStock > 0 && selectedStock <= 5;
-  const optionsReady = (!colorOptionsLabeled.length || selColor) && (!selected?.sizeOptions?.length || selSize);
+  const lowStock = variantStock !== null && variantStock > 0 && variantStock <= 5;
 
-  // ── 주문 제출 (모듈 2: /api/orders) ──
   const submitOrder = useCallback(async () => {
     if (!selected) return;
     setSubmitting(true);
@@ -439,8 +428,12 @@ export default function Home() {
           },
           items: [{
             sku: selected.id,
-            color: selColor,
-            colorIndex: (selected.colorOptions || []).findIndex((c) => colorLabel(c) === selColor),
+            color: selColor, // 원시 값 그대로 주문에 전달
+            colorIndex: (selected.colorOptions || []).reduce<number>((acc, raw, i) => {
+              const parts = raw.includes("·") ? raw.split("·") : raw.split(/\s+\/\s+/);
+              const hit = parts.map(s => s.trim()).find(s => s === selColor);
+              return hit !== undefined ? i : acc;
+            }, -1),
             size: selSize,
             qty: 1,
           }],
@@ -458,7 +451,7 @@ export default function Home() {
           holder: data.deposit_info.holder,
         });
         setOrderStage("done");
-        fetchProducts(); // 재고 반영 새로고침
+        fetchProducts();
       } else {
         setOrderError(data.error || "주문 처리 중 오류가 발생했습니다");
       }
@@ -470,14 +463,9 @@ export default function Home() {
   }, [selected, orderForm, selColor, selSize, fetchProducts]);
 
   const closeDetail = () => setSelected(null);
-  const nextSlide = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setSlide((s) => (s + 1) % Math.max(slideIds.length, 1));
-  };
-  const prevSlide = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setSlide((s) => (s - 1 + slideIds.length) % Math.max(slideIds.length, 1));
-  };
+  const nextSlide = (e?: React.MouseEvent) => { e?.stopPropagation(); setSlide((s) => (s + 1) % Math.max(slideIds.length, 1)); };
+  const prevSlide = (e?: React.MouseEvent) => { e?.stopPropagation(); setSlide((s) => (s - 1 + slideIds.length) % Math.max(slideIds.length, 1)); };
+  const openCs = () => window.dispatchEvent(new Event("n1:open-cs"));
 
   useEffect(() => {
     if (!selected) return;
@@ -494,25 +482,24 @@ export default function Home() {
     <main>
       <AuthNav />
 
-      {/* ── 히어로: 브랜드 + 이번 컬렉션 마감 (한 문장으로) ── */}
       <header className="hero">
-        <div className="hero-brand" data-reveal>
+        <div className="hero-brand">
           <h1>N°1</h1>
           <p className="hero-tag">20 Pieces · Selected by AI</p>
           <p className="hero-tagline">매주 일요일, 마음에 드는 몇 벌만 골라 보여드립니다</p>
         </div>
-        <p className="hero-drop" data-reveal>
+        <p className="hero-drop">
           이번 컬렉션 마감 {dDay || "—"} · 매주 일요일 자정에 새 컬렉션이 열립니다
         </p>
       </header>
 
       {error && <p className="error">⚠️ {error}</p>}
 
-      {/* ── 컬렉션 내비 (sticky glass — 스크롤 시 상단에 얇게 떠오른다) ── */}
+      {/* ── 컬렉션 내비 (sticky glass rail) ── */}
       <nav className="collection-nav" aria-label="컬렉션 필터">
         <span className="nav-brand">N°1</span>
         <button className={`gtab ${genderTab === "all" ? "active" : ""}`} onClick={() => changeTab("all")}>
-          전체 <span className="gcount">({readyProducts.length})</span>
+          전체 <span className="gcount">({readyAll.length})</span>
         </button>
         <button className={`gtab ${genderTab === "male" ? "active" : ""}`} onClick={() => changeTab("male")}>
           남성 <span className="gcount">({genderCount("male")})</span>
@@ -530,33 +517,44 @@ export default function Home() {
         </button>
       </nav>
 
-      {/* ── 컬렉션: 준비된 상품만, 하나씩 발견하는 편집형 그리드 ── */}
+      {/* ── 컬렉션: 에디토리얼 위계 ── */}
       <section className="collection">
-        <div className="collection-head" data-reveal>
+        <div className="collection-head">
           <h2 className="collection-title">이번 컬렉션</h2>
           <p className="collection-sub">
-            {readyProducts.length}벌이 준비되어 있습니다
+            {readyAll.length}벌이 준비되어 있습니다
             {genderTab !== "all" && " · " + ({male:"남성",female:"여성",genderless:"젠더리스"}[genderTab])}
           </p>
+          <div className="collection-search">
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="컬렉션 안에서 찾기"
+              aria-label="컬렉션 검색"
+            />
+            {query ? (
+              <button type="button" onClick={() => setQuery("")}>초기화</button>
+            ) : null}
+          </div>
         </div>
 
-        {filteredProducts.length ? (
+        {withRoles.length ? (
           <div className="pieces">
-            {filteredProducts.map((p, idx) => {
+            {withRoles.map(({ product: p, role }) => {
               const img = imageOf(p);
               const soldOut = p.stockStatus === "품절";
               return (
                 <Link
                   key={p.id}
                   href={`/product/${p.id}`}
-                  className="piece"
+                  className={`piece piece-${role}`}
                   data-reveal
-                  style={{ transitionDelay: `${(idx % 2) * 80}ms` }}
                 >
                   <div className={`piece-media ${img ? "" : "empty"}`}>
                     {img ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={img} alt={`${p.name} 대표 이미지`} loading={idx < 2 ? "eager" : "lazy"} />
+                      <img src={img} alt={`${p.name} 대표 이미지`} loading={role === "lead" ? "eager" : "lazy"} />
                     ) : (
                       <span>이미지 준비 중</span>
                     )}
@@ -575,24 +573,26 @@ export default function Home() {
           </div>
         ) : (
           <p className="collection-empty">
-            이번 컬렉션에는 해당하는 상품이 없습니다 — 다음 컬렉션에서 만나요.
+            {query
+              ? "검색 결과가 없습니다 — 다른 이름으로 찾아보세요."
+              : "이번 컬렉션에는 해당하는 상품이 없습니다 — 다음 컬렉션에서 만나요."}
           </p>
         )}
 
         {upcomingCount > 0 && (
           <p className="collection-upcoming">
-            다음 컬렉션의 {upcomingCount}벌이 준비 중입니다 — 매주 일요일에 공개됩니다.
+            다음 컬렉션 {upcomingCount}벌은 확인을 마치는 대로 순서대로 공개됩니다.
           </p>
         )}
       </section>
 
-      {/* ── 브랜드 스토리 (조용한 한 문단 + Smart Fit 유도) ── */}
-      <section className="story" data-reveal>
+      {/* ── 브랜드 스토리 ── */}
+      <section className="story">
         <h2 className="story-title">괜찮은 것만 보여드립니다</h2>
         <p className="story-body">
           N°1은 모든 상품을 한자리에 쏟아놓지 않습니다. 소재와 치수를 하나씩 확인하고,
           남을 만한 것만 컬렉션에 올립니다. 사진은 직접 만든 착용컷으로, 정보는 확인한
-          것만 적습니다. 스크롤이 길어도 보이는 것은 몇 벌뿐입니다 — 눈이 편한 쇼핑을 위해서입니다.
+          것만 적습니다 — 눈이 편한 쇼핑을 위해서입니다.
         </p>
         <button className="story-cta" onClick={() => setShowFitModal(true)}>
           내 핏 프로필 만들기 →
@@ -601,7 +601,6 @@ export default function Home() {
 
       <footer>© N°1 — 매주 일요일, 새로운 컬렉션</footer>
 
-      {/* ── STEP 2: 스마트 핏 온보딩 모달 (15초 3문 3답) ── */}
       {showFitModal && (
         <FitProfileModal
           initial={fitProfile}
@@ -610,7 +609,7 @@ export default function Home() {
         />
       )}
 
-      {/* ── 빠른 주문 모달 (PDP 구매하기 / ?product= 진입) ── */}
+      {/* ── 빠른 주문 모달 (PDP 구매 진입점) ── */}
       {selected && (
         <div className="modal" onClick={closeDetail}>
           <div className="modal-body" onClick={(e) => e.stopPropagation()}>
@@ -618,119 +617,79 @@ export default function Home() {
             <div className="slider">
               {slideIds[slide] ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
-                <img
-                  key={slide}
-                  src={driveImg(slideIds[slide], 1000)}
-                  alt={`${selected.name} — ${SHOT_LABELS[slide]}`}
-                  className="slide-img"
-                />
-              ) : selected.lookbookImage ? (
+                <img key={slide} src={driveImg(slideIds[slide], 1000)}
+                  alt={`${selected.name} — ${SHOT_LABELS[slide]}`} className="slide-img" />
+              ) : imageOf(selected) ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
-                <img
-                  src={selected.lookbookImage}
-                  alt={`${selected.name} — 대표컷`}
-                  className="slide-img"
-                />
+                <img src={imageOf(selected)!} alt={`${selected.name} — 대표컷`} className="slide-img" />
               ) : null}
-              <button className="nav prev" onClick={prevSlide} aria-label="이전">‹</button>
-              <button className="nav next" onClick={nextSlide} aria-label="다음">›</button>
-              <div className="slide-label">
-                {slideIds.length
-                  ? `${SHOT_LABELS[slide]} (${slide + 1}/${slideIds.length})`
-                  : "대표컷"}
-              </div>
+              {slideIds.length > 1 ? (
+                <>
+                  <button className="nav prev" onClick={prevSlide} aria-label="이전">‹</button>
+                  <button className="nav next" onClick={nextSlide} aria-label="다음">›</button>
+                  <div className="slide-label">{SHOT_LABELS[slide]} ({slide + 1}/{slideIds.length})</div>
+                </>
+              ) : null}
             </div>
             <div className="detail-info">
               <p className="category">{[genderKo(selected.gender), categoryShort(selected.category)].filter(Boolean).join(" · ")}</p>
               <h2>{selected.name}</h2>
               <p className="detail-price">₩{selected.price.toLocaleString("ko-KR")}</p>
               <div className="buy-box">
-                <p className="safe-fit-note">
-                  💡 체형 맞춤 추천: AI 스마트 핏과 실측 단면(cm)을 확인해 주세요.<br />
-                  (수령 후 7일 이내 규정 교환·반품 가능)
-                </p>
-                {/* ── 옵션 선택 (색상/사이즈) ── */}
-                {colorOptionsLabeled.length > 0 && (
+                {/* ── 옵션 선택 (원시 값 기준) ── */}
+                {colorPairs.length > 0 && (
                   <div className="option-row">
-                    <label className="option-label">색상</label>
-                    <select
-                      className="option-select"
+                    <label className="option-label" htmlFor="opt-color">색상</label>
+                    <select id="opt-color" className="option-select"
                       value={selColor}
-                      onChange={(e) => { setSelColor(e.target.value); setOptTouched(true); }}
-                    >
-                      {colorOptionsLabeled.length > 1 && <option value="">색상을 선택하세요</option>}
-                      {colorOptionsLabeled.map((c) => (
-                        <option key={c} value={c} disabled={(() => {
-                          // 색상 단위 품절: 해당 색상의 모든 조합이 0일 때
-                          const raw = (selected.colorOptions || []).find((x) => colorLabel(x) === c) ?? c;
-                          const entries = Object.entries(selected.optionStock || {});
-                          const rel = entries.filter(([k]) => selSize ? k === `${raw}_${selSize}` || k.replace(/\s/g,"") === `${raw}_${selSize}` : k === raw || k.startsWith(`${raw}_`));
-                          if (!rel.length) return false;
-                          return rel.every(([, v]) => v === 0);
-                        })()}>
-                          {c}
-                        </option>
-                      ))}
+                      onChange={(e) => { setSelColor(e.target.value); setOptTouched(true); }}>
+                      {colorPairs.length > 1 && <option value="">색상을 선택하세요</option>}
+                      {colorPairs.map((c) => (<option key={c.value} value={c.value}>{c.label}</option>))}
                     </select>
                   </div>
                 )}
                 {selected.sizeOptions && selected.sizeOptions.length > 0 && (
                   <div className="option-row">
-                    <label className="option-label">사이즈</label>
+                    <label className="option-label" htmlFor="opt-size">사이즈</label>
                     {fitProfile && selSize && (
                       <span className="fit-badge">✨ {fitBadge(selected, fitProfile)}</span>
                     )}
-                    <select
-                      className="option-select"
+                    <select id="opt-size" className="option-select"
                       value={selSize}
-                      onChange={(e) => { setSelSize(e.target.value); setOptTouched(true); }}
-                    >
+                      onChange={(e) => { setSelSize(e.target.value); setOptTouched(true); }}>
                       {selected.sizeOptions.length > 1 && <option value="">사이즈를 선택하세요</option>}
-                      {selected.sizeOptions.map((s) => {
-                        const st = (() => {
-                          const os = selected.optionStock || {};
-                          const rawColor = (selected.colorOptions || []).find((x) => colorLabel(x) === selColor) ?? selColor;
-                          const pairKey = rawColor ? `${rawColor}_${s}` : "";
-                          const pairKeyNs = pairKey.replace(/\s/g, "");
-                          if (pairKey && os[pairKey] !== undefined) return os[pairKey];
-                          if (pairKeyNs && os[pairKeyNs] !== undefined) return os[pairKeyNs];
-                          if (os[s] !== undefined) return os[s];
-                          return undefined;
-                        })();
-                        return (
-                          <option key={s} value={s} disabled={st === 0}>
-                            {s}{st === 0 ? " (품절)" : ""}
-                          </option>
-                        );
-                      })}
+                      {selected.sizeOptions.map((s) => (<option key={s} value={s}>{s}</option>))}
                     </select>
                   </div>
                 )}
 
-                {/* ── 품절 임박 (재고 5개 이하, 마스터 DB 실시간 연동) ── */}
-                {optionsReady && lowStock && (
-                  <p className="stock-alert">품절 임박! 남은 수량: {selectedStock}개</p>
+                {buyState === "ready" && lowStock && (
+                  <p className="stock-alert">품절 임박! 남은 수량: {variantStock}개</p>
                 )}
 
-                {/* ── 주문 플로우: 옵션 → 주문폼 → 입금안내 ── */}
+                {/* ── 구매 상태 — purchaseState 기준 정직한 분기 ── */}
                 {orderStage === "options" && (
                   <>
                     <div className="stock-line">
                       <span className={`stock-badge ${selected.stockStatus === "판매중" ? "in" : "out"}`}>
-                        {selected.stockStatus}
+                        {buyState === "unconfirmed" ? "재고 확인 중" : selected.stockStatus}
                       </span>
                     </div>
-                    <button
-                      className="buy-btn"
-                      disabled={selected.stockStatus !== "판매중" || !optionsReady || selectedStock === 0}
-                      onClick={() => setOrderStage("form")}
-                    >
-                      {selected.stockStatus !== "판매중" ? "품절"
-                        : !optionsReady ? (optTouched ? "옵션을 선택해 주세요" : "옵션 선택")
-                        : selectedStock === 0 ? "품절"
-                        : "구매하기"}
-                    </button>
-                    <p className="buy-note">결제 완료 후 신속하게 출고됩니다</p>
+                    {buyState === "ready" ? (
+                      <button className="buy-btn" onClick={() => setOrderStage("form")}>구매하기</button>
+                    ) : buyState === "soldout" ? (
+                      <button className="buy-btn" disabled>품절</button>
+                    ) : buyState === "choose" ? (
+                      <button className="buy-btn" disabled>{optTouched ? "옵션을 선택해 주세요" : "옵션 선택"}</button>
+                    ) : (
+                      <div className="unconfirmed-box">
+                        <p className="unconfirmed-note">
+                          옵션별 재고가 확인 중입니다 — 고객센터로 문의해 주시면 준비를 도와드립니다.
+                        </p>
+                        <button className="buy-btn buy-btn-quiet" onClick={openCs}>고객센터로 문의하기</button>
+                      </div>
+                    )}
+                    {buyState === "ready" && <p className="buy-note">결제 완료 후 신속하게 출고됩니다</p>}
                   </>
                 )}
 
@@ -746,7 +705,8 @@ export default function Home() {
                     <input className="order-input" placeholder="입금자명 (주문자명과 같으면 비워도 됨)" value={orderForm.depositor}
                       onChange={(e) => setOrderForm({ ...orderForm, depositor: e.target.value })} />
                     <p className="order-summary">
-                      {selected.name} · {selColor}{selSize && ` / ${selSize}`} · <b>₩{selected.price.toLocaleString("ko-KR")}</b>
+                      {selected.name} · {colorPairs.find(c => c.value === selColor)?.label ?? selColor}
+                      {selSize && ` / ${selSize}`} · <b>₩{selected.price.toLocaleString("ko-KR")}</b>
                     </p>
                     {orderError && <p className="stock-alert">{orderError}</p>}
                     <div className="order-form-btns">
@@ -771,9 +731,7 @@ export default function Home() {
                       <div className="info-row"><span>입금 기한</span><b>24시간 이내</b></div>
                     </div>
                     <p className="buy-note">입금 확인 후 출고됩니다. 주문번호를 보관해주세요.</p>
-                    {orderResult.notice && (
-                      <p className="split-notice">📦 {orderResult.notice}</p>
-                    )}
+                    {orderResult.notice && (<p className="split-notice">📦 {orderResult.notice}</p>)}
                   </div>
                 )}
               </div>
@@ -782,36 +740,51 @@ export default function Home() {
                 <div className="info-row"><span>배송</span><b>파스토 당일출고 (오후 1시 이전 결제 시)</b></div>
               </div>
 
-              {/* ── 소재 / 핏 / 사이즈 ── */}
               <div className="spec-block">
                 <h3 className="spec-title">소재 &amp; 핏</h3>
-                <div className="info-row"><span>소재</span><b className="material-inline">{orRef(materialText(selected.material))}</b></div>
+                {orRef(materialText(selected.material)) ? (
+                  <div className="info-row"><span>소재</span><b className="material-inline">{materialText(selected.material)}</b></div>
+                ) : null}
                 {selected.fit && (
                   <div className="fit-grid">
                     {([["두께감", selected.fit.thickness], ["신축성", selected.fit.stretch],
                        ["비침", selected.fit.sheer], ["안감", selected.fit.lining],
                        ["핏감", selected.fit.shape]] as const).map(([k, v]) => (
-                      <div className="fit-cell" key={k}><span>{k}</span><b>{orRef(v)}</b></div>
+                      orRef(v) ? <div className="fit-cell" key={k}><span>{k}</span><b>{orRef(v)}</b></div> : null
                     ))}
                   </div>
                 )}
-                <div className="info-row"><span>세탁/취급</span><b>{orRef(selected.washingInfo)}</b></div>
+                {orRef(selected.washingInfo) ? (
+                  <div className="info-row"><span>세탁/취급</span><b>{orRef(selected.washingInfo)}</b></div>
+                ) : null}
                 <SizeChartTable chart={selected.sizeChart} />
-                {selected.modelInfo && selected.modelInfo.trim() && (
+                {orRef(selected.modelInfo) ? (
                   <div className="info-row"><span>모델착용</span><b>{selected.modelInfo}</b></div>
-                )}
+                ) : null}
               </div>
 
-              {/* ── 상품정보제공고시 (전자상거래법 필수) ── */}
+              {/* ── 상품정보제공고시 — 확인된 값만 (기본값 판성 금지) ── */}
               <div className="spec-block">
                 <h3 className="spec-title">상품정보제공고시</h3>
                 <div className="notice-table">
-                  <div className="info-row"><span>제품 소재</span><b className="material-inline">{orRef(materialText(selected.material))}</b></div>
-                  <div className="info-row"><span>색상</span><b>{colorOptionsLabeled.length ? colorOptionsLabeled.join(", ") : orRef(undefined, "색상")}</b></div>
-                  <div className="info-row"><span>치수</span><b>{selected.sizeOptions?.length ? selected.sizeOptions.join(", ") : orRef(undefined)}</b></div>
-                  <div className="info-row"><span>제조자(수입자)</span><b>N°1 협력업체</b></div>
-                  <div className="info-row"><span>제조국(원산지)</span><b>{orRef(selected.origin, "원산지")}</b></div>
-                  <div className="info-row"><span>제조연월</span><b>{orRef(selected.notice?.madeAt, "제조연월")}</b></div>
+                  {orRef(materialText(selected.material)) ? (
+                    <div className="info-row"><span>제품 소재</span><b className="material-inline">{materialText(selected.material)}</b></div>
+                  ) : null}
+                  {colorPairs.length ? (
+                    <div className="info-row"><span>색상</span><b>{colorPairs.map(c => c.label).join(", ")}</b></div>
+                  ) : null}
+                  {selected.sizeOptions?.length ? (
+                    <div className="info-row"><span>치수</span><b>{selected.sizeOptions.join(", ")}</b></div>
+                  ) : null}
+                  {orRef(selected.notice?.manufacturer) ? (
+                    <div className="info-row"><span>제조자(수입자)</span><b>{selected.notice!.manufacturer}</b></div>
+                  ) : null}
+                  {orRef(selected.origin) ? (
+                    <div className="info-row"><span>제조국(원산지)</span><b>{selected.origin}</b></div>
+                  ) : null}
+                  {orRef(selected.notice?.madeAt) ? (
+                    <div className="info-row"><span>제조연월</span><b>{selected.notice!.madeAt}</b></div>
+                  ) : null}
                   <div className="info-row">
                     <span>품질보증기준</span>
                     <b className="quality-tip">
@@ -822,22 +795,19 @@ export default function Home() {
                     </b>
                   </div>
                   <div className="info-row"><span>A/S 책임자</span><b>{noticeAsText(selected.notice?.as) || "N°1 고객센터"}</b></div>
+                  {(!orRef(selected.notice?.manufacturer) || !orRef(selected.notice?.madeAt)) ? (
+                    <p className="notice-unconfirmed">제조자·제조연월 등 일부 항목은 확인 중입니다 — 고객센터로 문의해 주세요.</p>
+                  ) : null}
                 </div>
               </div>
 
-              {/* ── 배송 / 교환 / 반품 (탭형) ── */}
               <PolicyTabs />
 
               <div className="thumbs">
                 {slideIds.map((fid, n) => (
                   /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
-                    key={fid}
-                    src={driveImg(fid, 200)}
-                    alt={SHOT_LABELS[n]}
-                    className={`thumb ${n === slide ? "active" : ""}`}
-                    onClick={() => setSlide(n)}
-                  />
+                  <img key={fid} src={driveImg(fid, 200)} alt={SHOT_LABELS[n]}
+                    className={`thumb ${n === slide ? "active" : ""}`} onClick={() => setSlide(n)} />
                 ))}
               </div>
             </div>

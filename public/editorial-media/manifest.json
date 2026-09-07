@@ -1,0 +1,173 @@
+{
+ "PRD-W-52/01_front.jpg": {
+  "source": "_first_batch_dl/PRD-W-52/01_model_full_front.png",
+  "source_sha256_16": "fbefbc3bc56ff951",
+  "orig_size": [
+   1536,
+   2752
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변)"
+ },
+ "PRD-W-52/02_45deg.jpg": {
+  "source": "_first_batch_dl/PRD-W-52/02_model_45deg.png",
+  "source_sha256_16": "10b9e4f046b8bab5",
+  "orig_size": [
+   1536,
+   2752
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변)"
+ },
+ "PRD-W-52/03_side.jpg": {
+  "source": "_first_batch_dl/PRD-W-52/03_model_90deg.png",
+  "source_sha256_16": "93db311f606406cb",
+  "orig_size": [
+   1536,
+   2752
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변)"
+ },
+ "PRD-W-52/04_back.jpg": {
+  "source": "_first_batch_dl/PRD-W-52/04_model_180_back.png",
+  "source_sha256_16": "dd9677a41b0b9f91",
+  "orig_size": [
+   1536,
+   2752
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변)"
+ },
+ "PRD-W-52/05_product.jpg": {
+  "source": "_first_batch_dl/PRD-W-52/05_product_cutout_AI.png",
+  "source_sha256_16": "98d9fe5cb8a63446",
+  "orig_size": [
+   1024,
+   4096
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변) · 스트립 1컷 선택"
+ },
+ "PRD-G-50/01_front.jpg": {
+  "source": "_first_batch_dl/PRD-G-50/01_model_full_front.png",
+  "source_sha256_16": "db73f3493799f82e",
+  "orig_size": [
+   1536,
+   2752
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변)"
+ },
+ "PRD-G-50/02_45deg.jpg": {
+  "source": "_first_batch_dl/PRD-G-50/02_model_45deg.png",
+  "source_sha256_16": "6e8253a0703526b5",
+  "orig_size": [
+   1536,
+   2752
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변)"
+ },
+ "PRD-G-50/03_side.jpg": {
+  "source": "_first_batch_dl/PRD-G-50/03_model_90deg.png",
+  "source_sha256_16": "da8ad1c16ac8ccc6",
+  "orig_size": [
+   1536,
+   2752
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변)"
+ },
+ "PRD-G-50/04_back.jpg": {
+  "source": "_first_batch_dl/PRD-G-50/04_model_180_back.png",
+  "source_sha256_16": "b7391102e861c70e",
+  "orig_size": [
+   1536,
+   2752
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변)"
+ },
+ "PRD-G-50/05_product.jpg": {
+  "source": "_first_batch_dl/PRD-G-50/05_product_cutout_AI.png",
+  "source_sha256_16": "130989b908e83d43",
+  "orig_size": [
+   1024,
+   4096
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변)"
+ },
+ "PRD-M-51/01_front.jpg": {
+  "source": "_first_batch_dl/PRD-M-51/01_model_full_front.png",
+  "source_sha256_16": "a855dff42cd81ffb",
+  "orig_size": [
+   1536,
+   2752
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변)"
+ },
+ "PRD-M-51/03_side.jpg": {
+  "source": "_first_batch_dl/PRD-M-51/03_model_90deg.png",
+  "source_sha256_16": "6fd4ae840ccd38f2",
+  "orig_size": [
+   1536,
+   2752
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변)"
+ },
+ "PRD-M-51/04_back.jpg": {
+  "source": "_first_batch_dl/PRD-M-51/04_model_180_back.png",
+  "source_sha256_16": "5d5159dfa695d478",
+  "orig_size": [
+   1536,
+   2752
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변)"
+ },
+ "PRD-M-51/05_product.jpg": {
+  "source": "_first_batch_dl/PRD-M-51/05_product_cutout_AI.png",
+  "source_sha256_16": "9c3bd1f04a29db71",
+  "orig_size": [
+   1024,
+   4096
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변)"
+ },
+ "PRD-M-55/01_front.jpg": {
+  "source": "PRD-M-55/qa/01_model_front.png",
+  "source_sha256_16": "83c5b3e81d84fff4",
+  "orig_size": [
+   1536,
+   2752
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변)"
+ },
+ "PRD-M-55/02_45deg.jpg": {
+  "source": "PRD-M-55/qa/02_model_45deg.png",
+  "source_sha256_16": "e02b99e7896eca38",
+  "orig_size": [
+   1536,
+   2752
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변)"
+ },
+ "PRD-M-55/03_side.jpg": {
+  "source": "PRD-M-55/qa/03_model_90deg.png",
+  "source_sha256_16": "c7ffcd633b11beac",
+  "orig_size": [
+   1536,
+   2752
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변)"
+ },
+ "PRD-M-55/04_back.jpg": {
+  "source": "PRD-M-55/qa/04_model_back.png",
+  "source_sha256_16": "49b74b7ef8306a39",
+  "orig_size": [
+   1536,
+   2752
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변)"
+ },
+ "PRD-M-55/05_product.jpg": {
+  "source": "PRD-M-55/qa/05_product_cutout.png",
+  "source_sha256_16": "3fef92f96fa0d8aa",
+  "orig_size": [
+   2048,
+   2048
+  ],
+  "note": "JPEG q85 압축 복사(원본 불변)"
+ }
+}

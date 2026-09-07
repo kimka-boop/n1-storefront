@@ -337,6 +337,114 @@
   padding: 120px 0;
   text-align: center;
   font-size: 13px;
-  color: #999999;
+  color: #66685f;
   letter-spacing: 0.1em;
+}
+
+/* ═══ V2 (2026-09-08) — 챕터 미디어·구매 상태·접근성 ═══ */
+
+/* 히어로 높이 상한 — 상품명이 첫 화면에 들어온다 (핸드오프 §9) */
+.heroCap {
+  display: flex;
+  justify-content: center;
+}
+.heroCap > span {
+  max-width: calc(76vh * 0.8); /* 4:5 크롭 → 높이 ≤ 76vh */
+  width: 100%;
+}
+.heroEmpty {
+  width: 100%;
+  max-width: calc(76vh * 0.8);
+  aspect-ratio: 4 / 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f2f1ed;
+  color: #a8a49c;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+}
+
+/* 각도 뷰 — 수동 선택 + 200ms 크로스페이드 (상태 전이의 glass) */
+.viewBlock { margin-top: 8px; }
+.viewStage { max-width: 520px; }
+.viewFade img { animation: viewIn 200ms ease-out; }
+@keyframes viewIn { from { opacity: 0.35; } to { opacity: 1; } }
+.viewRow {
+  display: flex;
+  gap: 6px;
+  margin-top: 14px;
+}
+.viewBtn {
+  border: 1px solid #deddd5;
+  background: transparent;
+  color: #66685f;
+  padding: 10px 18px;
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  min-height: 44px;
+  transition: border-color 200ms ease-out, color 200ms ease-out;
+}
+.viewBtnOn {
+  border-color: #242722;
+  color: #242722;
+  font-weight: 500;
+}
+.viewNote {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #66685f;
+  line-height: 1.7;
+}
+
+/* AI 이미지 고지 — 조용한 캡션 */
+.aiDisclosure {
+  margin-top: 20px;
+  font-size: 11.5px;
+  color: #66685f;
+  line-height: 1.7;
+}
+
+/* 사이즈 선택 */
+.sizeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.sizeChip {
+  composes: colorChip;
+  min-width: 56px;
+}
+
+/* 미확정 구매 — 조용한 CTA (검정 실선, 채움 없음) */
+.ctaQuiet {
+  background: transparent;
+  color: #242722;
+  border: 1px solid #242722;
+}
+.ctaQuiet:hover { background: rgba(36, 39, 34, 0.05); }
+
+/* 대비 정정: #999 라벨 → #66685f (warm paper 위 AA) */
+.kicker, .heroKicker, .vCount, .vChevron, .vLabel, .facts dt,
+.toneLabel, .toneCaption, .sizeNote, .holdNotice, .colorSize {
+  color: #66685f;
+}
+
+/* 옵션 레이어 — 정적 패널에는 blur를 쓰지 않는다 (불투명) */
+.optionLayer {
+  background: #faf9f7;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1px solid #deddd5;
+  padding: 28px;
+}
+
+/* 컬러 칩 터치 타겟 */
+.colorChip { min-height: 44px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .viewFade img { animation: none; }
+  .viewBtn { transition: none; }
 }

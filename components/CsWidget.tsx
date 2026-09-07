@@ -22,6 +22,13 @@ export default function CsWidget() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [msgs]);
 
+  // 재고 미확정 등에서 "고객센터 문의" 버튼이 이 위젯을 여는 경로 (자동 메시지 없음)
+  useEffect(() => {
+    const open = () => setOpen(true);
+    window.addEventListener("n1:open-cs", open);
+    return () => window.removeEventListener("n1:open-cs", open);
+  }, []);
+
   // 상담원 답변 폴링 (세션 있을 때만, 3초)
   useEffect(() => {
     if (!sid) return;

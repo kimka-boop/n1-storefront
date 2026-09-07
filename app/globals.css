@@ -2,14 +2,17 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --ink: #111111;
+  --ink: #242722;
   --paper: #faf9f7;
   --accent: #C0282C;
-  --muted: #999999;
-  --line: #EDEAE4;
+  --muted: #66685f;   /* warm paper 위 AA 대비 (구 #999 — 2.71:1 미달) */
+  --line: #deddd5;
 }
 
 html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   background: var(--paper); color: var(--ink);
@@ -479,42 +482,92 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
 }
 
-/* ── 편집형 디스커버리 그리드 (blotter — 하나씩 발견) ── */
+/* ── 편집형 디스커버리 (blotter — 리드/서포팅/콰이어트의 위계) ── */
 .pieces {
   display: grid; grid-template-columns: repeat(2, 1fr);
   column-gap: clamp(32px, 6vw, 80px); row-gap: clamp(56px, 8vw, 104px);
 }
-@media (max-width: 760px) { .pieces { grid-template-columns: 1fr; row-gap: 56px; } }
-/* 데스크톱에서 두 번째 열을 아래로 — 시선이 지그재그로 흐른다 */
-@media (min-width: 761px) {
-  .piece:nth-child(even) { transform: translateY(56px); }
-  .piece:nth-child(even).revealed { transform: translateY(56px); }
+/* LEAD — 컬렉션의 첫 인상: 한 폭 넓게, 중앙 */
+.piece-lead {
+  grid-column: 1 / -1;
+  max-width: 680px; width: 100%; margin: 0 auto;
 }
-.piece { display: block; text-decoration: none; color: inherit;
-  opacity: 0; transition: opacity 600ms ease-out; }
-.piece.revealed { opacity: 1; }
-@media (prefers-reduced-motion: reduce) { .piece { opacity: 1; transition: none; } }
+/* QUIET — 마지막 잔잔한 발견: 좁고 조용히 */
+.piece-quiet {
+  max-width: 380px; margin: 0 auto; width: 100%;
+}
+.piece-quiet .piece-name { font-size: 13px; }
+.piece-quiet .piece-price { font-size: 12px; color: #66685f; }
+@media (max-width: 760px) {
+  .pieces { grid-template-columns: 1fr; row-gap: 56px; }
+  .piece-lead { max-width: 480px; }
+}
+.piece { display: block; text-decoration: none; color: inherit; }
+/* FOG DEPTH — 아직 접근하지 않은 대상은 재질이 살짝 옅다 (접근 시 또렷해짐) */
+.piece[data-reveal], [data-reveal].fog {
+  opacity: 0.93;
+  transition: opacity 300ms ease-out;
+}
+.piece[data-reveal].revealed, [data-reveal].fog.revealed { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .piece[data-reveal], [data-reveal].fog { opacity: 1; transition: none; }
+}
 .piece-media {
   position: relative; aspect-ratio: 3/4; background: #f2f1ed; overflow: hidden;
 }
 .piece-media img {
-  width: 100%; height: 100%; object-fit: cover; display: block;
-  transition: opacity 400ms ease-out;
+  width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%;
+  display: block; transition: opacity 400ms ease-out;
 }
 .piece:hover .piece-media img { opacity: 0.965; }
 .piece-media.empty { display: flex; align-items: center; justify-content: center;
-  color: #d4d4d0; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; }
+  color: #a8a49c; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; }
 .piece-soldout {
   position: absolute; top: 12px; left: 12px;
   font-size: 10px; letter-spacing: 0.18em; padding: 5px 10px;
-  background: rgba(17, 17, 17, 0.82); color: #faf9f7;
+  background: rgba(36, 39, 34, 0.85); color: #faf9f7;
 }
 .piece-caption { margin-top: 18px; }
-.piece-eyebrow { font-size: 10px; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; }
+.piece-eyebrow { font-size: 10px; letter-spacing: 0.2em; color: #66685f; text-transform: uppercase; }
 .piece-name { margin-top: 7px; font-size: 14.5px; font-weight: 500; line-height: 1.55; color: var(--ink);
   display: inline; box-shadow: inset 0 -1px 0 0 transparent; transition: box-shadow 200ms ease-out; }
 .piece:hover .piece-name { box-shadow: inset 0 -1px 0 0 var(--ink); }
 .piece-price { margin-top: 6px; font-size: 13px; color: #55534e; letter-spacing: 0.03em; }
+
+/* ── 컬렉션 내 검색 (컬렉션 범위 안에서만) ── */
+.collection-search {
+  margin-top: 18px; display: flex; justify-content: center; align-items: center; gap: 10px;
+}
+.collection-search input {
+  width: min(280px, 70vw); padding: 9px 2px; font-size: 13px;
+  border: none; border-bottom: 1px solid var(--line); background: transparent; color: var(--ink);
+}
+.collection-search input:focus { outline: none; border-bottom-color: var(--ink); }
+.collection-search button {
+  background: none; border: none; color: #66685f; font-size: 12px; cursor: pointer;
+  border-bottom: 1px solid #66685f; padding: 2px 1px;
+}
+
+/* ── 미확정 재고 — 정직한 안내 ── */
+.unconfirmed-box { margin-top: 4px; }
+.unconfirmed-note {
+  font-size: 12.5px; color: #66685f; line-height: 1.7; margin: 0 0 12px;
+}
+.buy-btn-quiet {
+  background: transparent; color: var(--ink); border: 1px solid var(--ink);
+}
+.buy-btn-quiet:hover:not(:disabled) { background: rgba(36,39,34,0.05); transform: none; }
+.notice-unconfirmed {
+  font-size: 11.5px; color: #66685f; margin: 10px 0 0; line-height: 1.7;
+}
+
+/* ── 스크롤 리빌 공통 — fog depth만 (entrance translateY 제거) ── */
+[data-reveal] { opacity: 0.93; transition: opacity 500ms ease-out; }
+[data-reveal].revealed { opacity: 1; }
+.hero-brand[data-reveal] { animation: heroIn .8s ease .1s forwards; }
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] { opacity: 1; transition: none; }
+}
 
 /* ── 브랜드 스토리 ── */
 .story { max-width: 620px; margin: 0 auto; text-align: center; padding: 140px 24px 120px; }
@@ -528,17 +581,6 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 }
 .story-cta:hover { opacity: 0.6; }
 @media (max-width: 640px) { .story { padding: 96px 20px 80px; } }
-
-/* ── 스크롤 리빌 공통 ── */
-[data-reveal] { opacity: 0; transform: translateY(18px);
-  transition: opacity 500ms ease-out, transform 500ms ease-out; }
-[data-reveal].revealed { opacity: 1; transform: none; }
-.hero-brand[data-reveal] { animation: heroIn .8s ease .1s forwards; }
-.piece[data-reveal] { transform: translateY(24px); }
-@media (min-width: 761px) { .piece[data-reveal].revealed:nth-child(even) { transform: translateY(56px); } }
-@media (prefers-reduced-motion: reduce) {
-  [data-reveal] { opacity: 1; transform: none; transition: none; }
-}
 
 /* ── 소재 구성 표시 (MaterialComposition — PDP/모달 공용) ── */
 .mc { display: inline-block; }
@@ -570,3 +612,11 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 
 /* ── 플로팅 상태 배지 아이콘 정렬 ── */
 .float-status svg { display: inline-block; vertical-align: -2px; margin-right: 3px; }
+
+/* ═══ V2 접근성 (2026-09-08) ═══ */
+/* 모바일에서 고객센터 플로팅 버튼이 PDP 하단 구매 바(StickyBuyBar)와 겹치지 않게 상향 */
+@media (max-width: 640px) {
+  .cs-fab { bottom: 96px; }
+}
+/* 텍스트 탭·정책 탭 터치 타겟 확보 */
+.gtab, .policy-tab { min-height: 44px; }
