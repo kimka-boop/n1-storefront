@@ -1,14 +1,24 @@
 "use client";
 
 /**
- * N°1 — 반응형 쇼핑몰
- * 대표이미지: 드라이브 01_full (서버 API로 file_id 조회)
- * 클릭: 구매 상세 + 5장 슬라이드
+ * N°1 — 메인 페이지 (2026-09-07 Redesign)
+ *
+ * 감사 판정 (KEEP/REFINE/REBUILD/REMOVE):
+ * - KEEP: 인증 네비, Smart Fit(모달·프리셋), 빠른 주문 모달+주문 플로우, 스크롤 리빌, 페이퍼 팔레트
+ * - REFINE: 히어로(한국어 태그라인+마감 안내 통합), 성별 탭(스티키 글래스 내비+enum 버그 수정),
+ *           상품 카드(편집형 2열 디스커버리 — PDP 라우트 연결)
+ * - REBUILD: 상품 탐색 섹션(준비된 컬렉션만 공개 + 준비 중 카운트), 브랜드 스토리 섹션
+ * - REMOVE: 60장 placeholder 벽(미생성 상품 카드), "[D-x]" 괄호 카운트다운
+ *
+ * Liquid Glass 원칙: 유리는 장식이 아니라 행동 — 스티키 내비가 스크롤에 반응해 나타나고,
+ * 나머지 영역은 여백과 콘텐츠가 지배한다.
  */
 import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
 import FitProfileModal from "@/components/FitProfileModal";
 import AuthNav from "@/components/AuthNav";
 import { useAuth } from "@/components/AuthProvider";
+import { genderKo, genderTabOf, categoryShort, colorLabel, noticeQualityText, noticeAsText, materialText } from "@/lib/display";
 
 interface FitInfo { thickness: string; stretch: string; sheer: string; lining: string; shape: string; }
 interface NoticeInfo { manufacturer: string; madeAt: string; colorSize: string; quality: string; as: string; }
@@ -16,6 +26,7 @@ interface Product {
   id: string;
   name: string;
   category: string;
+  gender?: string;
   price: number;
   stockStatus: string;
   lookbookStatus: string;
@@ -35,11 +46,10 @@ interface Product {
 
 // ═══ STEP 3: 스마트 핏 사이즈 프리셋 엔진 ═══
 // B유형(세미오버): 아우터류 +1치수 / C유형(오버핏): +1~2 / A유형: 기준 그대로
-const OUTER_KW = /(블루종|자켓|점퍼|가디건|코트|아우터|블루종|항공점퍼|패딩|야상)/i;
+const OUTER_KW = /(블루종|자켓|점퍼|가디건|코트|아우터|항공점퍼|패딩|야상)/i;
 const SIZE_ORDER = ["S", "M", "L", "XL", "2XL", "3XL"];
-const NUM_ORDER = ["95", "100", "105", "110"];
 
-// 숫자(95/100/105/110) → 문자(S/M/L/XL/2XL) 환산
+// 숫자(95/100/105/110) → 문자(S/M/L/XL) 환산
 const NUM_TO_ALPHA: Record<string, string> = { "95": "S", "100": "L", "105": "XL", "110": "2XL" };
 
 function smartFitPreset(product: Product, getProfile: () => any): string {
@@ -51,17 +61,11 @@ function smartFitPreset(product: Product, getProfile: () => any): string {
   const opts = product.sizeOptions;
   const isOuter = OUTER_KW.test(product.name);
 
-  // 기준 사이즈 → 문자 사이즈 정규화 (숫자 입력 대응)
-  let baseAlpha = NUM_TO_ALPHA[rawSize] || rawSize;  // "100"→"L"
-  // 문자 기준이 옵션에 없으면 옵션 체계에 맞는 가장 근접 사이즈 탐색
+  let baseAlpha = NUM_TO_ALPHA[rawSize] || rawSize;
   let baseIdx = SIZE_ORDER.indexOf(baseAlpha);
   if (baseIdx === -1) {
-    // 옵션에 문자 사이즈가 아예 없으면(FREE 등) 프리셋 스킵
     return "";
   }
-  // 옵션에서 정확 일치하는 인덱스 재조정 (옵션이 M부터 시작하는 경우 등)
-  const exactIdx = opts.findIndex((o) => o.toUpperCase() === baseAlpha);
-  if (exactIdx >= 0) baseIdx = SIZE_ORDER.indexOf(baseAlpha); // SIZE_ORDER 기준 유지
 
   let targetIdx = baseIdx;
   if (fit === "B" && isOuter) targetIdx = baseIdx + 1;          // 세미오버 + 아우터: +1
@@ -70,10 +74,8 @@ function smartFitPreset(product: Product, getProfile: () => any): string {
   targetIdx = Math.max(0, Math.min(targetIdx, SIZE_ORDER.length - 1));
   const targetAlpha = SIZE_ORDER[targetIdx];
 
-  // 옵션에서 정확 일치 (대소문자 무시)
   const hit = opts.find((o) => o.toUpperCase() === targetAlpha);
   if (hit) return hit;
-  // 타겟이 옵션 범위 초과 시(예: 2XL 요청인데 XL까지) 가장 큰 옵션 반환
   return "";
 }
 
@@ -102,18 +104,10 @@ function orRef(v?: string, key?: string): string {
   return (key && DEFAULTS[key]) || "고객센터 문의";
 }
 
-// 소재 표기 Component Rule: 색상 등 부가정보 제거, 원단 정보만 출력
-function cleanMaterial(v?: string): string {
-  if (!v) return "";
-  return v.replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim().replace(/[,·\s]+$/, "");
-}
-
-/** 실측사이즈 문자열 → 가독용 표 ("M-총장66/가슴단면48/..." 또는 "M: 총장 66, 가슴 48..." 형식 파싱) */
+/** 실측사이즈 문자열 → 가독용 표 */
 function parseSizeChart(chart: string): { cols: string[]; rows: { label: string; vals: string[] }[] } | null {
   if (!chart || !chart.trim()) return null;
-  // 보조 설명 꼬리 제거: "(한국사이즈 ...)", "단위 cm" 등은 표 데이터가 아님
   const cleaned = chart.replace(/\s*\((?:한국사이즈|단위)[\s\S]*$/, "").trim();
-  // 사이즈 그룹 분리: " | " 또는 " / " 앞에 사이즈명이 오는 패턴
   const groups = cleaned.split(/\s*\|\s*|\s+(?=[A-Z0-9가-힣]+\(|\d+[-~]\d+)/).filter(Boolean);
   const rows: { label: string; vals: string[] }[] = [];
   const colSet = new Set<string>();
@@ -224,7 +218,7 @@ function folderIdFromUrl(url: string): string | null {
 }
 
 function driveImg(fileId: string, w = 1000) {
-  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${w}&v=${Math.floor(Date.now() / 600000)}`; // 10분 캐시버스터
+  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${w}&v=${Math.floor(Date.now() / 600000)}`;
 }
 
 export default function Home() {
@@ -235,7 +229,6 @@ export default function Home() {
   const [selected, setSelected] = useState<Product | null>(null);
   const [slide, setSlide] = useState(0);
   const [slideIds, setSlideIds] = useState<string[]>([]);
-  const [revealed, setRevealed] = useState<Set<number>>(new Set());
   // ── 주간 드롭 카운트다운 (매주 일요일 자정 마감) ──
   const [dDay, setDDay] = useState("");
   useEffect(() => {
@@ -266,19 +259,18 @@ export default function Home() {
     if (t === "all") localStorage.removeItem("n1_gender_tab");
     else localStorage.setItem("n1_gender_tab", t);
   };
-  // 필터링 — 시트 성별 컬럼 기준 (남성/여성/남여공용). 상품명/ID로 판정하지 않음.
-  const genderOf = (p: Product): "male" | "female" | "genderless" => {
-    const g = (p as Product & { gender?: string }).gender || "";
-    if (g === "남성") return "male";
-    if (g === "여성") return "female";
-    return "genderless"; // 남여공용 및 미지정 → 젠더리스
-  };
-  const filteredProducts = products.filter((p) => {
-    if (genderTab === "all") return true;
-    return genderOf(p) === genderTab;
-  });
+
+  // ── 컬렉션: 이미지가 준비된 상품만 공개 (미생성은 카드 벽 대신 카운트로) ──
+  const readyProducts = products.filter(
+    (p) => p.lookbookStatus === "생성완료" && (p.lookbookImage || "").trim() !== ""
+  );
+  const upcomingCount = products.length - readyProducts.length;
+
+  const filteredProducts = genderTab === "all"
+    ? readyProducts
+    : readyProducts.filter((p) => genderTabOf(p.gender) === genderTab);
   const genderCount = (g: "male" | "female" | "genderless") =>
-    products.filter((p) => genderOf(p) === g).length;
+    readyProducts.filter((p) => genderTabOf(p.gender) === g).length;
 
   // ── STEP 2/3: 스마트 핏 프로필 (localStorage) ──
   const [fitProfile, setFitProfile] = useState<{gender: string; size: string; fit: string} | null>(null);
@@ -319,7 +311,7 @@ export default function Home() {
     }
   }, []);
 
-  // 대표이미지 로딩 (생성완료 제품만, 드라이브에서 file_id 조회)
+  // 대표이미지 로딩 (Drive 폴더형만 — FASHN 직접 URL은 lookbookImage를 그대로 사용)
   const loadThumb = useCallback(async (p: Product) => {
     const fid = folderIdFromUrl(p.lookbookImage);
     if (!fid || thumbs[p.id]) return;
@@ -338,11 +330,14 @@ export default function Home() {
     return () => clearInterval(t);
   }, [fetchProducts]);
 
-  // 생성완료 제품의 대표이미지 순차 로딩
+  // Drive 폴더형 제품의 대표이미지 순차 로딩
   useEffect(() => {
-    const pending = products.filter((p) => p.lookbookStatus === "생성완료" && !thumbs[p.id]);
+    const pending = readyProducts.filter((p) => !thumbs[p.id] && folderIdFromUrl(p.lookbookImage));
     pending.slice(0, 4).forEach((p) => loadThumb(p));
-  }, [products, thumbs, loadThumb]);
+  }, [readyProducts, thumbs, loadThumb]);
+
+  // 카드 이미지 소스 — Drive 썸네일 우선, 없으면 FASHN 원본 URL 직접
+  const imageOf = (p: Product): string | null => thumbs[p.id] || p.lookbookImage || null;
 
   // 스크롤 리빌
   useEffect(() => {
@@ -350,16 +345,17 @@ export default function Home() {
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
-            const idx = Number((e.target as HTMLElement).dataset.idx);
-            setRevealed((prev) => new Set(prev).add(idx));
+            const el = e.target as HTMLElement;
+            el.classList.add("revealed");
+            observer.unobserve(el);
           }
         });
       },
-      { threshold: 0.15 }
+      { threshold: 0.12 }
     );
-    document.querySelectorAll("[data-reveal]").forEach((el) => observer.observe(el));
+    document.querySelectorAll("[data-reveal]:not(.revealed)").forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [products]);
+  }, [filteredProducts.length]);
 
   const openDetail = useCallback(async (p: Product) => {
     const fid = folderIdFromUrl(p.lookbookImage);
@@ -368,7 +364,7 @@ export default function Home() {
       setSelected(p);
       setSlide(0);
       setSlideIds([]);
-      setSelColor(p.colorOptions?.length === 1 ? p.colorOptions[0] : "");
+      setSelColor(p.colorOptions?.length === 1 ? colorLabel(p.colorOptions[0]) : "");
       // STEP 3: 스마트 핏 프리셋 — 프로필이 있으면 사이즈 자동 선택
       const presetSize = smartFitPreset(p, () => authProfile);
       setSelSize(presetSize || (p.sizeOptions?.length === 1 ? p.sizeOptions[0] : ""));
@@ -385,9 +381,7 @@ export default function Home() {
         setSlideIds(data.files.map((f: any) => f.id));
         setSelected(p);
         setSlide(0);
-        // 옵션 초기화 — 단일 옵션이면 자동 선택
-        setSelColor(p.colorOptions?.length === 1 ? p.colorOptions[0] : "");
-        // STEP 3: 스마트 핏 프리셋 — 프로필이 있으면 사이즈 자동 선택
+        setSelColor(p.colorOptions?.length === 1 ? colorLabel(p.colorOptions[0]) : "");
         const presetSize = smartFitPreset(p, () => authProfile);
         setSelSize(presetSize || (p.sizeOptions?.length === 1 ? p.sizeOptions[0] : ""));
         setOptTouched(false);
@@ -398,7 +392,7 @@ export default function Home() {
     } catch {}
   }, [authProfile]);
 
-  // 상세 페이지(/product/[id]) 구매 CTA → /?product=<id> 진입 시 상세 모달 자동 오픈
+  // PDP 구매 CTA → /?product=<id> 진입 시 상세 모달 자동 오픈
   useEffect(() => {
     if (!products.length) return;
     const pid = new URLSearchParams(window.location.search).get("product");
@@ -411,18 +405,21 @@ export default function Home() {
   }, [products, openDetail]);
 
   // 선택된 옵션의 재고 수 — 신형 키(색상_사이즈) 우선, 구형 키(사이즈) 폴백
+  const colorOptionsLabeled = (selected?.colorOptions || []).map(colorLabel);
   const selectedStock = (() => {
     if (!selected?.optionStock) return null;
     const os = selected.optionStock;
-    if (selColor && selSize && os[`${selColor}_${selSize}`] !== undefined) return os[`${selColor}_${selSize}`];
-    if (selColor && selSize && os[`${selColor}_${selSize}`.replace(/\s/g, "")] !== undefined) return os[`${selColor}_${selSize}`.replace(/\s/g, "")];
+    const pairKey = selColor && selSize ? `${selColor}_${selSize}` : "";
+    const pairKeyNs = pairKey.replace(/\s/g, "");
+    if (pairKey && os[pairKey] !== undefined) return os[pairKey];
+    if (pairKeyNs && os[pairKeyNs] !== undefined) return os[pairKeyNs];
     if (selSize && os[selSize] !== undefined) return os[selSize];
     if (selColor && os[selColor] !== undefined) return os[selColor];
     const vals = Object.values(os);
     return vals.length ? Math.min(...vals) : null;
   })();
   const lowStock = selectedStock !== null && selectedStock > 0 && selectedStock <= 5;
-  const optionsReady = (!selected?.colorOptions?.length || selColor) && (!selected?.sizeOptions?.length || selSize);
+  const optionsReady = (!colorOptionsLabeled.length || selColor) && (!selected?.sizeOptions?.length || selSize);
 
   // ── 주문 제출 (모듈 2: /api/orders) ──
   const submitOrder = useCallback(async () => {
@@ -443,7 +440,7 @@ export default function Home() {
           items: [{
             sku: selected.id,
             color: selColor,
-            colorIndex: selected.colorOptions?.indexOf(selColor) ?? -1,
+            colorIndex: (selected.colorOptions || []).findIndex((c) => colorLabel(c) === selColor),
             size: selSize,
             qty: 1,
           }],
@@ -495,23 +492,27 @@ export default function Home() {
 
   return (
     <main>
+      <AuthNav />
+
+      {/* ── 히어로: 브랜드 + 이번 컬렉션 마감 (한 문장으로) ── */}
       <header className="hero">
         <div className="hero-brand" data-reveal>
           <h1>N°1</h1>
           <p className="hero-tag">20 Pieces · Selected by AI</p>
+          <p className="hero-tagline">매주 일요일, 마음에 드는 몇 벌만 골라 보여드립니다</p>
         </div>
+        <p className="hero-drop" data-reveal>
+          이번 컬렉션 마감 {dDay || "—"} · 매주 일요일 자정에 새 컬렉션이 열립니다
+        </p>
       </header>
 
       {error && <p className="error">⚠️ {error}</p>}
 
-      <AuthNav />
-      {/* ── 주간 드롭 마감 (초경량 1라인) ── */}
-      <p className="drop-line">Weekly Drop — Collection closes in [{dDay}] · Refresh every Sunday 00:00</p>
-
-      {/* ── STEP 1: 성별 퀵 필터 탭바 ── */}
-      <nav className="gender-tabs">
+      {/* ── 컬렉션 내비 (sticky glass — 스크롤 시 상단에 얇게 떠오른다) ── */}
+      <nav className="collection-nav" aria-label="컬렉션 필터">
+        <span className="nav-brand">N°1</span>
         <button className={`gtab ${genderTab === "all" ? "active" : ""}`} onClick={() => changeTab("all")}>
-          전체 <span className="gcount">({products.length})</span>
+          전체 <span className="gcount">({readyProducts.length})</span>
         </button>
         <button className={`gtab ${genderTab === "male" ? "active" : ""}`} onClick={() => changeTab("male")}>
           남성 <span className="gcount">({genderCount("male")})</span>
@@ -523,42 +524,82 @@ export default function Home() {
           젠더리스 <span className="gcount">({genderCount("genderless")})</span>
         </button>
         <button className="gtab gtab-fit" onClick={() => setShowFitModal(true)}>
-          {fitProfile ? `Smart Fit — ${fitProfile.size}${fitProfile.fit ? " · " + ({A:"Standard",B:"Semi-Over",C:"Overfit"}[fitProfile.fit as "A"|"B"|"C"] ?? "") : ""}` : "Smart Fit"}
+          {fitProfile
+            ? `Smart Fit — ${fitProfile.size}${fitProfile.fit ? " · " + ({A:"Standard",B:"Semi-Over",C:"Overfit"}[fitProfile.fit as "A"|"B"|"C"] ?? "") : ""}`
+            : "Smart Fit"}
         </button>
       </nav>
 
-      <section className="grid">
-        {filteredProducts.map((p, idx) => {
-          const ready = p.lookbookStatus === "생성완료";
-          const thumb = thumbs[p.id];
-          return (
-            <article
-              key={p.id}
-              data-reveal
-              data-idx={idx}
-              className={`card ${ready ? "clickable" : ""} ${revealed.has(idx) ? "revealed" : ""}`}
-              onClick={ready ? () => openDetail(p) : undefined}
-              style={{ transitionDelay: `${(idx % 5) * 60}ms` }}
-            >
-              {thumb ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={thumb} alt={p.name} className="tryon" loading="lazy" />
-              ) : (
-                <div className="placeholder"><span>{ready ? "LOADING" : "PREPARING"}</span></div>
-              )}
-              <div className="card-body">
-                <p className="category">{p.category}</p>
-                <h2>{p.name}</h2>
-                <p className="price">₩{p.price.toLocaleString("ko-KR")}</p>
-                <div className="card-foot">
-                  <span className="stock">{p.stockStatus}</span>
-                </div>
-              </div>
-            </article>
-          );
-        })}
+      {/* ── 컬렉션: 준비된 상품만, 하나씩 발견하는 편집형 그리드 ── */}
+      <section className="collection">
+        <div className="collection-head" data-reveal>
+          <h2 className="collection-title">이번 컬렉션</h2>
+          <p className="collection-sub">
+            {readyProducts.length}벌이 준비되어 있습니다
+            {genderTab !== "all" && " · " + ({male:"남성",female:"여성",genderless:"젠더리스"}[genderTab])}
+          </p>
+        </div>
+
+        {filteredProducts.length ? (
+          <div className="pieces">
+            {filteredProducts.map((p, idx) => {
+              const img = imageOf(p);
+              const soldOut = p.stockStatus === "품절";
+              return (
+                <Link
+                  key={p.id}
+                  href={`/product/${p.id}`}
+                  className="piece"
+                  data-reveal
+                  style={{ transitionDelay: `${(idx % 2) * 80}ms` }}
+                >
+                  <div className={`piece-media ${img ? "" : "empty"}`}>
+                    {img ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={img} alt={`${p.name} 대표 이미지`} loading={idx < 2 ? "eager" : "lazy"} />
+                    ) : (
+                      <span>이미지 준비 중</span>
+                    )}
+                    {soldOut && <span className="piece-soldout">품절</span>}
+                  </div>
+                  <div className="piece-caption">
+                    <p className="piece-eyebrow">
+                      {[genderKo(p.gender), categoryShort(p.category)].filter(Boolean).join(" · ")}
+                    </p>
+                    <h3 className="piece-name">{p.name}</h3>
+                    <p className="piece-price">₩{p.price.toLocaleString("ko-KR")}</p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="collection-empty">
+            이번 컬렉션에는 해당하는 상품이 없습니다 — 다음 컬렉션에서 만나요.
+          </p>
+        )}
+
+        {upcomingCount > 0 && (
+          <p className="collection-upcoming">
+            다음 컬렉션의 {upcomingCount}벌이 준비 중입니다 — 매주 일요일에 공개됩니다.
+          </p>
+        )}
       </section>
 
+      {/* ── 브랜드 스토리 (조용한 한 문단 + Smart Fit 유도) ── */}
+      <section className="story" data-reveal>
+        <h2 className="story-title">괜찮은 것만 보여드립니다</h2>
+        <p className="story-body">
+          N°1은 모든 상품을 한자리에 쏟아놓지 않습니다. 소재와 치수를 하나씩 확인하고,
+          남을 만한 것만 컬렉션에 올립니다. 사진은 직접 만든 착용컷으로, 정보는 확인한
+          것만 적습니다. 스크롤이 길어도 보이는 것은 몇 벌뿐입니다 — 눈이 편한 쇼핑을 위해서입니다.
+        </p>
+        <button className="story-cta" onClick={() => setShowFitModal(true)}>
+          내 핏 프로필 만들기 →
+        </button>
+      </section>
+
+      <footer>© N°1 — 매주 일요일, 새로운 컬렉션</footer>
 
       {/* ── STEP 2: 스마트 핏 온보딩 모달 (15초 3문 3답) ── */}
       {showFitModal && (
@@ -569,7 +610,7 @@ export default function Home() {
         />
       )}
 
-      {/* ── 구매 상세 ── */}
+      {/* ── 빠른 주문 모달 (PDP 구매하기 / ?product= 진입) ── */}
       {selected && (
         <div className="modal" onClick={closeDetail}>
           <div className="modal-body" onClick={(e) => e.stopPropagation()}>
@@ -600,7 +641,7 @@ export default function Home() {
               </div>
             </div>
             <div className="detail-info">
-              <p className="category">{selected.category}</p>
+              <p className="category">{[genderKo(selected.gender), categoryShort(selected.category)].filter(Boolean).join(" · ")}</p>
               <h2>{selected.name}</h2>
               <p className="detail-price">₩{selected.price.toLocaleString("ko-KR")}</p>
               <div className="buy-box">
@@ -609,7 +650,7 @@ export default function Home() {
                   (수령 후 7일 이내 규정 교환·반품 가능)
                 </p>
                 {/* ── 옵션 선택 (색상/사이즈) ── */}
-                {selected.colorOptions && selected.colorOptions.length > 0 && (
+                {colorOptionsLabeled.length > 0 && (
                   <div className="option-row">
                     <label className="option-label">색상</label>
                     <select
@@ -617,12 +658,13 @@ export default function Home() {
                       value={selColor}
                       onChange={(e) => { setSelColor(e.target.value); setOptTouched(true); }}
                     >
-                      {selected.colorOptions.length > 1 && <option value="">색상을 선택하세요</option>}
-                      {selected.colorOptions.map((c) => (
+                      {colorOptionsLabeled.length > 1 && <option value="">색상을 선택하세요</option>}
+                      {colorOptionsLabeled.map((c) => (
                         <option key={c} value={c} disabled={(() => {
                           // 색상 단위 품절: 해당 색상의 모든 조합이 0일 때
+                          const raw = (selected.colorOptions || []).find((x) => colorLabel(x) === c) ?? c;
                           const entries = Object.entries(selected.optionStock || {});
-                          const rel = entries.filter(([k]) => selSize ? k === `${c}_${selSize}` || k.replace(/\s/g,"") === `${c}_${selSize}` : k === c || k.startsWith(`${c}_`));
+                          const rel = entries.filter(([k]) => selSize ? k === `${raw}_${selSize}` || k.replace(/\s/g,"") === `${raw}_${selSize}` : k === raw || k.startsWith(`${raw}_`));
                           if (!rel.length) return false;
                           return rel.every(([, v]) => v === 0);
                         })()}>
@@ -647,8 +689,11 @@ export default function Home() {
                       {selected.sizeOptions.map((s) => {
                         const st = (() => {
                           const os = selected.optionStock || {};
-                          if (selColor && os[`${selColor}_${s}`] !== undefined) return os[`${selColor}_${s}`];
-                          if (selColor && os[`${selColor}_${s}`.replace(/\s/g, "")] !== undefined) return os[`${selColor}_${s}`.replace(/\s/g, "")];
+                          const rawColor = (selected.colorOptions || []).find((x) => colorLabel(x) === selColor) ?? selColor;
+                          const pairKey = rawColor ? `${rawColor}_${s}` : "";
+                          const pairKeyNs = pairKey.replace(/\s/g, "");
+                          if (pairKey && os[pairKey] !== undefined) return os[pairKey];
+                          if (pairKeyNs && os[pairKeyNs] !== undefined) return os[pairKeyNs];
                           if (os[s] !== undefined) return os[s];
                           return undefined;
                         })();
@@ -740,7 +785,7 @@ export default function Home() {
               {/* ── 소재 / 핏 / 사이즈 ── */}
               <div className="spec-block">
                 <h3 className="spec-title">소재 &amp; 핏</h3>
-                <div className="info-row"><span>소재</span><b>{orRef(cleanMaterial(selected.material))}</b></div>
+                <div className="info-row"><span>소재</span><b className="material-inline">{orRef(materialText(selected.material))}</b></div>
                 {selected.fit && (
                   <div className="fit-grid">
                     {([["두께감", selected.fit.thickness], ["신축성", selected.fit.stretch],
@@ -761,8 +806,8 @@ export default function Home() {
               <div className="spec-block">
                 <h3 className="spec-title">상품정보제공고시</h3>
                 <div className="notice-table">
-                  <div className="info-row"><span>제품 소재</span><b>{orRef(cleanMaterial(selected.material))}</b></div>
-                  <div className="info-row"><span>색상</span><b>{selected.colorOptions?.length ? selected.colorOptions.join(", ") : orRef(undefined, "색상")}</b></div>
+                  <div className="info-row"><span>제품 소재</span><b className="material-inline">{orRef(materialText(selected.material))}</b></div>
+                  <div className="info-row"><span>색상</span><b>{colorOptionsLabeled.length ? colorOptionsLabeled.join(", ") : orRef(undefined, "색상")}</b></div>
                   <div className="info-row"><span>치수</span><b>{selected.sizeOptions?.length ? selected.sizeOptions.join(", ") : orRef(undefined)}</b></div>
                   <div className="info-row"><span>제조자(수입자)</span><b>N°1 협력업체</b></div>
                   <div className="info-row"><span>제조국(원산지)</span><b>{orRef(selected.origin, "원산지")}</b></div>
@@ -770,13 +815,13 @@ export default function Home() {
                   <div className="info-row">
                     <span>품질보증기준</span>
                     <b className="quality-tip">
-                      소비자 분쟁해결기준에 따름
+                      수령 후 7일 이내 청약철회 가능(사용·훼손 제외)
                       <span className="tooltip">
-                        전자상거래 법에 규정되어 있는 소비자 청약철회 가능 범위를 준수합니다.
+                        수령 후 7일 이내 청약철회 요청이 가능합니다(사용·훼손된 경우 제외). 전자상거래법상 소비자 청약철회 가능 범위를 준수합니다.
                       </span>
                     </b>
                   </div>
-                  <div className="info-row"><span>A/S 책임자</span><b>{selected.notice?.as || "N°1 고객센터"}</b></div>
+                  <div className="info-row"><span>A/S 책임자</span><b>{noticeAsText(selected.notice?.as) || "N°1 고객센터"}</b></div>
                 </div>
               </div>
 
@@ -799,8 +844,6 @@ export default function Home() {
           </div>
         </div>
       )}
-
-      <footer>© N°1 — MINIMALIST FASHION MAGAZINE</footer>
     </main>
   );
 }

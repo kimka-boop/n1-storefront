@@ -38,11 +38,11 @@ export default function FloatingOrderTracker() {
     <>
       <div className="float-bar" onClick={() => order && setOpen(true)}>
         <span className="float-icon">
-          <CartIcon className="w-5 h-5" />
+          <CartIcon size={20} />
         </span>
         {status && (
           <span className={`float-status ${status.includes("완료") ? "done" : ""}`}>
-            <CardIcon className="w-3 h-3 inline-block mr-1 align-[-2px]" /> {status}
+            <CardIcon size={12} /> {status}
           </span>
         )}
       </div>

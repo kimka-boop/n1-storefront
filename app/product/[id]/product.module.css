@@ -75,6 +75,15 @@
   margin-bottom: 28px;
 }
 
+/* ── 소재 구성 (MaterialComposition) — Scene 3 본문 크기에 맞춤 ── */
+.materialBlock {
+  font-size: 15px;
+  line-height: 1.85;
+  color: #333333;
+  margin-bottom: 28px;
+}
+.materialBlock .mc-line { margin-bottom: 8px; }
+
 /* ── Scene 3 톤 패널: 단색 2톤 단차 (gradient·텍스처 금지) ── */
 .toneGrid {
   display: grid;

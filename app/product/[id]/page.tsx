@@ -3,19 +3,32 @@
 /**
  * N°1 — Product Detail Experience V1 (/product/[id])
  * 설계: N1_PRODUCT_DETAIL_EXPERIENCE_V1.md · 구현: N1_ZCODE_IMPLEMENTATION_HANDOFF.md
- * Scene 1 FIRST IMPRESSION → 2 WHY → 3 MATERIAL → 4 FIT → 5 VERIFICATION → 6 DECISION → Facts
- * 규칙: 상품 문구 창작 금지(API + D2 승인 스토리만) · Glass 3용도 한정 · 모션 토큰 준수
+ * Scene 1 FIRST IMPRESSION → 2 WHY → 3 MATERIAL → 4 FIT → 5 INFO → 6 DECISION → 상품 정보
+ *
+ * 2026-09-07 Owner 지시 반영:
+ * - "확인 기록"(영문 라벨 verification) 폐지 → 데이터 재노출형 "핵심 정보"로 재구성
+ * - 소재 한 줄 나열 → 옵션별 줄바꿈 + 공급사 고지 ⓘ 툴팁 (MaterialComposition)
+ * - Facts → "상품 정보", 교환·반품/문의 문구 정규화 (lib/display)
+ * - 색상 표기 통일(머스타드), 구매 CTA → 빠른 주문 모달(/?product=) 연동
  */
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import ImageCrop, { CROP_HERO, CROP_FULL, CROP_DETAIL } from "@/components/product/ImageCrop";
 import SceneSection from "@/components/product/SceneSection";
 import TonePanel from "@/components/product/TonePanel";
 import SizeTable from "@/components/product/SizeTable";
-import VerificationDrawer, { VerificationItem } from "@/components/product/VerificationDrawer";
 import StickyBuyBar from "@/components/product/StickyBuyBar";
+import MaterialComposition from "@/components/MaterialComposition";
 import { PRODUCT_STORY } from "@/lib/productContent";
+import {
+  genderKo,
+  categoryShort,
+  colorLabel,
+  noticeQualityText,
+  noticeAsText,
+  sizeSummary,
+} from "@/lib/display";
 import styles from "./product.module.css";
 
 interface FitInfo {
@@ -59,14 +72,14 @@ function parseColors(colorOptions?: string[]): string[] {
     ? flat.split("·")
     : flat.split("/");
   return parts
-    .map((s) => s.trim())
+    .map((s) => colorLabel(s.trim()))
     .filter((s) => s && s.toUpperCase() !== "UNKNOWN" && !s.startsWith("UNKNOWN"));
 }
 
 /** 시트의 미확정 플레이스홀더("UNKNOWN" 등)는 고객 화면에서 공백 취급한다. */
 function clean(value?: string): string {
   const v = (value || "").trim();
-  if (!v || v.toUpperCase() === "UNKNOWN") return "";
+  if (!v || v.toUpperCase() === "UNKNOWN" || v === "상세페이지 참조") return "";
   return v;
 }
 
@@ -76,7 +89,8 @@ function won(price: number): string {
 
 export default function ProductPage() {
   const params = useParams<{ id: string }>();
-  const id = typeof params?.id === "string" ? params.id : "";
+  const router = useRouter();
+  const id = typeof params?.id === "string" ? params?.id : "";
 
   const [product, setProduct] = useState<Product | null>(null);
   const [state, setState] = useState<"loading" | "ready" | "notfound">("loading");
@@ -145,21 +159,12 @@ export default function ProductPage() {
   const origin = clean(product.origin);
   const manufacturer = clean(product.notice?.manufacturer);
   const washing = clean(product.washingInfo);
+  const sizes = sizeSummary(product.sizeChart);
+  const genderLabel = genderKo(product.gender);
+  const categoryLabel = categoryShort(product.category);
 
-  // Scene 5 — 데이터에 있는 확인 항목만 (공백 = 비표시; 창작 금지)
-  const verifications: VerificationItem[] = [];
-  if (origin)
-    verifications.push({ label: "Source checked", fact: `원산지 ${origin} 확인` });
-  if (manufacturer)
-    verifications.push({ label: "Source checked", fact: `제조사 ${manufacturer} 확인` });
-  if (materialKnown)
-    verifications.push({ label: "Material verified", fact: "소재 표기 상세 판독으로 확인" });
-  if ((product.sizeChart || "").trim())
-    verifications.push({ label: "Size confirmed", fact: "치수 실측치 공개" });
-  else verifications.push({ label: "Size confirmed", fact: "수치표 미제공 — 착용컷으로 확인" });
-
-  const scrollToDecision = () =>
-    decisionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  // 빠른 주문 — 메인 페이지의 구매 모달이 ?product=<id> 진입 시 자동으로 열린다
+  const goToQuickBuy = () => router.push(`/?product=${encodeURIComponent(product.id)}`);
 
   return (
     <main className={styles.page}>
@@ -173,13 +178,13 @@ export default function ProductPage() {
             eager
           />
           <p className={styles.heroKicker}>
-            {product.gender || ""} {product.category ? `· ${product.category}` : ""}
+            {[genderLabel, categoryLabel].filter(Boolean).join(" · ")}
           </p>
           <h1 className={styles.heroName}>{product.name}</h1>
         </SceneSection>
       </div>
 
-      {/* ── Scene 2 WHY THIS PRODUCT — D2 승인 Description만 ── */}
+      {/* ── Scene 2 WHY THIS PRODUCT — 승인 사실 기반 서술 ── */}
       {story ? (
         <SceneSection id="scene2" kicker="Why this product" title="왜 이 상품인가">
           <div className={styles.twoCol}>
@@ -196,7 +201,7 @@ export default function ProductPage() {
         </SceneSection>
       ) : null}
 
-      {/* ── Scene 3 MATERIAL — 톤 패널 (텍스처 이미지 금지) ── */}
+      {/* ── Scene 3 MATERIAL — 옵션별 소재 구성 + 톤 패널 ── */}
       <SceneSection id="scene3" kicker="Material" title="소재">
         <div className={styles.twoCol}>
           <ImageCrop
@@ -207,7 +212,9 @@ export default function ProductPage() {
           />
           <div>
             {materialKnown ? (
-              <p className={styles.lede}>{material}</p>
+              <div className={styles.materialBlock}>
+                <MaterialComposition material={material} />
+              </div>
             ) : (
               <p className={styles.lede}>소재 정보가 보강 중입니다.</p>
             )}
@@ -235,12 +242,42 @@ export default function ProductPage() {
         )}
       </SceneSection>
 
-      {/* ── Scene 5 VERIFICATION — 조용한 확인 기록 (Glass ②) ── */}
-      <SceneSection id="scene5" kicker="Verification" title="확인 기록">
-        <VerificationDrawer items={verifications} />
+      {/* ── Scene 5 INFO — 확인된 정보의 조용한 요약 (데이터 재노출) ── */}
+      <SceneSection id="scene5" kicker="Info" title="핵심 정보">
+        <dl className={styles.facts}>
+          {materialKnown ? (
+            <>
+              <dt>소재 구성</dt>
+              <dd><MaterialComposition material={material} /></dd>
+            </>
+          ) : null}
+          {sizes ? (
+            <>
+              <dt>치수</dt>
+              <dd>{sizes}{(product.sizeChart || "").trim() ? " — 아래 표 참조" : ""}</dd>
+            </>
+          ) : (
+            <>
+              <dt>치수</dt>
+              <dd>수치표 미제공 — 착용컷으로 확인</dd>
+            </>
+          )}
+          {origin ? (
+            <>
+              <dt>원산지</dt>
+              <dd>{origin}</dd>
+            </>
+          ) : null}
+          {manufacturer ? (
+            <>
+              <dt>제조사</dt>
+              <dd>{manufacturer}</dd>
+            </>
+          ) : null}
+        </dl>
       </SceneSection>
 
-      {/* ── Scene 6 DECISION — 옵션 · 가격 · 구매 (Glass ③) ── */}
+      {/* ── Scene 6 DECISION — 옵션 · 가격 · 구매 ── */}
       <div ref={decisionRef}>
         <SceneSection id="scene6" kicker="Decision" title="구매">
           <div className={styles.optionLayer}>
@@ -271,22 +308,24 @@ export default function ProductPage() {
                 </p>
               </>
             ) : (
-              <button type="button" className={styles.cta} onClick={scrollToDecision}>
+              <button type="button" className={styles.cta} onClick={goToQuickBuy}>
                 구매하기
               </button>
             )}
-            <p className={styles.colorSize}>{product.notice?.colorSize}</p>
+            {clean(product.notice?.colorSize) ? (
+              <p className={styles.colorSize}>{clean(product.notice?.colorSize)}</p>
+            ) : null}
           </div>
         </SceneSection>
       </div>
 
-      {/* ── Facts — 스토리 끝의 사실 ── */}
-      <SceneSection id="facts" kicker="Facts">
+      {/* ── 상품 정보 — 스토리 끝의 사실 ── */}
+      <SceneSection id="facts" kicker="Info" title="상품 정보">
         <dl className={styles.facts}>
           {materialKnown ? (
             <>
               <dt>소재</dt>
-              <dd>{material}</dd>
+              <dd><MaterialComposition material={material} /></dd>
             </>
           ) : null}
           {washing ? (
@@ -310,13 +349,13 @@ export default function ProductPage() {
           {product.notice?.quality ? (
             <>
               <dt>교환·반품</dt>
-              <dd>{product.notice.quality}</dd>
+              <dd>{noticeQualityText(product.notice.quality)}</dd>
             </>
           ) : null}
           {product.notice?.as ? (
             <>
               <dt>문의</dt>
-              <dd>{product.notice.as}</dd>
+              <dd>{noticeAsText(product.notice.as)}</dd>
             </>
           ) : null}
         </dl>
@@ -332,7 +371,7 @@ export default function ProductPage() {
         price={product.price}
         soldOut={soldOut}
         heroVisible={heroVisible}
-        onBuy={scrollToDecision}
+        onBuy={goToQuickBuy}
       />
     </main>
   );

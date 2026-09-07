@@ -424,3 +424,149 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 .auth-user { color: var(--ink, #0a0a0a); font-weight: 500; }
 .fit-alt { font-size: 12px; color: #888; text-align: center; margin: 12px 0 0; }
 .fit-alt button { background: none; border: none; color: #111; text-decoration: underline; cursor: pointer; font-size: 12px; }
+
+/* ══════════════════════════════════════════════════════════════
+   2026-09-07 MAIN PAGE REDESIGN
+   원칙: PRODUCT > SPACE > INFORMATION — 여백이 간격의 1등 시민,
+   Liquid Glass는 행동(스티키 내비)으로만, 모션은 400ms opacity/transform.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── 히어로: 브랜드 + 다음 드롭 안내 (한 문장) ── */
+.hero { min-height: auto; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 96px 20px 64px; }
+.hero-tagline {
+  margin-top: 18px; font-size: 15px; color: #55534e; letter-spacing: 0.02em; line-height: 1.7;
+}
+.hero-drop {
+  margin-top: 34px; font-size: 11px; color: var(--muted); letter-spacing: 0.14em;
+  padding-top: 18px; border-top: 1px solid var(--line); min-width: 260px;
+}
+@media (max-width: 640px) {
+  .hero { padding: 56px 16px 40px; }
+  .hero-tagline { font-size: 13.5px; margin-top: 14px; }
+  .hero-drop { margin-top: 24px; font-size: 10px; }
+}
+
+/* ── 컬렉션 내비 (sticky glass — 유리는 장식이 아니라 행동) ── */
+.collection-nav {
+  position: sticky; top: 0; z-index: 500;
+  display: flex; flex-wrap: nowrap; align-items: baseline; justify-content: center;
+  gap: 30px; padding: 14px 4vw;
+  background: rgba(250, 249, 247, 0.84);
+  backdrop-filter: blur(14px) saturate(1.04);
+  -webkit-backdrop-filter: blur(14px) saturate(1.04);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto; scrollbar-width: none;
+}
+.collection-nav::-webkit-scrollbar { display: none; }
+.nav-brand {
+  font-size: 13px; letter-spacing: 0.22em; color: var(--ink); font-weight: 600;
+  margin-right: 8px; white-space: nowrap;
+}
+@media (max-width: 640px) { .collection-nav { gap: 20px; justify-content: flex-start; } .nav-brand { display: none; } }
+
+/* ── 컬렉션 섹션 ── */
+.collection { max-width: 1160px; margin: 0 auto; padding: 88px 6vw 24px; }
+.collection-head { text-align: center; margin-bottom: 64px; }
+.collection-title { font-size: 13px; letter-spacing: 0.3em; color: var(--ink); font-weight: 600;
+  text-transform: uppercase; }
+.collection-sub { margin-top: 10px; font-size: 12.5px; color: var(--muted); letter-spacing: 0.06em; }
+.collection-empty { text-align: center; color: var(--muted); font-size: 13.5px; padding: 60px 0; line-height: 1.8; }
+.collection-upcoming {
+  margin-top: 88px; text-align: center; font-size: 12px; color: var(--muted);
+  letter-spacing: 0.08em; line-height: 1.8; padding: 26px 0;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+}
+
+/* ── 편집형 디스커버리 그리드 (blotter — 하나씩 발견) ── */
+.pieces {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  column-gap: clamp(32px, 6vw, 80px); row-gap: clamp(56px, 8vw, 104px);
+}
+@media (max-width: 760px) { .pieces { grid-template-columns: 1fr; row-gap: 56px; } }
+/* 데스크톱에서 두 번째 열을 아래로 — 시선이 지그재그로 흐른다 */
+@media (min-width: 761px) {
+  .piece:nth-child(even) { transform: translateY(56px); }
+  .piece:nth-child(even).revealed { transform: translateY(56px); }
+}
+.piece { display: block; text-decoration: none; color: inherit;
+  opacity: 0; transition: opacity 600ms ease-out; }
+.piece.revealed { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .piece { opacity: 1; transition: none; } }
+.piece-media {
+  position: relative; aspect-ratio: 3/4; background: #f2f1ed; overflow: hidden;
+}
+.piece-media img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: opacity 400ms ease-out;
+}
+.piece:hover .piece-media img { opacity: 0.965; }
+.piece-media.empty { display: flex; align-items: center; justify-content: center;
+  color: #d4d4d0; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; }
+.piece-soldout {
+  position: absolute; top: 12px; left: 12px;
+  font-size: 10px; letter-spacing: 0.18em; padding: 5px 10px;
+  background: rgba(17, 17, 17, 0.82); color: #faf9f7;
+}
+.piece-caption { margin-top: 18px; }
+.piece-eyebrow { font-size: 10px; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; }
+.piece-name { margin-top: 7px; font-size: 14.5px; font-weight: 500; line-height: 1.55; color: var(--ink);
+  display: inline; box-shadow: inset 0 -1px 0 0 transparent; transition: box-shadow 200ms ease-out; }
+.piece:hover .piece-name { box-shadow: inset 0 -1px 0 0 var(--ink); }
+.piece-price { margin-top: 6px; font-size: 13px; color: #55534e; letter-spacing: 0.03em; }
+
+/* ── 브랜드 스토리 ── */
+.story { max-width: 620px; margin: 0 auto; text-align: center; padding: 140px 24px 120px; }
+.story-title { font-size: 21px; font-weight: 500; letter-spacing: 0.04em; color: var(--ink); }
+.story-body { margin-top: 22px; font-size: 14.5px; line-height: 2.0; color: #44423d; }
+.story-cta {
+  margin-top: 36px; background: none; border: none; cursor: pointer;
+  font-size: 12.5px; letter-spacing: 0.14em; color: var(--ink);
+  border-bottom: 1px solid var(--ink); padding: 0 2px 4px;
+  transition: opacity 200ms ease-out;
+}
+.story-cta:hover { opacity: 0.6; }
+@media (max-width: 640px) { .story { padding: 96px 20px 80px; } }
+
+/* ── 스크롤 리빌 공통 ── */
+[data-reveal] { opacity: 0; transform: translateY(18px);
+  transition: opacity 500ms ease-out, transform 500ms ease-out; }
+[data-reveal].revealed { opacity: 1; transform: none; }
+.hero-brand[data-reveal] { animation: heroIn .8s ease .1s forwards; }
+.piece[data-reveal] { transform: translateY(24px); }
+@media (min-width: 761px) { .piece[data-reveal].revealed:nth-child(even) { transform: translateY(56px); } }
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] { opacity: 1; transform: none; transition: none; }
+}
+
+/* ── 소재 구성 표시 (MaterialComposition — PDP/모달 공용) ── */
+.mc { display: inline-block; }
+.mc-line { margin: 0 0 7px; line-height: 1.8; }
+.mc-line:last-of-type { margin-bottom: 0; }
+.mc-label { display: inline-block; min-width: 36px; color: #999999; margin-right: 6px; }
+.mc-note {
+  position: relative; display: inline-flex; align-items: center;
+  color: #a8a49c; cursor: help; margin-left: 10px; vertical-align: -2px;
+}
+.mc-note:hover, .mc-note:focus { color: #666666; outline: none; }
+.mc-tip {
+  position: absolute; bottom: calc(100% + 10px); left: 0;
+  width: max-content; max-width: 264px;
+  background: #111111; color: #faf9f7;
+  font-size: 12px; font-weight: 400; line-height: 1.65; letter-spacing: 0.01em;
+  padding: 11px 13px; text-align: left; white-space: normal;
+  visibility: hidden; opacity: 0;
+  transition: opacity 200ms ease-out, visibility 200ms;
+  z-index: 40;
+}
+.mc-note:hover .mc-tip, .mc-note:focus .mc-tip { visibility: visible; opacity: 1; }
+@media (max-width: 640px) {
+  .mc-tip { left: -8px; max-width: 220px; }
+}
+
+/* ── 모달 소재 행: 줄바꿈 허용 ── */
+.info-row b.material-inline { white-space: normal; font-weight: 400; text-align: right; line-height: 1.7; }
+
+/* ── 플로팅 상태 배지 아이콘 정렬 ── */
+.float-status svg { display: inline-block; vertical-align: -2px; margin-right: 3px; }
