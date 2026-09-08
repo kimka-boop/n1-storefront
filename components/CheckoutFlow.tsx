@@ -33,6 +33,31 @@ interface CheckoutLine {
 
 const DEPOSIT = { bank: "케이뱅크", account: "100127890230", holder: "김성빈" };
 const PENDING_ORDER_KEY = "n1_pending_order";
+// [Session C §7] 체크아웃 시도 단위 멱등키 — 더블 클릭/제출 실패 재시도에서 동일 키를 재사용하고,
+// 주문 생성 성공 시 폐기한다. 서버(lib/idempotency + Orders.멱등키 컬럼)가 최종 방어선.
+const CHECKOUT_IDEM_KEY = "n1_checkout_idem";
+
+function currentIdempotencyKey(): string {
+  try {
+    let key = sessionStorage.getItem(CHECKOUT_IDEM_KEY);
+    if (!key) {
+      key =
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `ck_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+      sessionStorage.setItem(CHECKOUT_IDEM_KEY, key);
+    }
+    return key;
+  } catch {
+    return `ck_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+  }
+}
+
+function consumeIdempotencyKey(): void {
+  try {
+    sessionStorage.removeItem(CHECKOUT_IDEM_KEY);
+  } catch {}
+}
 
 type Source = "cart" | "buynow";
 
@@ -140,6 +165,7 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
           },
           items: lines.map((i) => ({ sku: i.sku, color: i.color, size: i.size, qty: i.qty })),
           source,
+          idempotency_key: currentIdempotencyKey(), // 동일 시도 재제출 = 동일 키 → 서버가 1회만 생성
         }),
       });
       const data = await res.json();
@@ -147,6 +173,7 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
         setError(data.error || "주문 처리 실패");
         return;
       }
+      consumeIdempotencyKey(); // 성공 — 다음 주문은 새 멱등키로
       // 주문 생성 성공 — 소스 비움 (재고는 서버가 이미 차감)
       if (source === "cart") clearCart();
       clearBuyNow();

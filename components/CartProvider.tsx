@@ -5,7 +5,13 @@
  * - localStorage "n1_cart_v1" — 브라우저 refresh/네비게이션에 유지 (미션 §4)
  * - 로그인/로그아웃과 무관하게 카트를 잃지 않는다 (미션 §5 — 게스트 카트 보존)
  * - 탭 간 동기화(storage event)
- * - 서버 카트 persistence가 생기면 mergeCarts(lib/cart.ts) 계약으로 합성
+ *
+ * [Session C — Cart persistence contract]
+ * - 활성 카트는 신원(identity)을 따라간다: 게스트 "n1_cart_v1" ↔ 회원 "n1_cart_v1_m_<email>"
+ * - 로그인: 현재(게스트) 카트를 게스트 키에 그대로 보존한 뒤 mergeCarts(회원, 게스트)를
+ *   회원 키에 적용 — 게스트 카트는 파괴되지 않는다
+ * - 로그아웃: 회원 카트를 회원 키에 유지한 채 게스트 보존본으로 복귀
+ * - AuthProvider(auth core)는 수정하지 않고, token/email 변화만 관찰한다
  */
 import {
   createContext,
@@ -13,6 +19,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   ReactNode,
 } from "react";
@@ -20,13 +27,15 @@ import {
   addToCart,
   cartCount,
   cartSubtotal,
+  GUEST_CART_KEY,
+  memberCartKey,
+  mergeCarts,
   parseCart,
   removeFromCart,
   setLineQty,
   CartItem,
 } from "@/lib/cart";
-
-const CART_KEY = "n1_cart_v1";
+import { useAuth } from "@/components/AuthProvider";
 
 interface CartState {
   items: CartItem[];
@@ -46,16 +55,63 @@ const CartCtx = createContext<CartState>({
   setOpen: () => {}, add: () => {}, remove: () => {}, setQty: () => {}, clear: () => {},
 });
 
+function readKey(key: string): CartItem[] {
+  try {
+    return parseCart(localStorage.getItem(key));
+  } catch {
+    return [];
+  }
+}
+
+function writeKey(key: string, items: CartItem[]): void {
+  try {
+    localStorage.setItem(key, JSON.stringify(items));
+  } catch {}
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [ready, setReady] = useState(false);
   const [open, setOpen] = useState(false);
+  const { token, email, ready: authReady } = useAuth();
+  const activeKeyRef = useRef<string>(GUEST_CART_KEY);
+
+  // ── 신원 전환 (게스트 ↔ 회원): mergeCarts 계약으로 카트 이동 ──
+  useEffect(() => {
+    if (!ready || !authReady) return;
+    const memberKey = token && email ? memberCartKey(email) : null;
+
+    if (memberKey && activeKeyRef.current !== memberKey) {
+      // 로그인 — 게스트 보존 → 회원 카트와 병합 → 활성 전환
+      const guestItems = readKey(GUEST_CART_KEY);
+      const memberItems = readKey(memberKey);
+      writeKey(GUEST_CART_KEY, guestItems); // 로그아웃 복귀용 보존 (파괴 금지)
+      const merged = mergeCarts(memberItems, guestItems);
+      writeKey(memberKey, merged);
+      activeKeyRef.current = memberKey;
+      setItems(merged);
+      return;
+    }
+    if (!token && activeKeyRef.current !== GUEST_CART_KEY) {
+      // 로그아웃 — 회원 카트는 회원 키에 유지, 게스트 보존본으로 복귀
+      const guestItems = readKey(GUEST_CART_KEY);
+      activeKeyRef.current = GUEST_CART_KEY;
+      setItems(guestItems);
+      return;
+    }
+    if (activeKeyRef.current === GUEST_CART_KEY && items.length === 0 && !token) {
+      // 초기 로드 (게스트)
+      const guestItems = readKey(GUEST_CART_KEY);
+      if (guestItems.length) setItems(guestItems);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, authReady, token, email]);
 
   useEffect(() => {
-    setItems(parseCart(localStorage.getItem(CART_KEY)));
+    setItems(readKey(GUEST_CART_KEY));
     setReady(true);
     const onStorage = (e: StorageEvent) => {
-      if (e.key === CART_KEY) setItems(parseCart(e.newValue));
+      if (e.key === activeKeyRef.current) setItems(readKey(e.key));
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
@@ -63,21 +119,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const persist = useCallback((next: CartItem[]) => {
     setItems(next);
-    try {
-      localStorage.setItem(CART_KEY, JSON.stringify(next));
-    } catch {}
+    writeKey(activeKeyRef.current, next);
   }, []);
 
   const add = useCallback((item: CartItem) => {
-    persist(addToCart(parseCart(localStorage.getItem(CART_KEY)), item));
+    persist(addToCart(readKey(activeKeyRef.current), item));
   }, [persist]);
 
   const remove = useCallback((key: string) => {
-    persist(removeFromCart(parseCart(localStorage.getItem(CART_KEY)), key));
+    persist(removeFromCart(readKey(activeKeyRef.current), key));
   }, [persist]);
 
   const setQty = useCallback((key: string, qty: number) => {
-    persist(setLineQty(parseCart(localStorage.getItem(CART_KEY)), key, qty));
+    persist(setLineQty(readKey(activeKeyRef.current), key, qty));
   }, [persist]);
 
   const clear = useCallback(() => persist([]), [persist]);

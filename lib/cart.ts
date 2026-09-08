@@ -11,6 +11,22 @@
 
 export const MAX_QTY_PER_LINE = 10; // /api/orders 서버 캡과 동일
 
+// ── Cart persistence contract (Session C) ──
+// 활성 카트 = localStorage "n1_cart_v1" (게스트 — 기존 그대로, 하위호환 유지)
+// 회원 카트 = localStorage "n1_cart_v1_m_<정규화된 이메일>" — 계정별 보관.
+// 로그인 시점: 게스트 카트를 그대로 게스트 키에 보존 + mergeCarts(회원, 게스트) 결과를
+// 회원 키에 저장하고 활성 카트로 전환. 로그아웃 시 게스트 보존본으로 복귀.
+// → 게스트 카트는 절대 파괴되지 않고, 재로그인 시 mergeCarts 계약으로 재합성된다.
+export const GUEST_CART_KEY = "n1_cart_v1";
+
+export function sanitizeCartIdentity(email: string): string {
+  return (email || "").trim().toLowerCase().replace(/[^a-z0-9@._-]/g, "_");
+}
+
+export function memberCartKey(email: string): string {
+  return `${GUEST_CART_KEY}_m_${sanitizeCartIdentity(email)}`;
+}
+
 export interface CartItem {
   sku: string;
   name: string;

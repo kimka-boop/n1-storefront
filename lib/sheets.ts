@@ -131,6 +131,47 @@ export async function findOrderById(doc: GoogleSpreadsheet, orderId: string): Pr
   return toOrderRecord(record);
 }
 
+// ── 멱등키 (Session C) — 주문 중복 생성 방지의 영구 계층 ──
+
+/** 멱등키 컬럼이 있으면 보장한다(없으면 헤더 맨 뒤 append). 실패해도 주문을 막지 않는다. */
+export async function ensureOrdersIdempotencyColumn(doc: GoogleSpreadsheet): Promise<boolean> {
+  try {
+    const sheet = await getOrdersSheet(doc);
+    if (!sheet) return false;
+    if ((sheet.headerValues || []).includes("멱등키")) return true;
+    await sheet.setHeaderRow([...(sheet.headerValues || []), "멱등키"]);
+    return true;
+  } catch {
+    return false; // 컬럼 확보 실패 → 메모리 계층만으로 운영 (호출자가 이어서 진행)
+  }
+}
+
+/** 멱등키로 기존 주문 조회 — 있으면 중복 생성 없이 원본 응답 replay 의 근거가 된다 */
+export async function findOrderByIdempotencyKey(
+  doc: GoogleSpreadsheet,
+  key: string,
+): Promise<OrderRecord | null> {
+  const clean = str(key);
+  if (!clean) return null;
+  const sheet = await getOrdersSheet(doc);
+  if (!sheet) return null;
+  const rows = await sheet.getRows();
+  const hit = rows.find((r) => str(r.get("멱등키")) === clean);
+  if (!hit) return null;
+  const record: Record<string, string> = {};
+  for (const key2 of Object.keys(sheet.headerValues || {})) record[key2] = str(hit.get(key2));
+  return toOrderRecord(record);
+}
+
+/** 회원 주문내역 — 본인 이메일 일치 주문 전수(최신순). limit 기본 50 (CS 용도의 5와 분리) */
+export async function findOrdersByMemberEmail(
+  doc: GoogleSpreadsheet,
+  email: string,
+  limit = 50,
+): Promise<OrderRecord[]> {
+  return findOrdersByCustomerEmail(doc, email, limit);
+}
+
 /** 전화번호 뒷자리로 후보 주문 조회 (CS 검증용 — 최신순) */
 export async function findOrdersByPhoneLast4(
   doc: GoogleSpreadsheet,
