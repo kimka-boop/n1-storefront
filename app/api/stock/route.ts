@@ -23,7 +23,8 @@ import { loadLedgerFile } from "@/lib/stock/ledger";
 
 export const dynamic = "force-dynamic";
 
-export const CONTRACT_VERSION = "n1.stock.v1";
+// Next.js 라우트 모듈은 핸들러·route config 외 export 금지 — 계약 버전은 응답 본문으로만 공개.
+const CONTRACT_VERSION = "n1.stock.v1";
 
 const UNKNOWN_VIEW_BASE = {
   stockStatus: "UNKNOWN" as const,
