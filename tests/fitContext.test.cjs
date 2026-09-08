@@ -109,3 +109,136 @@ test('context remains usable with fit preference alone (progressive input, §7)'
   assert.equal(isFitContextUsable(null), false);
   assert.equal(isFitContextUsable(migrateFitContext({ fit: 'nope' })), false);
 });
+
+/* ══════════════════════════════════════════════════════════════════
+   SESSION A — SMART FIT DATA FOUNDATION (A5·A6·A7·A8-클라이언트·A9-클라이언트)
+   저장소 경계: 게스트 = sessionStorage, 회원 = localStorage + 서버(§6·§7·§8)
+   ══════════════════════════════════════════════════════════════════ */
+
+function fakeSession() { return fakeStorage(); } // sessionStorage 계약 (getItem/setItem/removeItem)
+function fakeLocal() { return fakeStorage(); }  // localStorage 계약
+
+/* ── A5: 게스트 핏은 탭 세션 안에서 유지된다 — PDP 이동·새로고침·카트 이동 ── */
+test('A5 — guest fit persists across simulated PDP navigation/reload within one tab session', () => {
+  const { saveGuestFitContext, loadGuestFitContext } = load();
+  const session = fakeSession();
+  // 홈에서 스마트 핏 답변 → sessionStorage에 저장
+  saveGuestFitContext(GUEST_CTX, session);
+  // PDP 이동(컴포넌트 리마운트 = 다시 로드) — 같은 값
+  assert.deepEqual(loadGuestFitContext(session), GUEST_CTX);
+  // 새로고침(다시 로드) — 같은 값
+  assert.deepEqual(loadGuestFitContext(session), GUEST_CTX);
+  // 카트 이동(또 다시 로드) — 같은 값
+  assert.deepEqual(loadGuestFitContext(session), GUEST_CTX);
+});
+
+/* ── A5b: 탭이 닫히면(새 세션) 게스트 핏은 사라진다 ── */
+test('A5b — a new tab session starts with no guest fit (session-bound, not persistent)', () => {
+  const { saveGuestFitContext, loadGuestFitContext } = load();
+  const oldTab = fakeSession();
+  saveGuestFitContext(GUEST_CTX, oldTab);
+  const newTab = fakeSession(); // 닫힌 탭의 sessionStorage는 새 탭으로 이어지지 않는다
+  assert.equal(loadGuestFitContext(newTab), null);
+});
+
+/* ── A6: 게스트 핏은 localStorage·Customer Sheet 어디에도 쓰지 않는다 ── */
+test('A6 — guest fit goes to sessionStorage only, never to persistent storage', () => {
+  const { saveGuestFitContext, loadMemberFitContext, loadGuestFitContext } = load();
+  const session = fakeSession();
+  const local = fakeLocal();
+  saveGuestFitContext(GUEST_CTX, session);
+  // localStorage에는 아무것도 없다
+  assert.equal(loadMemberFitContext(local), null, '회원 기기 슬롯도 건드리지 않는다');
+  // 세션에는 있다
+  assert.deepEqual(loadGuestFitContext(session), GUEST_CTX);
+  // "Sheet에 없다"의 코드측 보장: 게스트 저장 경로는 서버를 호출하지 않는다 —
+  // AuthProvider.saveFit이 token 없으면 sessionStorage에만 쓴다(컴포넌트 테스트는
+  // 브라우저 QA, 서버 401은 authFoundation A6-server가 검증).
+});
+
+/* ── A7: 게스트 → 회원 승격 — 세션 사본이 기기 슬롯으로 옮겨지고 사본은 지워진다 ── */
+test('A7 — promotion moves guest session copy into the member slot and clears the session copy', () => {
+  const { saveGuestFitContext, promoteGuestFitToMember, loadGuestFitContext, loadMemberFitContext } = load();
+  const session = fakeSession();
+  const local = fakeLocal();
+  saveGuestFitContext(GUEST_CTX, session);
+  const promoted = promoteGuestFitToMember(GUEST_CTX, session, local);
+  assert.deepEqual(promoted, GUEST_CTX);
+  // 회원 슬롯에 저장되어 다음 방문(같은 탭이 아니어도) 회원으로 복원된다
+  assert.deepEqual(loadMemberFitContext(local), GUEST_CTX);
+  // 게스트 임시 사본은 정리된다 — 남은 잔존 금지(§8)
+  assert.equal(loadGuestFitContext(session), null);
+});
+
+/* ── A7b: 승격은 서버 동기화 필요 여부를 그대로 유지한다(계정에 저장 → readback) ── */
+test('A7b — a promoted guest context still encodes for the server without re-asking', () => {
+  const { promoteGuestFitToMember, saveGuestFitContext, encodeProfileForServer, mergeOnLogin } = load();
+  const session = fakeSession();
+  const local = fakeLocal();
+  saveGuestFitContext(GUEST_CTX, session);
+  const promoted = promoteGuestFitToMember(GUEST_CTX, session, local);
+  const wire = encodeProfileForServer(promoted);
+  assert.deepEqual(wire, { gender: '미지정', size: '상의 100 · 하의 30~31', fit: 'C' });
+  // 회원가입 응답의 profile(서버에 저장된 값)과 병합 — 서버가 비어 있으므로 승격 유지
+  const merged = mergeOnLogin({ gender: '미지정', size: '', fit: '' }, promoted);
+  assert.deepEqual(merged.ctx, GUEST_CTX);
+  assert.equal(merged.syncToServer, true, '서버 저장 + readback 경로가 열린다');
+  // Smart Fit을 다시 묻지 않는다 — 승격된 ctx로 initialFlowState가 result에서 시작한다
+  const flow = require(path.resolve(__dirname, '../lib/fitFlow.ts'));
+  const st = flow.initialFlowState(promoted, null);
+  assert.equal(st.step, 'result');
+});
+
+/* ── A8: 회원 핏 복원 — 계정 기억이 기기 슬롯에서(그리고 서버에서) 돌아온다 ── */
+test('A8 — member fit restores from the device slot and wins through server merge', () => {
+  const { saveMemberFitContext, loadMemberFitContext, mergeOnLogin } = load();
+  const local = fakeLocal();
+  saveMemberFitContext(GUEST_CTX, local); // 회원이 저장해 둔 상태
+  // 같은 브라우저 재방문 — 기기 슬롯에서 복원
+  assert.deepEqual(loadMemberFitContext(local), GUEST_CTX);
+  // 다른 기기에서 저장된 서버 프로필 — 서버가 이긴다(계정 기억)
+  const serverWire = { gender: '미지정', size: '상의 95 · 하의 28~29', fit: 'A' };
+  const merged = mergeOnLogin(serverWire, loadMemberFitContext(local));
+  assert.equal(merged.ctx.preferredFit, 'A');
+  assert.equal(merged.syncToServer, false);
+});
+
+/* ── A9: edit/reset — 회원의 기기+서버 양쪽 정리 경로가 준비되어 있다 ── */
+test('A9 — edit updates the slot; reset clears both storages and flags the server reset', () => {
+  const {
+    saveMemberFitContext, saveGuestFitContext, clearFitContext,
+    loadMemberFitContext, loadGuestFitContext, RESET_FIT_PROFILE_FLAG,
+  } = load();
+  const local = fakeLocal();
+  const session = fakeSession();
+  // edit — 값을 바꿔 저장하면 슬롯이 새 값이 된다
+  saveMemberFitContext({ v: 2, preferredFit: 'A', topSize: '95' }, local);
+  assert.equal(loadMemberFitContext(local).preferredFit, 'A');
+  saveMemberFitContext({ v: 2, preferredFit: 'C', topSize: '105', bottomSize: '32~33' }, local);
+  const edited = loadMemberFitContext(local);
+  assert.equal(edited.preferredFit, 'C');
+  assert.equal(edited.bottomSize, '32~33');
+  // reset — 두 저장소 모두에서 지워진다(숨은 잔존 금지, §9)
+  saveGuestFitContext(GUEST_CTX, session);
+  clearFitContext(local);
+  clearFitContext(session);
+  assert.equal(loadMemberFitContext(local), null);
+  assert.equal(loadGuestFitContext(session), null);
+  // 서버 초기화 플래그 계약 — AuthProvider가 action profile + 이 플래그로 보낸다
+  assert.equal(RESET_FIT_PROFILE_FLAG, 'resetFitProfile');
+});
+
+/* ── A8b: 서버가 이긴 로그인 — 기기 슬롯은 서버 값으로 묶이고 세션 사본은 지워진다 ── */
+test('A8b — when the server profile wins, the device slot takes the server value, not the stale session copy', () => {
+  const { saveGuestFitContext, promoteGuestFitToMember, loadGuestFitContext, loadMemberFitContext } = load();
+  const session = fakeSession();
+  const local = fakeLocal();
+  // 게스트 세션에는 C 취향이, 서버(다른 기기)에는 A 프로필이 있다
+  saveGuestFitContext({ v: 2, preferredFit: 'C', topSize: '110' }, session);
+  const serverCtx = { v: 2, preferredFit: 'A', topSize: '95', bottomSize: '28~29' };
+  // mergeOnLogin이 서버 값을 고른 뒤 그 값으로 승격한다 — 세션 사본으로 슬롯을 덮지 않는다
+  const promoted = promoteGuestFitToMember(serverCtx, session, local);
+  assert.deepEqual(promoted, serverCtx);
+  assert.deepEqual(loadMemberFitContext(local), serverCtx, '기기 슬롯은 서버 값이다');
+  assert.equal(loadGuestFitContext(session), null, '게스트 사본은 정리된다');
+});

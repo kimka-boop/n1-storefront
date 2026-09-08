@@ -1119,3 +1119,28 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
   line-height: 1.7;
 }
 .cs-msg.agent p { background: #eef1ea; }
+
+/* ── Session A: AUTH + SMART FIT FOUNDATION (2026-09-09) ──
+   스마트 핏 단계 뒤로 가기 — lq-close와 같은 조용한 원형 컨트롤(새 재질 아님).
+   진입 단계에서는 렌더링되지 않는다(components/SmartFitFlow.tsx §4). */
+.lq-back {
+  position: absolute; top: 12px; left: 14px;
+  background: none; border: none; font-size: 14px; cursor: pointer; color: #8f8b80;
+  width: 34px; height: 34px; border-radius: 50%;
+  line-height: 1;
+  transition: color 200ms ease, background-color 200ms ease;
+}
+.lq-back:hover { color: var(--ink); background: rgba(36, 39, 34, 0.06); }
+
+/* 아이디 가용성 인라인 피드백(§1) — available은 조용한 올리브, taken/invalid는 경고 적갈색 */
+.lq-avail[data-status="available"] { color: #555e4c; }
+.lq-avail[data-status="taken"],
+.lq-avail[data-status="invalid"] { color: #a0432d; }
+.lq-avail[data-status="checking"] { color: #8f8b80; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lq-back { transition: none; }
+}
+
+/* 뒤로 컨트롤이 있을 때는 내용이 컨트롤 열을 피해 들어간다 (겹침 방지) */
+.lq-surface:has(.lq-back) .lq-stage { padding-left: 30px; }
