@@ -1,0 +1,12 @@
+{
+ "requestId": "PB-PRD-N1-40-20260908T22005",
+ "productId": "PRD-N1-40",
+ "supplierName": "도매꾹",
+ "supplierProductId": "63396814",
+ "supplierUrl": "https://www.domeggook.com/63396814",
+ "probes": [
+  "item_view"
+ ],
+ "requestedAt": "2026-09-08T22:00:57.511Z",
+ "requestedBy": "n1-stock-watcher"
+}

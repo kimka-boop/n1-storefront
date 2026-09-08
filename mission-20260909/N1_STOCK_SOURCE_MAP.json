@@ -1,0 +1,1455 @@
+{
+ "artifact": "N1_STOCK_SOURCE_MAP",
+ "generatedAt": "2026-09-09T07:00:11+09:00",
+ "catalogCount": 44,
+ "supplierSummary": {
+  "도매꾹": {
+   "count": 44,
+   "api": "https://www.domeggook.com/ssl/api/ (OpenAPI, key=HERMES 관할)",
+   "cadence": {
+    "itemViewIntervalHours": 6,
+    "jitterMinutes": 15,
+    "dailyCapPerProduct": 4,
+    "backoffCapHours": 48
+   }
+  }
+ },
+ "rows": [
+  {
+   "productId": "PRD-N1-01",
+   "supplierName": "도매꾹",
+   "supplierProductId": "67853341",
+   "supplierUrl": "http://domeggook.com/67853341",
+   "supplierUrlNormalized": "https://www.domeggook.com/67853341",
+   "name": "블랙 셔츠",
+   "options": {
+    "colors": [
+     "블랙"
+    ],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:12:35"
+   }
+  },
+  {
+   "productId": "PRD-N1-02",
+   "supplierName": "도매꾹",
+   "supplierProductId": "64287719",
+   "supplierUrl": "http://domeggook.com/64287719",
+   "supplierUrlNormalized": "https://www.domeggook.com/64287719",
+   "name": "블랙 체크 셔츠",
+   "options": {
+    "colors": [
+     "블랙",
+     "화이트",
+     "네이비"
+    ],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:12:36"
+   }
+  },
+  {
+   "productId": "PRD-N1-03",
+   "supplierName": "도매꾹",
+   "supplierProductId": "66173967",
+   "supplierUrl": "http://domeggook.com/66173967",
+   "supplierUrlNormalized": "https://www.domeggook.com/66173967",
+   "name": "카키 브이넥 오버핏 니트",
+   "options": {
+    "colors": [
+     "카키"
+    ],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:12:38"
+   }
+  },
+  {
+   "productId": "PRD-N1-04",
+   "supplierName": "도매꾹",
+   "supplierProductId": "67330307",
+   "supplierUrl": "http://domeggook.com/67330307",
+   "supplierUrlNormalized": "https://www.domeggook.com/67330307",
+   "name": "핑크 체크 니트",
+   "options": {
+    "colors": [
+     "핑크"
+    ],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:12:41"
+   }
+  },
+  {
+   "productId": "PRD-N1-05",
+   "supplierName": "도매꾹",
+   "supplierProductId": "63997490",
+   "supplierUrl": "http://domeggook.com/63997490",
+   "supplierUrlNormalized": "https://www.domeggook.com/63997490",
+   "name": "브라운 브이넥 가디건",
+   "options": {
+    "colors": [
+     "브라운"
+    ],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:12:42"
+   }
+  },
+  {
+   "productId": "PRD-N1-06",
+   "supplierName": "도매꾹",
+   "supplierProductId": "64372806",
+   "supplierUrl": "http://domeggook.com/64372806",
+   "supplierUrlNormalized": "https://www.domeggook.com/64372806",
+   "name": "터틀넥 니트",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:12:37"
+   }
+  },
+  {
+   "productId": "PRD-N1-07",
+   "supplierName": "도매꾹",
+   "supplierProductId": "45237702",
+   "supplierUrl": "http://domeggook.com/45237702",
+   "supplierUrlNormalized": "https://www.domeggook.com/45237702",
+   "name": "브이넥 셔츠",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:12:56"
+   }
+  },
+  {
+   "productId": "PRD-N1-08",
+   "supplierName": "도매꾹",
+   "supplierProductId": "41323565",
+   "supplierUrl": "http://domeggook.com/41323565",
+   "supplierUrlNormalized": "https://www.domeggook.com/41323565",
+   "name": "하프집업 오버핏 맨투맨",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:12:57"
+   }
+  },
+  {
+   "productId": "PRD-N1-09",
+   "supplierName": "도매꾹",
+   "supplierProductId": "64042632",
+   "supplierUrl": "http://domeggook.com/64042632",
+   "supplierUrlNormalized": "https://www.domeggook.com/64042632",
+   "name": "피그먼트 오버핏 데님",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:01"
+   }
+  },
+  {
+   "productId": "PRD-N1-10",
+   "supplierName": "도매꾹",
+   "supplierProductId": "66012884",
+   "supplierUrl": "http://domeggook.com/66012884",
+   "supplierUrlNormalized": "https://www.domeggook.com/66012884",
+   "name": "블랙 피그먼트 스트레이트 데님",
+   "options": {
+    "colors": [
+     "블랙",
+     "흑청"
+    ],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:03"
+   }
+  },
+  {
+   "productId": "PRD-N1-11",
+   "supplierName": "도매꾹",
+   "supplierProductId": "61090550",
+   "supplierUrl": "http://domeggook.com/61090550",
+   "supplierUrlNormalized": "https://www.domeggook.com/61090550",
+   "name": "스트레이트 데님",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:12:59"
+   }
+  },
+  {
+   "productId": "PRD-N1-12",
+   "supplierName": "도매꾹",
+   "supplierProductId": "61168968",
+   "supplierUrl": "http://domeggook.com/61168968",
+   "supplierUrlNormalized": "https://www.domeggook.com/61168968",
+   "name": "기모 스트레이트 슬랙스",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:05"
+   }
+  },
+  {
+   "productId": "PRD-N1-13",
+   "supplierName": "도매꾹",
+   "supplierProductId": "63037811",
+   "supplierUrl": "http://domeggook.com/63037811",
+   "supplierUrlNormalized": "https://www.domeggook.com/63037811",
+   "name": "기모 루즈핏 팬츠",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:04"
+   }
+  },
+  {
+   "productId": "PRD-N1-14",
+   "supplierName": "도매꾹",
+   "supplierProductId": "67368795",
+   "supplierUrl": "http://domeggook.com/67368795",
+   "supplierUrlNormalized": "https://www.domeggook.com/67368795",
+   "name": "세미와이드 슬랙스",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:06"
+   }
+  },
+  {
+   "productId": "PRD-N1-15",
+   "supplierName": "도매꾹",
+   "supplierProductId": "64319546",
+   "supplierUrl": "http://domeggook.com/64319546",
+   "supplierUrlNormalized": "https://www.domeggook.com/64319546",
+   "name": "오버핏 세미와이드 슬랙스",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:16"
+   }
+  },
+  {
+   "productId": "PRD-N1-16",
+   "supplierName": "도매꾹",
+   "supplierProductId": "66685140",
+   "supplierUrl": "http://domeggook.com/66685140",
+   "supplierUrlNormalized": "https://www.domeggook.com/66685140",
+   "name": "테이퍼드 밴딩 팬츠",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:12"
+   }
+  },
+  {
+   "productId": "PRD-N1-17",
+   "supplierName": "도매꾹",
+   "supplierProductId": "67441196",
+   "supplierUrl": "http://domeggook.com/67441196",
+   "supplierUrlNormalized": "https://www.domeggook.com/67441196",
+   "name": "블랙 브이넥 니트",
+   "options": {
+    "colors": [
+     "블랙"
+    ],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:22"
+   }
+  },
+  {
+   "productId": "PRD-N1-18",
+   "supplierName": "도매꾹",
+   "supplierProductId": "64319792",
+   "supplierUrl": "http://domeggook.com/64319792",
+   "supplierUrlNormalized": "https://www.domeggook.com/64319792",
+   "name": "브이넥 셔츠 여성",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:25"
+   }
+  },
+  {
+   "productId": "PRD-N1-19",
+   "supplierName": "도매꾹",
+   "supplierProductId": "66680474",
+   "supplierUrl": "http://domeggook.com/66680474",
+   "supplierUrlNormalized": "https://www.domeggook.com/66680474",
+   "name": "니트",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:26"
+   }
+  },
+  {
+   "productId": "PRD-N1-20",
+   "supplierName": "도매꾹",
+   "supplierProductId": "66154302",
+   "supplierUrl": "http://domeggook.com/66154302",
+   "supplierUrlNormalized": "https://www.domeggook.com/66154302",
+   "name": "셔츠",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:24"
+   }
+  },
+  {
+   "productId": "PRD-N1-21",
+   "supplierName": "도매꾹",
+   "supplierProductId": "61885394",
+   "supplierUrl": "http://domeggook.com/61885394",
+   "supplierUrlNormalized": "https://www.domeggook.com/61885394",
+   "name": "블랙 루즈핏 맨투맨",
+   "options": {
+    "colors": [
+     "블랙"
+    ],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:29"
+   }
+  },
+  {
+   "productId": "PRD-N1-22",
+   "supplierName": "도매꾹",
+   "supplierProductId": "67463120",
+   "supplierUrl": "http://domeggook.com/67463120",
+   "supplierUrlNormalized": "https://www.domeggook.com/67463120",
+   "name": "브이넥 니트",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:33"
+   }
+  },
+  {
+   "productId": "PRD-N1-23",
+   "supplierName": "도매꾹",
+   "supplierProductId": "62049027",
+   "supplierUrl": "http://domeggook.com/62049027",
+   "supplierUrlNormalized": "https://www.domeggook.com/62049027",
+   "name": "피그먼트 오버핏 맨투맨",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:42"
+   }
+  },
+  {
+   "productId": "PRD-N1-24",
+   "supplierName": "도매꾹",
+   "supplierProductId": "66043596",
+   "supplierUrl": "http://domeggook.com/66043596",
+   "supplierUrlNormalized": "https://www.domeggook.com/66043596",
+   "name": "피그먼트 셔츠",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:44"
+   }
+  },
+  {
+   "productId": "PRD-N1-25",
+   "supplierName": "도매꾹",
+   "supplierProductId": "62214901",
+   "supplierUrl": "http://domeggook.com/62214901",
+   "supplierUrlNormalized": "https://www.domeggook.com/62214901",
+   "name": "브라운 코듀로이 팬츠",
+   "options": {
+    "colors": [
+     "브라운"
+    ],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:46"
+   }
+  },
+  {
+   "productId": "PRD-N1-26",
+   "supplierName": "도매꾹",
+   "supplierProductId": "64988716",
+   "supplierUrl": "http://domeggook.com/64988716",
+   "supplierUrlNormalized": "https://www.domeggook.com/64988716",
+   "name": "블랙 세미와이드 슬랙스",
+   "options": {
+    "colors": [
+     "블랙",
+     "네이비"
+    ],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:48"
+   }
+  },
+  {
+   "productId": "PRD-N1-27",
+   "supplierName": "도매꾹",
+   "supplierProductId": "64041358",
+   "supplierUrl": "http://domeggook.com/64041358",
+   "supplierUrlNormalized": "https://www.domeggook.com/64041358",
+   "name": "피그먼트 부츠컷 데님",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:49"
+   }
+  },
+  {
+   "productId": "PRD-N1-28",
+   "supplierName": "도매꾹",
+   "supplierProductId": "61854628",
+   "supplierUrl": "http://domeggook.com/61854628",
+   "supplierUrlNormalized": "https://www.domeggook.com/61854628",
+   "name": "부츠컷 데님",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:50"
+   }
+  },
+  {
+   "productId": "PRD-N1-29",
+   "supplierName": "도매꾹",
+   "supplierProductId": "67759645",
+   "supplierUrl": "http://domeggook.com/67759645",
+   "supplierUrlNormalized": "https://www.domeggook.com/67759645",
+   "name": "기모 밴딩 슬랙스",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:13:54"
+   }
+  },
+  {
+   "productId": "PRD-N1-30",
+   "supplierName": "도매꾹",
+   "supplierProductId": "60933277",
+   "supplierUrl": "http://domeggook.com/60933277",
+   "supplierUrlNormalized": "https://www.domeggook.com/60933277",
+   "name": "밴딩 미디 스커트",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:14:01"
+   }
+  },
+  {
+   "productId": "PRD-N1-31",
+   "supplierName": "도매꾹",
+   "supplierProductId": "63480575",
+   "supplierUrl": "http://domeggook.com/63480575",
+   "supplierUrlNormalized": "https://www.domeggook.com/63480575",
+   "name": "스커트",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:14:00"
+   }
+  },
+  {
+   "productId": "PRD-N1-32",
+   "supplierName": "도매꾹",
+   "supplierProductId": "66012983",
+   "supplierUrl": "http://domeggook.com/66012983",
+   "supplierUrlNormalized": "https://www.domeggook.com/66012983",
+   "name": "데님",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:14:11"
+   }
+  },
+  {
+   "productId": "PRD-N1-33",
+   "supplierName": "도매꾹",
+   "supplierProductId": "62479147",
+   "supplierUrl": "http://domeggook.com/62479147",
+   "supplierUrlNormalized": "https://www.domeggook.com/62479147",
+   "name": "블랙 루즈핏 오버핏 가디건",
+   "options": {
+    "colors": [
+     "블랙"
+    ],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:14:13"
+   }
+  },
+  {
+   "productId": "PRD-N1-34",
+   "supplierName": "도매꾹",
+   "supplierProductId": "65650411",
+   "supplierUrl": "http://domeggook.com/65650411",
+   "supplierUrlNormalized": "https://www.domeggook.com/65650411",
+   "name": "블랙 루즈핏 가디건",
+   "options": {
+    "colors": [
+     "블랙"
+    ],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:14:13"
+   }
+  },
+  {
+   "productId": "PRD-N1-35",
+   "supplierName": "도매꾹",
+   "supplierProductId": "61845165",
+   "supplierUrl": "http://domeggook.com/61845165",
+   "supplierUrlNormalized": "https://www.domeggook.com/61845165",
+   "name": "스트라이프 피그먼트 셔츠",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:14:14"
+   }
+  },
+  {
+   "productId": "PRD-N1-36",
+   "supplierName": "도매꾹",
+   "supplierProductId": "64198857",
+   "supplierUrl": "http://domeggook.com/64198857",
+   "supplierUrlNormalized": "https://www.domeggook.com/64198857",
+   "name": "체크 오버핏 셔츠",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:14:15"
+   }
+  },
+  {
+   "productId": "PRD-N1-37",
+   "supplierName": "도매꾹",
+   "supplierProductId": "66460368",
+   "supplierUrl": "http://domeggook.com/66460368",
+   "supplierUrlNormalized": "https://www.domeggook.com/66460368",
+   "name": "터틀넥 니트 남녀공용",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:14:24"
+   }
+  },
+  {
+   "productId": "PRD-N1-38",
+   "supplierName": "도매꾹",
+   "supplierProductId": "61397289",
+   "supplierUrl": "http://domeggook.com/61397289",
+   "supplierUrlNormalized": "https://www.domeggook.com/61397289",
+   "name": "피그먼트 오버핏 맨투맨 남녀공용",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:14:23"
+   }
+  },
+  {
+   "productId": "PRD-N1-39",
+   "supplierName": "도매꾹",
+   "supplierProductId": "65097434",
+   "supplierUrl": "http://domeggook.com/65097434",
+   "supplierUrlNormalized": "https://www.domeggook.com/65097434",
+   "name": "루즈핏 와이드 슬랙스",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:14:27"
+   }
+  },
+  {
+   "productId": "PRD-N1-40",
+   "supplierName": "도매꾹",
+   "supplierProductId": "63396814",
+   "supplierUrl": "http://domeggook.com/63396814",
+   "supplierUrlNormalized": "https://www.domeggook.com/63396814",
+   "name": "와이드 스트레이트 데님",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:14:29"
+   }
+  },
+  {
+   "productId": "PRD-N1-41",
+   "supplierName": "도매꾹",
+   "supplierProductId": "63475072",
+   "supplierUrl": "http://domeggook.com/63475072",
+   "supplierUrlNormalized": "https://www.domeggook.com/63475072",
+   "name": "와이드 팬츠",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:14:28"
+   }
+  },
+  {
+   "productId": "PRD-N1-42",
+   "supplierName": "도매꾹",
+   "supplierProductId": "67581704",
+   "supplierUrl": "http://domeggook.com/67581704",
+   "supplierUrlNormalized": "https://www.domeggook.com/67581704",
+   "name": "체크 슬랙스",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:14:30"
+   }
+  },
+  {
+   "productId": "PRD-N1-43",
+   "supplierName": "도매꾹",
+   "supplierProductId": "63480112",
+   "supplierUrl": "http://domeggook.com/63480112",
+   "supplierUrlNormalized": "https://www.domeggook.com/63480112",
+   "name": "코듀로이 스커트",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:14:31"
+   }
+  },
+  {
+   "productId": "PRD-N1-44",
+   "supplierName": "도매꾹",
+   "supplierProductId": "66394660",
+   "supplierUrl": "http://domeggook.com/66394660",
+   "supplierUrlNormalized": "https://www.domeggook.com/66394660",
+   "name": "오버핏 데님",
+   "options": {
+    "colors": [],
+    "sizes": [],
+    "optionIdentityBasis": "TITLE_TOKENS_ONLY"
+   },
+   "currentStockFields": {
+    "sheetStockStatus": "판매중",
+    "sheetStockQuantity": null,
+    "optionStock": {},
+    "stockVerifiedAt": null,
+    "note": "Products 시트에 재고검증일시/옵션별재고 컬럼 없음 — 스왑 시 API 존재 신호로 판매중 기입"
+   },
+   "sourceType": {
+    "productLevelNumeric": "A_CANDIDATE(getItemView qty.inventory — 문서 근거, HERMES 실측 검증 대기)",
+    "productLevelStatus": "B(getItemView basis.status + getItemList 판매중-only 노출)",
+    "optionLevelNumeric": "D(selectOpt 스키마 별첨 docx 미검증)",
+    "optionLevelBinary": "B(getAllSupplyChk OPTSOLDOUT — 바이어 계정 적용성 미검증)",
+    "htmlDetailPage": "PARSER_FAILED_44_OF_44(enrich 2026-09-09 실측: colors/sizes/price 전건 미획득)"
+   },
+   "lastDetailProbe": {
+    "price_verified": "UNKNOWN",
+    "soldout": "NO(API 판매중)",
+    "verified_at": "2026-09-09T06:14:32"
+   }
+  }
+ ]
+}

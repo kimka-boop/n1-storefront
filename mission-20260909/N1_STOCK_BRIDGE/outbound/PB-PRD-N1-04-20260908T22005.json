@@ -1,0 +1,12 @@
+{
+ "requestId": "PB-PRD-N1-04-20260908T22005",
+ "productId": "PRD-N1-04",
+ "supplierName": "도매꾹",
+ "supplierProductId": "67330307",
+ "supplierUrl": "https://www.domeggook.com/67330307",
+ "probes": [
+  "item_view"
+ ],
+ "requestedAt": "2026-09-08T22:00:57.511Z",
+ "requestedBy": "n1-stock-watcher"
+}
