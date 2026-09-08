@@ -397,18 +397,37 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 
 /* ── 리퀴드 글래스 플로팅 버튼 (iOS 26 컨트롤 레퍼런스) — 장바구니·문의하기 공통·완전 동일 ──
    유리는 행동에만: 두 액션 버튼에만 프로스틱 유리를 입히고, 팝업 본체는 불투명 유지.
+   대각 광택 그라디언트+렌즈 림으로 밝은 배경 위에서도 유리 재질이 읽히게.
    backdrop-filter 미지원 브라우저는 위의 흰색 단색 규칙이 그대로 폴백. */
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .float-bar, .cs-fab {
-    background: rgba(255, 255, 255, 0.48);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    backdrop-filter: blur(16px) saturate(180%);
-    border-color: rgba(255, 255, 255, 0.72);
-    box-shadow: 0 8px 24px rgba(10, 10, 10, 0.14),
-      inset 0 1px 1px rgba(255, 255, 255, 0.95),
-      inset 0 -1px 1px rgba(255, 255, 255, 0.4);
+    background:
+      linear-gradient(135deg,
+        rgba(255,255,255,0.85) 0%,
+        rgba(255,255,255,0.25) 38%,
+        rgba(255,255,255,0.10) 55%,
+        rgba(255,255,255,0.45) 100%);
+    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+    backdrop-filter: blur(20px) saturate(1.8);
+    border-color: rgba(255,255,255,0.9);
+    box-shadow:
+      0 10px 28px rgba(10,10,10,0.16),
+      0 0 0 1px rgba(10,10,10,0.05),
+      inset 0 1.5px 1px rgba(255,255,255,1),
+      inset 0 -2px 3px rgba(255,255,255,0.55),
+      inset 2px 0 4px rgba(255,255,255,0.35),
+      inset -2px 0 4px rgba(255,255,255,0.35);
   }
-  .float-bar:hover, .cs-fab:hover { border-color: rgba(10, 10, 10, 0.45); transform: translateY(-2px); }
+  .float-bar:hover, .cs-fab:hover {
+    border-color: rgba(10,10,10,0.35); transform: translateY(-2px);
+    box-shadow:
+      0 14px 34px rgba(10,10,10,0.20),
+      0 0 0 1px rgba(10,10,10,0.05),
+      inset 0 1.5px 1px rgba(255,255,255,1),
+      inset 0 -2px 3px rgba(255,255,255,0.55),
+      inset 2px 0 4px rgba(255,255,255,0.35),
+      inset -2px 0 4px rgba(255,255,255,0.35);
+  }
 }
 .float-popup-head button { background: none; border: none; color: #fff; cursor: pointer; }
 .float-popup-body { padding: 14px 16px; }
