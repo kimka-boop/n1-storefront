@@ -10,17 +10,18 @@ const path = require('node:path');
 const target = path.resolve(__dirname, '../lib/experience.ts');
 const load = () => fs.existsSync(target) ? require(target) : {};
 
-test('collection exposes only ready media, matches exact gender, and searches within that edit', () => {
+test('collection shows every product by exact gender and searches within the edit', () => {
   const { selectCollection } = load();
-  assert.equal(typeof selectCollection, 'function', 'ready collection selector must exist');
+  assert.equal(typeof selectCollection, 'function', 'collection selector must exist');
   const rows = [
     { id:'a', name:'울 니트', gender:'FEMALE', lookbookStatus:'생성완료', lookbookImage:'https://example.test/a.png' },
     { id:'b', name:'셔츠', gender:'MALE', lookbookStatus:'생성완료', lookbookImage:'https://example.test/b.png' },
     { id:'c', name:'미완성 니트', gender:'FEMALE', lookbookStatus:'대기', lookbookImage:'' },
   ];
-  assert.deepEqual(selectCollection(rows, 'FEMALE', '니트').map(p=>p.id), ['a']);
+  // 2026-09-08 Owner 지시: 룩북 미생성('대기') 상품도 컬렉션에서 제외하지 않는다(남20/여20/젠더리스20 전체 전시)
+  assert.deepEqual(selectCollection(rows, 'FEMALE', '니트').map(p=>p.id), ['a','c']);
   assert.equal(selectCollection(rows, 'MALE', '니트').length, 0);
-  assert.equal(selectCollection(rows, 'all', '').length, 2);
+  assert.equal(selectCollection(rows, 'all', '').length, 3);
 });
 
 test('purchase readiness rejects unknown variants and carries raw color through the handoff', () => {

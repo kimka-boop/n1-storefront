@@ -6,7 +6,7 @@ import CsWidget from "@/components/CsWidget";
 import SiteHeader from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
-  title: "N°1 — 20 Pieces. Selected by AI.",
+  title: "N°1 — 60 Pieces. Selected by AI.",
   description: "AI가 선별한 큐레이션 패션 스토어",
 };
 

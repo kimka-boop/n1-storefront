@@ -261,9 +261,11 @@ export default function ProductPage() {
               <p className={styles.lede}>소재 정보가 보강 중입니다.</p>
             )}
             <TonePanel fit={fit} />
-            <p className={styles.aiDisclosure}>
-              이미지는 스타일링 참고용 AI 컷입니다 — 실측·소재는 표기 정보로 확인해 주세요.
-            </p>
+            {media && (
+              <p className={styles.aiDisclosure}>
+                이미지는 스타일링 참고용 AI 컷입니다 — 실측·소재는 표기 정보로 확인해 주세요.
+              </p>
+            )}
           </div>
         </div>
       </SceneSection>

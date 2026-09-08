@@ -6,7 +6,7 @@
  *
  * V2:
  * - 에디토리얼 위계: LEAD(대형) → SUPPORTING(2) → QUIET(잔잔) — 동일 카드 벽 제거
- * - selectCollection(준비된 상품만·정확 성별 enum·컬렉션 내 검색)
+ * - selectCollection(전체 상품·정확 성별 enum·컬렉션 내 검색 — 룩북 미생성은 플레이스홀더)
  * - 미디어: 로컬 에디토리얼 샷 우선(public/editorial-media) → 폴백 체인
  * - 구매 상태: purchaseState(ready/choose/soldout/unconfirmed) — 재고 미확정은
  *   구매 가능처럼 보이지 않고 CS 문의로 안내 (미션 §10·§16)
@@ -254,13 +254,11 @@ export default function Home() {
     else localStorage.setItem("n1_gender_tab", t);
   };
 
-  const readyAll = selectCollection(products, "all");
   const collection = selectCollection(
     products,
     genderTab === "all" ? "all" : GENDER_API[genderTab],
     query
   ).sort((a, b) => editorialWeight(b) - editorialWeight(a));
-  const upcomingCount = products.length - readyAll.length;
   const genderCount = (g: Exclude<GenderKey, "all">) =>
     selectCollection(products, GENDER_API[g]).length;
 
@@ -324,13 +322,16 @@ export default function Home() {
   }, [fetchProducts]);
 
   useEffect(() => {
-    const pending = readyAll.filter((p) => !thumbs[p.id] && folderIdFromUrl(p.lookbookImage));
+    const pending = products.filter((p) => !thumbs[p.id] && folderIdFromUrl(p.lookbookImage));
     pending.slice(0, 4).forEach((p) => loadThumb(p));
-  }, [readyAll, thumbs, loadThumb]);
+  }, [products, thumbs, loadThumb]);
 
-  // 카드 이미지: 에디토리얼 로컬 샷 → Drive 썸네일 → API 원본
+  // 카드 이미지: 에디토리얼 로컬 샷 → Drive 썸네일 (폴더 URL 원문은 img src로 부적합 — mediaFor가 차단)
   const imageOf = (p: Product): string | null =>
-    mediaFor(p.id, p.lookbookImage)?.front || thumbs[p.id] || p.lookbookImage || null;
+    mediaFor(p.id, p.lookbookImage)?.front || thumbs[p.id] || null;
+
+  // 외부 이미지 로드 실패(FASHN 만료 등) → '이미지 준비 중' 플레이스홀더로 정직하게 폴백
+  const [failedImg, setFailedImg] = useState<Record<string, true>>({});
 
   // fog depth — 접근 전엔 살짝 옅게, 가까워지면 또렷하게 (Liquid Glass 문법)
   useEffect(() => {
@@ -483,7 +484,7 @@ export default function Home() {
       <header className="hero">
         <div className="hero-brand">
           <h1>N°1</h1>
-          <p className="hero-tag">20 Pieces · Selected by AI</p>
+          <p className="hero-tag">60 Pieces · Selected by AI</p>
           <p className="hero-tagline">매주 일요일, 마음에 드는 몇 벌만 골라 보여드립니다</p>
         </div>
         <p className="hero-drop">
@@ -497,7 +498,7 @@ export default function Home() {
       <nav className="collection-nav" aria-label="컬렉션 필터">
         <span className="nav-brand">N°1</span>
         <button className={`gtab ${genderTab === "all" ? "active" : ""}`} onClick={() => changeTab("all")}>
-          전체 <span className="gcount">({readyAll.length})</span>
+          전체 <span className="gcount">({products.length})</span>
         </button>
         <button className={`gtab ${genderTab === "male" ? "active" : ""}`} onClick={() => changeTab("male")}>
           남성 <span className="gcount">({genderCount("male")})</span>
@@ -520,8 +521,9 @@ export default function Home() {
         <div className="collection-head">
           <h2 className="collection-title">이번 컬렉션</h2>
           <p className="collection-sub">
-            {readyAll.length}벌이 준비되어 있습니다
-            {genderTab !== "all" && " · " + ({male:"남성",female:"여성",genderless:"젠더리스"}[genderTab])}
+            {genderTab === "all"
+              ? `남성 ${genderCount("male")} · 여성 ${genderCount("female")} · 젠더리스 ${genderCount("genderless")} — 총 ${products.length}벌`
+              : `${({ male: "남성", female: "여성", genderless: "젠더리스" } as Record<string, string>)[genderTab]} 컬렉션 — ${collection.length}벌`}
           </p>
           <div className="collection-search">
             <input
@@ -540,7 +542,7 @@ export default function Home() {
         {withRoles.length ? (
           <div className="pieces">
             {withRoles.map(({ product: p, role }) => {
-              const img = imageOf(p);
+              const img = failedImg[p.id] ? null : imageOf(p);
               const soldOut = p.stockStatus === "품절";
               return (
                 <Link
@@ -552,7 +554,14 @@ export default function Home() {
                   <div className={`piece-media ${img ? "" : "empty"}`}>
                     {img ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={img} alt={`${p.name} 대표 이미지`} loading={role === "lead" ? "eager" : "lazy"} />
+                      <img
+                        src={img}
+                        alt={`${p.name} 대표 이미지`}
+                        loading={role === "lead" ? "eager" : "lazy"}
+                        onError={() =>
+                          setFailedImg((f) => (f[p.id] ? f : { ...f, [p.id]: true }))
+                        }
+                      />
                     ) : (
                       <span>이미지 준비 중</span>
                     )}
@@ -574,13 +583,6 @@ export default function Home() {
             {query
               ? "검색 결과가 없습니다 — 다른 이름으로 찾아보세요."
               : "이번 컬렉션에는 해당하는 상품이 없습니다 — 다음 컬렉션에서 만나요."}
-          </p>
-        )}
-
-        {upcomingCount > 0 && (
-          <p className="collection-upcoming">
-            이번 주 컬렉션은 남성 20 · 여성 20 · 젠더리스 20, 총 60벌입니다 —
-            지금은 확인을 마친 {readyAll.length}벌이 공개되어 있습니다.
           </p>
         )}
       </section>
@@ -621,7 +623,9 @@ export default function Home() {
               ) : imageOf(selected) ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img src={imageOf(selected)!} alt={`${selected.name} — 대표컷`} className="slide-img" />
-              ) : null}
+              ) : (
+                <span className="slide-empty">이미지 준비 중</span>
+              )}
               {slideIds.length > 1 ? (
                 <>
                   <button className="nav prev" onClick={prevSlide} aria-label="이전">‹</button>

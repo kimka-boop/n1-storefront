@@ -29,8 +29,10 @@ export function purchaseState(p: Pick<RetailProduct, 'stockStatus'|'colorOptions
 }
 
 export function selectCollection<T extends { name: string; gender?: string; lookbookStatus: string; lookbookImage: string }>(rows: T[], gender = 'all', query = ''): T[] {
+  // 2026-09-08 Owner 지시: 컬렉션의 모든 상품(남20/여20/젠더리스20)을 상태와 무관하게 전시한다.
+  // 룩북 미생성(대기) 상품은 카드에서 '이미지 준비 중' 플레이스홀더로 정직하게 표시.
   const term = query.trim().toLocaleLowerCase();
-  return rows.filter(p => p.lookbookStatus === '생성완료' && Boolean(p.lookbookImage?.trim()) &&
+  return rows.filter(p =>
     (gender === 'all' || p.gender?.toUpperCase() === gender) &&
     (!term || p.name.toLocaleLowerCase().includes(term)));
 }

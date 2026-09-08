@@ -74,7 +74,8 @@ export function mediaFor(pid: string, fallback?: string): ProductMedia | null {
   const m = EDITORIAL_MEDIA[pid];
   if (m) return m;
   const src = (fallback || "").trim();
-  if (!src) return null;
+  // Drive 폴더 링크는 이미지가 아니라 폴더 목록 — img src로 쓰면 깨진다.
+  if (!src || /drive\.google\.com\/drive\/folders/.test(src)) return null;
   return {
     front: src,
     views: [{ key: "front", label: "정면", src }],
