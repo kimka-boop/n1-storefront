@@ -15,7 +15,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import ImageCrop, { CROP_HERO, CROP_FULL, CROP_DETAIL } from "@/components/product/ImageCrop";
 import SceneSection from "@/components/product/SceneSection";
 import TonePanel from "@/components/product/TonePanel";
@@ -24,6 +24,9 @@ import StickyBuyBar from "@/components/product/StickyBuyBar";
 import MaterialComposition from "@/components/MaterialComposition";
 import SmartFitFlow from "@/components/SmartFitFlow";
 import { useAuth } from "@/components/AuthProvider";
+import { useCart } from "@/components/CartProvider";
+import { stashBuyNow } from "@/lib/checkout";
+import type { CartItem } from "@/lib/cart";
 import { PRODUCT_STORY } from "@/lib/productContent";
 import { mediaFor } from "@/lib/media";
 import { productColors, purchaseState, quickBuyUrl } from "@/lib/experience";
@@ -96,9 +99,12 @@ export default function ProductPage() {
   const heroRef = useRef<HTMLDivElement>(null);
   const decisionRef = useRef<HTMLDivElement>(null);
 
-  // ── 나에게 맞게 보기: 핏 개인화 (훅은 early return 이전에 unconditional) ──
+  // ── 나에게 맞게 보기: Smart Fit V2 Fit Context (훅은 early return 이전에 unconditional) ──
   const { fit: authFit } = useAuth();
+  const { add: addCartLine, setOpen: setCartOpen } = useCart();
+  const router = useRouter();
   const [showFitFlow, setShowFitFlow] = useState(false);
+  const [buyQty, setBuyQty] = useState(1);
 
   useEffect(() => {
     let alive = true;
@@ -120,6 +126,7 @@ export default function ProductPage() {
         const colors = productColors(p.colorOptions);
         setSelColor(colors[0]?.value ?? "");
         setSelSize(p.sizeOptions?.length === 1 ? p.sizeOptions[0] : "");
+        setBuyQty(1);
       })
       .catch(() => alive && setState("notfound"));
     return () => {
@@ -185,8 +192,30 @@ export default function ProductPage() {
   const activeView = media?.views.find((v) => v.key === viewKey) ?? media?.views[0];
   const buy = purchaseState(product, selColor, selSize);
 
-  const goToQuickBuy = () =>
-    window.location.assign(quickBuyUrl(product.id, selColor, selSize));
+  // ── 구매 (미션 §6): 장바구니에 담기 / 바로 구매 — 원시 옵션 값 그대로 전달 (미션 §8)
+  const variantStockSnap =
+    typeof product.optionStock?.[selColor && selSize ? `${selColor}_${selSize}` : selSize] === "number"
+      ? product.optionStock![selColor && selSize ? `${selColor}_${selSize}` : selSize]
+      : null;
+  const buildCartItem = (): CartItem => ({
+    sku: product.id,
+    name: product.name,
+    color: selColor, // 원시 값 (표시 라벨과 분리)
+    size: selSize,
+    qty: buyQty,
+    unit_price: product.price,
+    image: media?.front,
+    stock_snapshot: variantStockSnap,
+  });
+  const handleAddToCart = () => {
+    addCartLine(buildCartItem());
+    setCartOpen(true); // 담기 즉시 카트 경험 오픈
+  };
+  const handleBuyNow = () => {
+    stashBuyNow(buildCartItem()); // 현재 선택만 — 카트의 다른 상품 미포함
+    router.push("/checkout");
+  };
+
   const scrollToDecision = () =>
     decisionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   const openCs = () => window.dispatchEvent(new Event("n1:open-cs"));
@@ -440,9 +469,38 @@ export default function ProductPage() {
                 </p>
               </>
             ) : (
-              <button type="button" className={styles.cta} onClick={goToQuickBuy}>
-                구매하기
-              </button>
+              <>
+                <div className={styles.qtyRow} role="group" aria-label="수량 선택">
+                  <button
+                    type="button"
+                    className={styles.qtyBtn}
+                    onClick={() => setBuyQty((q) => Math.max(1, q - 1))}
+                    disabled={buyQty <= 1}
+                    aria-label="수량 줄이기"
+                  >
+                    −
+                  </button>
+                  <span className={styles.qtyVal}>{buyQty}</span>
+                  <button
+                    type="button"
+                    className={styles.qtyBtn}
+                    onClick={() => setBuyQty((q) => Math.min(10, q + 1))}
+                    disabled={buyQty >= 10}
+                    aria-label="수량 늘리기"
+                  >
+                    ＋
+                  </button>
+                  <span className={styles.qtyTotal}>{won(product.price * buyQty)}</span>
+                </div>
+                <div className={styles.buyRow}>
+                  <button type="button" className={styles.cta} onClick={handleAddToCart}>
+                    장바구니에 담기
+                  </button>
+                  <button type="button" className={`${styles.cta} ${styles.ctaBuyNow}`} onClick={handleBuyNow}>
+                    바로 구매
+                  </button>
+                </div>
+              </>
             )}
             {clean(product.notice?.colorSize) ? (
               <p className={styles.colorSize}>{clean(product.notice?.colorSize)}</p>

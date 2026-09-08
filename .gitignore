@@ -12,3 +12,4 @@ lookbook/
 
 .vercel
 .env*
+tsconfig.tsbuildinfo
