@@ -550,7 +550,8 @@ export default function ProductPage() {
           ) : null}
         </dl>
         <p className={styles.homeLinkWrap}>
-          <Link href="/" className={styles.homeLink}>
+          {/* SESSION F §4: '전체 상품 보기'는 항상 '전체' 컬렉션 — 저장된 탭(남성 등)보다 ?tab=all이 이긴다 */}
+          <Link href="/?tab=all" className={styles.homeLink}>
             N°1 전체 상품 보기
           </Link>
         </p>

@@ -177,7 +177,8 @@ function driveImg(fileId: string, w = 1000) {
   return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${w}&v=${Math.floor(Date.now() / 600000)}`;
 }
 
-type GenderKey = "home" | "all" | "male" | "female" | "genderless";
+// N°1은 카테고리가 아니다(SESSION F) — 브랜드 내비는 홈 hero·SiteHeader 브랜드 블록 전용.
+type GenderKey = "all" | "male" | "female" | "genderless";
 const GENDER_API: Record<"male" | "female" | "genderless", "MALE" | "FEMALE" | "GENDERLESS"> = {
   male: "MALE", female: "FEMALE", genderless: "GENDERLESS",
 };
@@ -224,20 +225,30 @@ export default function Home() {
   const [genderTab, setGenderTab] = useState<GenderKey>("all");
   const [query, setQuery] = useState("");
   useEffect(() => {
-    // §8: N°1은 destination이고 '전체'가 collection 기본 — home은 세션에 저장/복원하지 않는다.
+    // §8: '전체'가 collection 기본 — 탭은 세션에 저장/복원한다(브랜드 진입과 무관).
+    // PDP 'N°1 전체 상품 보기'(/?tab=all)는 저장된 탭보다 항상 이긴다 — 어느 탭을
+    // 보고 있었든 '전체' 컬렉션으로 착지해야 한다(SESSION F §4).
+    const sp = new URLSearchParams(window.location.search);
+    const t = sp.get("tab");
+    if (t === "all" || t === "male" || t === "female" || t === "genderless") {
+      setGenderTab(t);
+      if (t === "all") localStorage.removeItem("n1_gender_tab");
+      else localStorage.setItem("n1_gender_tab", t);
+      window.history.replaceState(null, "", window.location.pathname);
+      return;
+    }
     const saved = localStorage.getItem("n1_gender_tab");
     if (saved === "male" || saved === "female" || saved === "genderless") setGenderTab(saved);
   }, []);
   const changeTab = (t: GenderKey) => {
     setGenderTab(t);
-    if (t === "all" || t === "home") localStorage.removeItem("n1_gender_tab");
+    if (t === "all") localStorage.removeItem("n1_gender_tab");
     else localStorage.setItem("n1_gender_tab", t);
-    if (t === "home") window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // ── 페어 컬렉션: 한 row = 추천 코디 1벌 (LEFT=TOP, RIGHT=BOTTOM) ──
   // N1_PAIRING_POLICY_V1 — HERMES가 사전 계산한 mapping만 소비, 프론트에서 조합 생성 금지.
-  const scope = genderTab === "all" || genderTab === "home" ? "all" : GENDER_API[genderTab];
+  const scope = genderTab === "all" ? "all" : GENDER_API[genderTab];
   const { rows: pairRows, singles } = buildCollectionPairs(products, pairs, scope, query);
   const collection = pairRows.length
     ? [...pairRows.flatMap((r) => [r.top, r.bottom]), ...singles]
@@ -249,7 +260,8 @@ export default function Home() {
   // 상태 소스는 genderTab 단일(중복 내비 상태 없음). 렌즈 배치는 React state
   // (Glass Lab TabZoneDemo와 동일 패턴 — DOM 직접 조작의 리렌더 경합 제거).
   // 드래그 중엔 lens DOM을 직접 조작(리렌더 없음), 놓으면 가장 가까운 탭으로 스냅.
-  const GLASS_TABS: GenderKey[] = ["home", "all", "male", "female", "genderless"];
+  // 그룹은 순수 카테고리 4개 — N°1 브랜드는 렌즈 destination이 아니다(SESSION F §5).
+  const GLASS_TABS: GenderKey[] = ["all", "male", "female", "genderless"];
   const trackRef = useRef<HTMLDivElement>(null);
   const lensRef = useRef<HTMLSpanElement>(null);
   const dragRef = useRef<{ pointerId: number; startX: number; baseLeft: number; active: boolean; lastHover: number } | null>(null);
@@ -257,7 +269,7 @@ export default function Home() {
 
   const syncLens = useCallback(() => {
     const track = trackRef.current;
-    // 모바일 등에서 활성 탭이 감춰져 있으면(예: N°1 브랜드) 동일 컬렉션을 보여주는 '전체'에 렌즈
+    // 활성 탭 버튼을 못 찾는 비정상 상황에만 동일 컬렉션의 '전체'로 폴백 (정상 경로엔 미동작)
     const btn =
       track?.querySelector<HTMLElement>(`[data-tab="${genderTab}"]`) ??
       track?.querySelector<HTMLElement>('[data-tab="all"]');
@@ -597,7 +609,8 @@ export default function Home() {
 
       {error && <p className="error">⚠️ {error}</p>}
 
-      {/* ── 컬렉션 내비 (sticky glass rail + 드래그 가능한 Liquid Glass 셀렉터) ── */}
+      {/* ── 컬렉션 내비 (sticky glass rail + 드래그 가능한 Liquid Glass 셀렉터) ──
+          N°1 브랜드 내비는 이 그룹 밖 — 홈은 위 hero 브랜드, 그 외 페이지는 SiteHeader. */}
       <nav className="collection-nav" aria-label="컬렉션 필터">
         <div className="gtab-track" ref={trackRef}>
           <span
@@ -614,9 +627,6 @@ export default function Home() {
             onPointerUp={onLensPointerEnd}
             onPointerCancel={onLensPointerEnd}
           />
-          <button data-tab="home" className={`gtab gtab-brand ${genderTab === "home" ? "active" : ""}`} onClick={() => changeTab("home")}>
-            N°1
-          </button>
           <button data-tab="all" className={`gtab ${genderTab === "all" ? "active" : ""}`} onClick={() => changeTab("all")}>
             전체 <span className="gcount">({products.length})</span>
           </button>
@@ -641,7 +651,7 @@ export default function Home() {
         <div className="collection-head">
           <h2 className="collection-title">이번 컬렉션</h2>
           <p className="collection-sub">
-            {genderTab === "all" || genderTab === "home"
+            {genderTab === "all"
               ? `남성 ${genderCount("male")} · 여성 ${genderCount("female")} · 젠더리스 ${genderCount("genderless")} — 코디 ${pairRows.length}벌 · 단품 ${singles.length}개`
               : `${({ male: "남성", female: "여성", genderless: "젠더리스" } as Record<string, string>)[genderTab]} 컬렉션 — 코디 ${pairRows.length}벌 · 단품 ${singles.length}개`}
           </p>
