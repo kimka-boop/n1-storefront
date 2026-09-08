@@ -199,17 +199,18 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   padding: 8px 10px; margin: 8px 0 0; line-height: 1.6;
 }
 
-/* ── CS 채팅 위젯 (V2 미니멀: 벡터 아이콘, 잉크 원형) ── */
+/* ── CS 채팅 위젯 (좌측 장바구니 플로팅 바와 완전 대칭: 같은 배경·테두리·그림자·크기) ── */
 .cs-fab {
   position: fixed; right: 28px; bottom: 28px; z-index: 999;
   width: 52px; height: 52px; border-radius: 50%;
-  background: #0a0a0a; color: #fff;
-  border: 1px solid #0a0a0a; cursor: pointer;
+  background: #fff; color: #0a0a0a;
+  border: 1px solid var(--line, #e8e8e5); cursor: pointer;
   display: flex; align-items: center; justify-content: center; /* 아이콘 중앙 정렬 */
-  box-shadow: 0 6px 24px rgba(10,10,10,0.18);
-  transition: transform 0.25s cubic-bezier(.22,.61,.36,1), box-shadow 0.25s;
+  box-shadow: 0 4px 18px rgba(10,10,10,0.10);
+  transition: border-color 0.2s, transform 0.25s cubic-bezier(.22,.61,.36,1);
 }
-.cs-fab:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(10,10,10,0.24); }
+.cs-fab:hover { border-color: #0a0a0a; transform: translateY(-2px); }
+@media (max-width: 640px) { .cs-fab { right: 12px; bottom: 14px; } } /* .float-bar left:12/bottom:14 미러 */
 .cs-window {
   position: fixed; right: 20px; bottom: 20px; z-index: 1000;
   width: 320px; max-width: calc(100vw - 32px); height: 440px;
@@ -474,7 +475,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 @media (max-width: 640px) { .collection-nav { gap: 20px; justify-content: flex-start; } .nav-brand { display: none; } }
 
 /* ── 컬렉션 섹션 ── */
-.collection { max-width: 1160px; margin: 0 auto; padding: 88px 6vw 24px; }
+.collection { max-width: 1160px; margin: 0 auto; padding: 48px 6vw 24px; }
 .collection-head { text-align: center; margin-bottom: 64px; }
 .collection-title { font-size: 13px; letter-spacing: 0.3em; color: var(--ink); font-weight: 600;
   text-transform: uppercase; }
@@ -540,7 +541,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 
 /* ── 컬렉션 내 검색 (컬렉션 범위 안에서만) ── */
 .collection-search {
-  margin-top: 18px; display: flex; justify-content: center; align-items: center; gap: 10px;
+  margin-top: 48px; display: flex; justify-content: center; align-items: center; gap: 10px;
 }
 .collection-search input {
   width: min(280px, 70vw); padding: 9px 2px; font-size: 13px;
