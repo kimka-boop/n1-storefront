@@ -14,7 +14,7 @@
  * - 고시 기본값 판성 데이터 제거 — 확인된 사실만 표기
  * - 모션: fog depth(접근 전 opacity .93) + 상태 전이 크로스페이드만
  */
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import SmartFitFlow from "@/components/SmartFitFlow";
 import { useAuth } from "@/components/AuthProvider";
@@ -175,8 +175,8 @@ function driveImg(fileId: string, w = 1000) {
   return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${w}&v=${Math.floor(Date.now() / 600000)}`;
 }
 
-type GenderKey = "all" | "male" | "female" | "genderless";
-const GENDER_API: Record<Exclude<GenderKey, "all">, string> = {
+type GenderKey = "home" | "all" | "male" | "female" | "genderless";
+const GENDER_API: Record<"male" | "female" | "genderless", string> = {
   male: "MALE", female: "FEMALE", genderless: "GENDERLESS",
 };
 
@@ -219,21 +219,104 @@ export default function Home() {
   const [query, setQuery] = useState("");
   useEffect(() => {
     const saved = localStorage.getItem("n1_gender_tab");
-    if (saved === "male" || saved === "female" || saved === "genderless") setGenderTab(saved);
+    if (saved === "male" || saved === "female" || saved === "genderless" || saved === "home") setGenderTab(saved);
   }, []);
   const changeTab = (t: GenderKey) => {
     setGenderTab(t);
     if (t === "all") localStorage.removeItem("n1_gender_tab");
     else localStorage.setItem("n1_gender_tab", t);
+    if (t === "home") window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const collection = selectCollection(
     products,
-    genderTab === "all" ? "all" : GENDER_API[genderTab],
+    genderTab === "all" || genderTab === "home" ? "all" : GENDER_API[genderTab],
     query
   ).sort((a, b) => editorialWeight(b) - editorialWeight(a));
-  const genderCount = (g: Exclude<GenderKey, "all">) =>
+  const genderCount = (g: "male" | "female" | "genderless") =>
     selectCollection(products, GENDER_API[g]).length;
+
+  // ── Liquid Glass 탭 셀렉터 — glass 자체가 드래그되는 살아 있는 selection material ──
+  // 상태 소스는 genderTab 단일(중복 내비 상태 없음). 드래그 중엔 lens DOM을 직접
+  // 조작(리렌더 없음), 놓으면 가장 가까운 탭으로 스냅 → 기존 changeTab 로직 실행.
+  const GLASS_TABS: GenderKey[] = ["home", "all", "male", "female", "genderless"];
+  const trackRef = useRef<HTMLDivElement>(null);
+  const lensRef = useRef<HTMLSpanElement>(null);
+  const dragRef = useRef<{ pointerId: number; startX: number; baseLeft: number; active: boolean; lastHover: number } | null>(null);
+
+  const lensLeft = (lens: HTMLElement) =>
+    parseFloat(lens.style.transform.match(/translate3d\(([-\d.]+)px/)?.[1] ?? "0") || 0;
+
+  const syncLens = useCallback(() => {
+    const track = trackRef.current, lens = lensRef.current;
+    // 모바일 등에서 활성 탭이 감춰져 있으면(예: N°1 브랜드) 동일 컬렉션을 보여주는 '전체'에 렌즈
+    const btn =
+      track?.querySelector<HTMLElement>(`[data-tab="${genderTab}"]`) ??
+      track?.querySelector<HTMLElement>('[data-tab="all"]');
+    if (!track || !lens || !btn) return;
+    lens.style.width = `${btn.offsetWidth}px`;
+    lens.style.transform = `translate3d(${btn.offsetLeft}px, 0, 0)`;
+  }, [genderTab]);
+  useEffect(() => { syncLens(); }, [syncLens, products.length]); // 카운트 변화로 탭 폭 변해도 재계산
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => syncLens());
+    ro.observe(track);
+    return () => ro.disconnect();
+  }, [syncLens]);
+
+  const onLensPointerDown = (e: React.PointerEvent<HTMLSpanElement>) => {
+    const lens = lensRef.current;
+    if (!lens) return;
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* 일부 환경/합성 포인터 — 없어도 lens 핸들러로 동작 */ }
+    dragRef.current = { pointerId: e.pointerId, startX: e.clientX, baseLeft: lensLeft(lens), active: false, lastHover: -1 };
+  };
+  const onLensPointerMove = (e: React.PointerEvent<HTMLSpanElement>) => {
+    const ds = dragRef.current;
+    const lens = lensRef.current, track = trackRef.current;
+    if (!ds || !lens || !track || e.pointerId !== ds.pointerId) return;
+    const dx = e.clientX - ds.startX;
+    if (!ds.active) {
+      if (Math.abs(dx) < 6) return; // 수평 의도 확인 전엔 무동작 (세로 스크롤 보호)
+      ds.active = true;
+      lens.classList.add("dragging");
+    }
+    const maxX = Math.max(0, track.offsetWidth - lens.offsetWidth);
+    const left = Math.max(0, Math.min(ds.baseLeft + dx, maxX));
+    lens.style.transform = `translate3d(${left}px, 0, 0)`;
+    // 렌즈 아래 텍스트 미세 반응 (레이아웃 변화 없이 색만)
+    const center = left + lens.offsetWidth / 2;
+    const btns = GLASS_TABS.map((k) => track.querySelector<HTMLElement>(`[data-tab="${k}"]`));
+    let hover = -1;
+    btns.forEach((b, i) => {
+      if (b && center >= b.offsetLeft && center <= b.offsetLeft + b.offsetWidth) hover = i;
+    });
+    if (hover !== ds.lastHover) {
+      btns.forEach((b) => b?.classList.remove("lens-hover"));
+      if (hover >= 0 && btns[hover]) btns[hover]!.classList.add("lens-hover");
+      ds.lastHover = hover;
+    }
+  };
+  const onLensPointerEnd = (e: React.PointerEvent<HTMLSpanElement>) => {
+    const ds = dragRef.current;
+    const lens = lensRef.current, track = trackRef.current;
+    dragRef.current = null;
+    lens?.classList.remove("dragging");
+    track?.querySelectorAll(".lens-hover").forEach((el) => el.classList.remove("lens-hover"));
+    if (!ds || !ds.active || !lens || !track || e.pointerId !== ds.pointerId) return;
+    // 가장 가까운 탭으로 스냅 — 기존 상태 로직 재사용 (glass state == category state)
+    const center = lensLeft(lens) + lens.offsetWidth / 2;
+    let best: GenderKey = genderTab, bestD = Infinity;
+    GLASS_TABS.forEach((k) => {
+      const b = track.querySelector<HTMLElement>(`[data-tab="${k}"]`);
+      if (!b) return;
+      const d = Math.abs(b.offsetLeft + b.offsetWidth / 2 - center);
+      if (d < bestD) { bestD = d; best = k; }
+    });
+    if (best !== genderTab) changeTab(best);
+    else syncLens(); // 제자리 안정화 스냅
+  };
 
   // 에디토리얼 역할 배분: 첫 편성 = LEAD, 다음 2 = SUPPORTING, 나머지 = QUIET
   const withRoles = collection.map((p, i) => ({
@@ -468,22 +551,35 @@ export default function Home() {
 
       {error && <p className="error">⚠️ {error}</p>}
 
-      {/* ── 컬렉션 내비 (sticky glass rail) ── */}
+      {/* ── 컬렉션 내비 (sticky glass rail + 드래그 가능한 Liquid Glass 셀렉터) ── */}
       <nav className="collection-nav" aria-label="컬렉션 필터">
-        <span className="nav-brand">N°1</span>
-        <button className={`gtab ${genderTab === "all" ? "active" : ""}`} onClick={() => changeTab("all")}>
-          전체 <span className="gcount">({products.length})</span>
-        </button>
-        <button className={`gtab ${genderTab === "male" ? "active" : ""}`} onClick={() => changeTab("male")}>
-          남성 <span className="gcount">({genderCount("male")})</span>
-        </button>
-        <button className={`gtab ${genderTab === "female" ? "active" : ""}`} onClick={() => changeTab("female")}>
-          여성 <span className="gcount">({genderCount("female")})</span>
-        </button>
-        <button className={`gtab ${genderTab === "genderless" ? "active" : ""}`} onClick={() => changeTab("genderless")}>
-          젠더리스 <span className="gcount">({genderCount("genderless")})</span>
-        </button>
-        <button className={`gtab gtab-fit`} onClick={() => setShowFitModal(true)}>
+        <div className="gtab-track" ref={trackRef}>
+          <span
+            ref={lensRef}
+            className="gtab-lens"
+            aria-hidden="true"
+            onPointerDown={onLensPointerDown}
+            onPointerMove={onLensPointerMove}
+            onPointerUp={onLensPointerEnd}
+            onPointerCancel={onLensPointerEnd}
+          />
+          <button data-tab="home" className={`gtab gtab-brand ${genderTab === "home" ? "active" : ""}`} onClick={() => changeTab("home")}>
+            N°1
+          </button>
+          <button data-tab="all" className={`gtab ${genderTab === "all" ? "active" : ""}`} onClick={() => changeTab("all")}>
+            전체 <span className="gcount">({products.length})</span>
+          </button>
+          <button data-tab="male" className={`gtab ${genderTab === "male" ? "active" : ""}`} onClick={() => changeTab("male")}>
+            남성 <span className="gcount">({genderCount("male")})</span>
+          </button>
+          <button data-tab="female" className={`gtab ${genderTab === "female" ? "active" : ""}`} onClick={() => changeTab("female")}>
+            여성 <span className="gcount">({genderCount("female")})</span>
+          </button>
+          <button data-tab="genderless" className={`gtab ${genderTab === "genderless" ? "active" : ""}`} onClick={() => changeTab("genderless")}>
+            젠더리스 <span className="gcount">({genderCount("genderless")})</span>
+          </button>
+        </div>
+        <button className="gtab gtab-fit" onClick={() => setShowFitModal(true)}>
           {fitProfile
             ? `내 핏 — ${fitProfile.size}${fitProfile.fit ? " · " + (FIT_LABEL[fitProfile.fit as "A"|"B"|"C"] ?? "") : ""}`
             : "나에게 맞게 보기"}
@@ -495,7 +591,7 @@ export default function Home() {
         <div className="collection-head">
           <h2 className="collection-title">이번 컬렉션</h2>
           <p className="collection-sub">
-            {genderTab === "all"
+            {genderTab === "all" || genderTab === "home"
               ? `남성 ${genderCount("male")} · 여성 ${genderCount("female")} · 젠더리스 ${genderCount("genderless")} — 총 ${products.length}벌`
               : `${({ male: "남성", female: "여성", genderless: "젠더리스" } as Record<string, string>)[genderTab]} 컬렉션 — ${collection.length}벌`}
           </p>

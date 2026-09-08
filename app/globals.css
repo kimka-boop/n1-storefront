@@ -252,15 +252,43 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   margin-bottom: 2px; text-align: left; letter-spacing: 0.05em;
 }
 .cs-typing { font-size: 11.5px; color: #aaa; }
-.cs-input-row { display: flex; border-top: 1px solid #e5e5e5; }
+.cs-input-row { display: flex; align-items: stretch; border-top: 1px solid #e5e5e5; padding: 8px; gap: 8px; background: rgba(36, 39, 34, 0.025); }
 .cs-input-row input {
-  flex: 1; border: none; padding: 12px; font-size: 13px; outline: none;
+  flex: 1; border: none; padding: 10px 12px; font-size: 13px; outline: none;
+  background: rgba(255, 255, 255, 0.65); border-radius: 12px;
 }
-.cs-input-row button {
-  border: none; background: #111; color: #fff; padding: 0 18px;
-  font-size: 13px; cursor: pointer;
+/* ── 전송 — 작은 Liquid Glass material (액션 상태 = 재질 상태) ──
+   입력창과 한 몸의 composer: 같은 인셋 트랙 안에서 접촉 */
+.cs-send {
+  border: none; padding: 0 20px; min-width: 68px;
+  border-radius: 13px 11px 12px 14px / 16px 13px 14px 15px;
+  font-size: 13px; font-weight: 600; letter-spacing: 0.04em;
+  color: var(--ink); cursor: pointer;
+  background: var(--n1-glass-bg);
+  -webkit-backdrop-filter: var(--n1-glass-blur);
+  backdrop-filter: var(--n1-glass-blur);
+  box-shadow: var(--n1-glass-shadow), var(--n1-glass-edge);
+  transition: opacity var(--n1-glass-transition), background var(--n1-glass-transition),
+    box-shadow var(--n1-glass-transition), transform 160ms ease;
+  touch-action: manipulation;
 }
-.cs-input-row button:disabled { opacity: 0.4; cursor: not-allowed; }
+.cs-send:disabled {
+  opacity: 0.45; cursor: default;
+  -webkit-backdrop-filter: blur(4px) saturate(1.05);
+  backdrop-filter: blur(4px) saturate(1.05);
+}
+.cs-send:not(:disabled):hover { background: var(--n1-glass-bg-active); }
+.cs-send:not(:disabled):active { transform: scale(0.96); }
+.cs-send.sent { animation: csSendGlow 500ms ease-out; }
+@keyframes csSendGlow {
+  0% { box-shadow: 0 4px 16px rgba(36, 39, 34, 0.16), var(--n1-glass-edge), 0 0 0 5px rgba(255, 255, 255, 0.28); }
+  100% { box-shadow: var(--n1-glass-shadow), var(--n1-glass-edge); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-send { transition: opacity 120ms linear; }
+  .cs-send.sent { animation: none; }
+  .cs-send:not(:disabled):active { transform: none; }
+}
 
 /* ═══ STEP 1: 성별 필터 탭바 (V2: 텍스트 탭, 활성만 언더라인 — COS 스타일) ═══ */
 .gender-tabs {
@@ -271,14 +299,19 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   position: static;
 }
 .gtab {
-  padding: 6px 2px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  position: relative; z-index: 1; /* 렌즈(유리) 위에 텍스트 */
+  padding: 6px 4px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
   border: none; background: transparent;
   color: var(--muted, #8a8a86); cursor: pointer; border-radius: 0;
-  border-bottom: 1px solid transparent;
-  transition: color 0.2s, border-color 0.2s;
+  transition: color 0.2s, filter 0.2s;
 }
 .gtab:hover { color: var(--ink, #0a0a0a); }
-.gtab.active { background: transparent; color: var(--ink, #0a0a0a); border-bottom: 1px solid var(--ink, #0a0a0a); font-weight: 500; }
+.gtab:focus-visible { outline: 1.5px solid #555e4c; outline-offset: 2px; border-radius: 8px; }
+/* 활성 표시는 Liquid Glass 렌즈가 담당 — 언더라인 제거 */
+.gtab.active { background: transparent; color: var(--ink, #0a0a0a); font-weight: 500; }
+/* 드래그 중 렌즈 아래를 지나는 텍스트의 미세 반응 (색만 — 크기/레이아웃 불변) */
+.gtab.lens-hover { color: var(--ink, #0a0a0a); filter: brightness(1.08); }
+.gtab-brand { font-size: 12px; letter-spacing: 0.22em; font-weight: 600; }
 .gcount { opacity: 0.6; font-size: 10px; margin-left: 4px; letter-spacing: 0.04em; text-transform: none; }
 .gtab-fit { margin-left: auto; font-size: 10.5px; border-style: none; display: flex; align-items: center; gap: 6px; }
 .gtab-fit.active { background: transparent; color: var(--ink, #0a0a0a); border-bottom: none; }
@@ -480,11 +513,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   overflow-x: auto; scrollbar-width: none;
 }
 .collection-nav::-webkit-scrollbar { display: none; }
-.nav-brand {
-  font-size: 13px; letter-spacing: 0.22em; color: var(--ink); font-weight: 600;
-  margin-right: 8px; white-space: nowrap;
-}
-@media (max-width: 640px) { .collection-nav { gap: 20px; justify-content: flex-start; } .nav-brand { display: none; } }
+@media (max-width: 640px) { .collection-nav { gap: 20px; justify-content: flex-start; } .gtab-brand { display: none; } .gtab-track { gap: 16px; } }
 
 /* ── 컬렉션 섹션 ── */
 .collection { max-width: 1160px; margin: 0 auto; padding: 64px 6vw 24px; }
@@ -830,3 +859,55 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
   margin-top: 2px; letter-spacing: 0.01em;
 }
 .lq-seg button.on .lq-seg-sub { color: #6d6a60; }
+
+/* ════════════════════════════════════════════════════════════════
+   N°1 LIQUID GLASS INTERACTION (2026-09-08) — 공유 유리 토큰
+   탭 셀렉터 렌즈와 CS 전송 버튼이 같은 재질 언어를 공유한다.
+   ════════════════════════════════════════════════════════════════ */
+:root {
+  --n1-glass-bg:
+    linear-gradient(165deg,
+      rgba(255, 255, 254, 0.62) 0%,
+      rgba(250, 248, 243, 0.48) 45%,
+      rgba(243, 241, 234, 0.55) 100%);
+  --n1-glass-bg-active:
+    linear-gradient(165deg,
+      rgba(255, 255, 255, 0.72) 0%,
+      rgba(251, 249, 244, 0.58) 45%,
+      rgba(245, 243, 237, 0.64) 100%);
+  --n1-glass-blur: blur(10px) saturate(1.22);
+  --n1-glass-edge:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.35),
+    inset 1px 0 0 rgba(255, 255, 255, 0.4),
+    inset -1px 0 0 rgba(255, 255, 255, 0.4);
+  --n1-glass-shadow: 0 4px 14px rgba(36, 39, 34, 0.10);
+  --n1-glass-transition: 240ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ── 카테고리 Liquid Glass 셀렉터 — 선택 상태 자체가 재질 ── */
+.gtab-track {
+  position: relative;
+  display: flex; align-items: stretch; gap: 26px;
+}
+.gtab-lens {
+  position: absolute; top: 6px; bottom: 6px; left: 0; z-index: 0;
+  width: 60px; /* syncLens가 활성 탭 폭으로 기록 */
+  border-radius: 15px 13px 14px 16px / 17px 14px 15px 16px; /* 살짝 유기적인 드롭릿 곡률 */
+  background: var(--n1-glass-bg);
+  -webkit-backdrop-filter: var(--n1-glass-blur);
+  backdrop-filter: var(--n1-glass-blur);
+  box-shadow: var(--n1-glass-shadow), var(--n1-glass-edge);
+  transition: transform var(--n1-glass-transition), width var(--n1-glass-transition),
+    background var(--n1-glass-transition), box-shadow var(--n1-glass-transition);
+  touch-action: pan-y; /* 세로 스크롤은 브라우저에 — 가로 드래그만 렌즈가 */
+  cursor: grab;
+}
+.gtab-lens.dragging {
+  transition: none; cursor: grabbing;
+  background: var(--n1-glass-bg-active);
+  box-shadow: 0 6px 18px rgba(36, 39, 34, 0.13), var(--n1-glass-edge);
+}
+@media (prefers-reduced-motion: reduce) {
+  .gtab-lens { transition: opacity 120ms linear; }
+}

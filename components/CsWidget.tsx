@@ -14,6 +14,7 @@ export default function CsWidget() {
   const [open, setOpen] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
+  const [sentGlow, setSentGlow] = useState(false);
   const [sid, setSid] = useState<string | null>(null);
   const [typing, setTyping] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -50,6 +51,8 @@ export default function CsWidget() {
     setInput("");
     setMsgs((prev) => [...prev, { role: "customer", text }]);
     setTyping(true);
+    setSentGlow(true); // 전송 액션의 짧은 유리 afterglow (마이크로 인터랙션 전용)
+    setTimeout(() => setSentGlow(false), 500);
     try {
       // 실시간 챗봇 응답 (/api/chat)
       const res = await fetch("/api/chat", {
@@ -120,7 +123,7 @@ export default function CsWidget() {
               onKeyDown={(e) => e.key === "Enter" && send()}
               placeholder="메시지를 입력하세요"
             />
-            <button onClick={send} disabled={!input.trim()}>전송</button>
+            <button className={`cs-send ${sentGlow ? "sent" : ""}`} onClick={send} disabled={!input.trim()}>전송</button>
           </div>
         </div>
       )}
