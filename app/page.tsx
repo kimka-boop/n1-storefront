@@ -19,7 +19,7 @@ import Link from "next/link";
 import SmartFitFlow from "@/components/SmartFitFlow";
 import { useAuth } from "@/components/AuthProvider";
 import { mediaFor } from "@/lib/media";
-import { FIT_LABEL, fitPresetSize, preferenceShift, type FitProfile } from "@/lib/fit";
+import { FIT_LABEL, fitPresetSize, preferenceShift, categoryOf } from "@/lib/fit";
 import {
   productColors,
   purchaseState,
@@ -188,7 +188,9 @@ function editorialWeight(p: Product): number {
 }
 
 export default function Home() {
-  const { profile: authProfile, token: authToken, login: authLogin, updateProfile: authUpdateProfile } = useAuth();
+  // ── 스마트 핏 — 컨텍스트는 AuthProvider 단일 진실(게스트 즉시 저장, §8) ──
+  const { fit } = useAuth();
+  const [showFitModal, setShowFitModal] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
@@ -357,23 +359,6 @@ export default function Home() {
     role: (i === 0 ? "lead" : i <= 2 ? "supporting" : "quiet") as "lead" | "supporting" | "quiet",
   }));
 
-  // ── 스마트 핏 (게스트: 브라우저 저장 / 로그인: 계정 동기화) ──
-  const [fitProfile, setFitProfile] = useState<FitProfile | null>(null);
-  const [showFitModal, setShowFitModal] = useState(false);
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("n1_fit_profile");
-      if (raw) setFitProfile(JSON.parse(raw));
-    } catch {}
-  }, []);
-  const saveFitProfile = (p: FitProfile) => {
-    setFitProfile(p);
-    localStorage.setItem("n1_fit_profile", JSON.stringify(p));
-    if (authToken) authUpdateProfile(p); // AuthProvider.updateProfile이 서버(Users 시트)에도 반영
-    // 닫기는 SmartFitFlow가 '기억했어요' confirm 후 스스로 소멸하며 처리
-  };
-  useEffect(() => { if (authProfile) setFitProfile(authProfile); }, [authProfile]);
-
   // ── 빠른 주문 상태 (원시 색상/사이즈 값) ──
   const [selColor, setSelColor] = useState("");
   const [selSize, setSelSize] = useState("");
@@ -445,7 +430,10 @@ export default function Home() {
     const colors = productColors(p.colorOptions);
     const apply = () => {
       setSelColor(preset?.color || (colors.length === 1 ? colors[0].value : ""));
-      const presetSize = fitPresetSize(p.name, authProfile?.size || fitProfile?.size || "", authProfile?.fit || fitProfile?.fit || "", p.sizeOptions || []);
+      // 사이즈 프리셋 — 카테고리에 맞는 평소 사이즈 기준(§17). sizeOptions가 없으면 조용히 생략.
+      const kind = categoryOf({ name: p.name, category: p.category });
+      const baseSize = (kind === "bottom" ? fit?.bottomSize : fit?.topSize) || "";
+      const presetSize = fitPresetSize(p.name, baseSize, fit?.preferredFit || "", p.sizeOptions || []);
       setSelSize(preset?.size || presetSize || (p.sizeOptions?.length === 1 ? p.sizeOptions[0] : ""));
       setOptTouched(false);
       setOrderStage("options");
@@ -472,7 +460,7 @@ export default function Home() {
       setSlideIds([]);
       apply();
     }
-  }, [authProfile]);
+  }, [fit]);
 
   // PDP 구매 CTA → /?product=<id>&color=<raw>&size=<raw> 진입 시 모달 자동 오픈 + 원시값 선선택
   useEffect(() => {
@@ -640,10 +628,9 @@ export default function Home() {
             젠더리스 <span className="gcount">({genderCount("genderless")})</span>
           </button>
         </div>
-        <button className="gtab gtab-fit" onClick={() => setShowFitModal(true)}>
-          {fitProfile
-            ? `내 핏 — ${fitProfile.size}${fitProfile.fit ? " · " + (FIT_LABEL[fitProfile.fit as "A"|"B"|"C"] ?? "") : ""}`
-            : "스마트 핏"}
+        <button className="gtab gtab-fit" onClick={() => setShowFitModal(true)}
+          aria-label={fit ? "스마트 핏 — 설정됨, 열어서 수정" : "스마트 핏 설정하기"}>
+          {fit ? "스마트 핏 · 설정됨" : "스마트 핏"}
         </button>
       </nav>
 
@@ -741,8 +728,8 @@ export default function Home() {
           눈이 편한 쇼핑을 위해서입니다.
         </p>
         <button className="story-cta" onClick={() => setShowFitModal(true)}>
-          {fitProfile
-            ? `내 핏 — ${FIT_LABEL[fitProfile.fit as "A"|"B"|"C"] ?? ""} · 수정하기 →`
+          {fit
+            ? `내 핏 — ${FIT_LABEL[fit.preferredFit as "A"|"B"|"C"] ?? ""} · 수정하기 →`
             : "스마트 핏 →"}
         </button>
       </section>
@@ -750,16 +737,7 @@ export default function Home() {
       <footer>© N°1 — 매주 일요일, 새로운 컬렉션</footer>
 
       {showFitModal && (
-        <SmartFitFlow
-          initial={fitProfile}
-          isLoggedIn={Boolean(authToken)}
-          onSave={saveFitProfile}
-          onAuthed={(token, email, profile) => {
-            authLogin(token, email, profile); // 방금 만든 핏 프로필 유지 + 서버 동기화
-            setFitProfile(profile);
-          }}
-          onClose={() => setShowFitModal(false)}
-        />
+        <SmartFitFlow onClose={() => setShowFitModal(false)} />
       )}
 
       {/* ── 빠른 주문 모달 (PDP 구매 진입점) ── */}
@@ -813,11 +791,11 @@ export default function Home() {
                 {selected.sizeOptions && selected.sizeOptions.length > 0 && (
                   <div className="option-row">
                     <span className="option-label">사이즈</span>
-                    {fitProfile && selSize && (
+                    {fit && selSize && (
                       <span className="fit-badge">
-                        {fitProfile.size} 기준 —{" "}
+                        평소 {(categoryOf({ name: selected.name, category: selected.category }) === "bottom" ? fit.bottomSize : fit.topSize) || fit.topSize || fit.bottomSize} 기준 —{" "}
                         {(() => {
-                          const shift = preferenceShift(selected.name, fitProfile.fit || "");
+                          const shift = preferenceShift(selected.name, fit.preferredFit);
                           return shift === 0 ? "평소 사이즈 그대로" : shift === 1 ? "한 치수 여유 있게" : "두 치수 여유 있게";
                         })()}
                       </span>

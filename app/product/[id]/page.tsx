@@ -27,7 +27,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { PRODUCT_STORY } from "@/lib/productContent";
 import { mediaFor } from "@/lib/media";
 import { productColors, purchaseState, quickBuyUrl } from "@/lib/experience";
-import { fitGuidance, type FitProfile } from "@/lib/fit";
+import { interpretFit, categoryOf } from "@/lib/fit";
 import {
   genderKo,
   categoryShort,
@@ -97,7 +97,7 @@ export default function ProductPage() {
   const decisionRef = useRef<HTMLDivElement>(null);
 
   // ── 나에게 맞게 보기: 핏 개인화 (훅은 early return 이전에 unconditional) ──
-  const { profile: authProfile, token: authToken, login: authLogin, updateProfile: authUpdateProfile } = useAuth();
+  const { fit: authFit } = useAuth();
   const [showFitFlow, setShowFitFlow] = useState(false);
 
   useEffect(() => {
@@ -155,15 +155,22 @@ export default function ProductPage() {
   const story = PRODUCT_STORY[product.id];
   const media = mediaFor(product.id, product.lookbookImage);
 
-  // ── 나에게 맞게 보기: 핏 개인화 해석 (FACT → PREFERENCE 순서, lib/fit.ts) ──
-  const guidance = fitGuidance(
-    { name: product.name, fitShape: (product as { fit?: FitInfo }).fit?.shape, sizeChart: product.sizeChart },
-    authProfile as FitProfile | null,
-  );
-  const saveFitProfile = (p: FitProfile) => {
-    localStorage.setItem("n1_fit_profile", JSON.stringify(p));
-    if (authToken) authUpdateProfile(p);
+  // ── 나에게 맞게 보기: interpretFit 4층 해석 (FACT → CONTEXT → INTERPRETATION →
+  //    LIMITATION 순서, lib/fit.ts). 컨텍스트는 AuthProvider가 소유하므로 Scene을
+  //    벗어나 돌아와도 즉시 재계산되고, 상품을 바꿔도 설정은 유지된다 (§22). ──
+  const fitInput = {
+    name: product.name,
+    category: product.category,
+    fitShape: (product as { fit?: FitInfo }).fit?.shape,
+    stretch: (product as { fit?: FitInfo }).fit?.stretch,
+    sizeChart: product.sizeChart,
+    sizeOptions: product.sizeOptions,
+    optionStock: product.optionStock,
+    stockStatus: product.stockStatus,
+    modelInfo: product.modelInfo,
   };
+  const fitCategory = categoryOf({ name: product.name, category: product.category });
+  const fitInterp = authFit ? interpretFit(fitInput, authFit) : null;
   const material = clean(product.material);
   const materialKnown = material !== "";
   const fit = product.fit ?? {};
@@ -306,15 +313,26 @@ export default function ProductPage() {
             수치표 미제공 — 착용컷으로 확인하실 수 있습니다.
           </p>
         )}
-        {/* 개인 해석층 — 상품 사실(위) 아래에서 '취향 기준'임을 분리해 전달 */}
-        {guidance ? (
+        {/* 개인 해석층 — 상품 사실(위) 아래에서 FACT → CONTEXT → INTERPRETATION →
+            LIMITATION 순서 유지. 결과는 상품 설명을 대체하지 않는다 (§21) */}
+        {fitInterp && fitInterp.evidence !== "UNAVAILABLE" ? (
           <div className={styles.yourFit}>
-            <p className={styles.yourFitKicker}>Your preference</p>
-            <p className={styles.yourFact}>{guidance.fact}</p>
-            <p className={styles.yourFitText}>{guidance.preference}</p>
-            <p className={styles.yourFitNote}>{guidance.note}</p>
+            <p className={styles.yourFitKicker}>Your fit</p>
+            <p className={styles.yourFact}>{fitInterp.productFact}</p>
+            <p className={styles.yourFitNote}>내 설정 — {fitInterp.yourContext}</p>
+            <p className={styles.yourFitText}>{fitInterp.interpretation}</p>
+            {fitInterp.sizeHint ? <p className={styles.yourFitNote}>{fitInterp.sizeHint}</p> : null}
+            <p className={styles.yourFitNote}>{fitInterp.limitation}</p>
             <button className={styles.yourFitEntry} style={{ marginTop: 14 }} onClick={() => setShowFitFlow(true)}>
               수정하기 →
+            </button>
+          </div>
+        ) : fitInterp ? (
+          <div className={styles.yourFit}>
+            <p className={styles.yourFitKicker}>Your fit</p>
+            <p className={styles.yourFitText}>{fitInterp.interpretation}</p>
+            <button className={styles.yourFitEntry} style={{ marginTop: 14 }} onClick={() => setShowFitFlow(true)}>
+              스마트 핏 →
             </button>
           </div>
         ) : (
@@ -326,14 +344,9 @@ export default function ProductPage() {
 
       {showFitFlow && (
         <SmartFitFlow
-          initial={authProfile as FitProfile | null}
-          isLoggedIn={Boolean(authToken)}
-          onSave={saveFitProfile}
-          onAuthed={(token, email, profile) => {
-            authLogin(token, email, profile);
-          }}
           onClose={() => setShowFitFlow(false)}
-          product={{ name: product.name, fitShape: product.fit?.shape, sizeChart: product.sizeChart }}
+          product={fitInput}
+          needCategory={fitCategory === "bottom" ? "bottom" : "top"}
         />
       )}
 
