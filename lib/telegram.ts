@@ -19,27 +19,40 @@ function buildApiUrl(token: string, method: string): URL | null {
 export interface TelegramSendResult {
   ok: boolean;
   messageId?: number;
+  /** 발송된 모든 청크의 message_id — conversation 매핑 앵커 전체 (운영자가 어느 청크에 답장해도 라우팅) */
+  messageIds?: number[];
 }
 
 /** sendMessage — 성공 시 Telegram message_id 반환 (운영자 답장 매핑용) */
-export async function sendTelegramMessage(token: string, chatId: string, text: string): Promise<TelegramSendResult> {
+export async function sendTelegramMessage(
+  token: string,
+  chatId: string,
+  text: string,
+  replyToMessageId?: number,
+): Promise<TelegramSendResult> {
   if (!token || !chatId || !text) return { ok: false };
   const url = buildApiUrl(token, "sendMessage");
   if (!url) return { ok: false };
+  const body: Record<string, unknown> = {
+    chat_id: chatId,
+    text,
+    link_preview_options: { is_disabled: true },
+  };
+  if (replyToMessageId) {
+    // 원래 스레드에 연결 (원본이 삭제되어도 전송 자체는 계속)
+    body.reply_parameters = { message_id: replyToMessageId, allow_sending_without_reply: true };
+  }
   try {
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text,
-        link_preview_options: { is_disabled: true },
-      }),
+      body: JSON.stringify(body),
     });
     if (!res.ok) return { ok: false };
     const data = await res.json().catch(() => null);
     const messageId = data?.result?.message_id;
-    return { ok: true, messageId: typeof messageId === "number" ? messageId : undefined };
+    if (typeof messageId !== "number") return { ok: true };
+    return { ok: true, messageId, messageIds: [messageId] };
   } catch {
     return { ok: false };
   }
@@ -48,9 +61,15 @@ export async function sendTelegramMessage(token: string, chatId: string, text: s
 /**
  * 긴 텍스트를 Telegram 4096자 제한에 맞춰 분할 발송.
  * 헤더가 잘리지 않도록 줄 단위로 쪼갠다. 순서 보장을 위해 순차 발송.
- * messageId는 첫 청크의 것 (답장 매핑 앵커).
+ * messageIds는 모든 청크의 message_id — 전부 conversation에 매핑해야
+ * 운영자가 마지막 청크에 답장해도 올바른 고객에게 라우팅된다.
  */
-export async function sendTelegramLong(token: string, chatId: string, text: string): Promise<TelegramSendResult> {
+export async function sendTelegramLong(
+  token: string,
+  chatId: string,
+  text: string,
+  replyToMessageId?: number,
+): Promise<TelegramSendResult> {
   const MAX = 3800;
   const chunks: string[] = [];
   let current = "";
@@ -72,13 +91,13 @@ export async function sendTelegramLong(token: string, chatId: string, text: stri
   }
   if (current) chunks.push(current);
   if (!chunks.length) return { ok: false };
-  let anchor: number | undefined;
+  const ids: number[] = [];
   for (let i = 0; i < chunks.length; i++) {
-    const r = await sendTelegramMessage(token, chatId, chunks[i]);
-    if (!r.ok) return { ok: false, messageId: anchor };
-    if (i === 0) anchor = r.messageId;
+    const r = await sendTelegramMessage(token, chatId, chunks[i], replyToMessageId);
+    if (!r.ok) return { ok: false, messageId: ids[0], messageIds: ids };
+    if (r.messageId !== undefined) ids.push(r.messageId);
   }
-  return { ok: true, messageId: anchor };
+  return { ok: true, messageId: ids[0], messageIds: ids };
 }
 
 export interface TelegramUpdate {
@@ -86,6 +105,7 @@ export interface TelegramUpdate {
   message?: {
     message_id: number;
     text?: string;
+    from?: { id?: number; username?: string };
     chat?: { id: number | string };
     reply_to_message?: { message_id: number };
   };

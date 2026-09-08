@@ -26,8 +26,9 @@ const relay = require('../lib/csRelay.ts');
 const engine = require('../lib/csEngine.ts');
 
 // 테스트 환경: 텔레그램 토큰 없음 → 전송 실패가 정상 경로 (거짓 성공 없음)
+// 채널 id는 authorization 검증용으로만 설정 (값은 임의의 테스트 상수)
 process.env.N1_CS_BOT_TOKEN = '';
-process.env.N1_CS_CHAT_ID = '';
+process.env.N1_CS_CHAT_ID = '4242';
 
 function freshSession(sid = '#SESS_TEST_1') {
   delete store.getStore().sessions[sid];
@@ -98,14 +99,20 @@ test('human takeover: AI stays silent and escalation is not duplicated', async (
   assert.equal(during.reply, null); // AI 끼어들기 금지 (미션 §29)
   const sess = store.getStore().sessions[sid];
   assert.equal(sess.messages.filter((m) => m.role === 'system').length, 1); // 안내 1회
-  // ── 운영자 답장 → VERBATIM 전달 (미션 §27)
-  // 다른 테스트가 남긴 HUMAN_* 세션을 치운다 (자동 매핑은 활성 대화 1개일 때만 동작)
-  const st = store.getStore();
-  for (const k of Object.keys(st.sessions)) {
-    if (k !== sid) delete st.sessions[k];
-  }
-  const relayed = await relay.processTelegramUpdate({ message: { message_id: 999, text: '안내 말씀 드립니다. 원문 그대로 전달됩니다 [테스트]', chat: { id: 1 } } });
-  assert.equal(relayed.handled, true);
+  // ── 운영자 답장 → VERBATIM 전달 (미션 §27, reply-to 단일 라우팅 §9)
+  // 토큰 없는 테스트 환경에서는 escalation 원문이 실제 전송되지 않으므로,
+  // 전송 성공 시 기록될 앵커 message_id를 수동으로 시뮬레이션한다.
+  sess.telegramMsgIds.push(781);
+  const relayed = await relay.processTelegramUpdate({
+    update_id: 555001,
+    message: {
+      message_id: 1001,
+      text: '안내 말씀 드립니다. 원문 그대로 전달됩니다 [테스트]',
+      chat: { id: '4242' },
+      reply_to_message: { message_id: 781 },
+    },
+  });
+  assert.equal(relayed.delivered, true); // reply-to 매핑으로만 전달된다
   const last = sess.messages[sess.messages.length - 1];
   assert.equal(last.role, 'agent');
   assert.equal(last.text, '안내 말씀 드립니다. 원문 그대로 전달됩니다 [테스트]'); // 요약/교정 없음

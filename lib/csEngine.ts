@@ -153,7 +153,9 @@ export async function handleCustomerMessage(
 
   // ── 상담원 응대 중이면 AI는 끼어들지 않는다 (미션 §29) — 전사본 기록 + 운영자 알림만
   if (session.status === "HUMAN_PENDING" || session.status === "HUMAN_ACTIVE") {
-    notifyOperatorNewCustomerMessage(session).catch(() => {});
+    // §12 — 기존 상담 context로 운영자에게 전달하며, 이 알림 메시지도 같은 conversation에 매핑해
+    //       운영자가 그 알림에 답장하면 동일 고객으로 라우팅되게 한다. 고객 응답 경로를 막지 않는다.
+    await notifyOperatorNewCustomerMessage(session).catch(() => {});
     return { ok: true, sid: session.id, reply: null, status: session.status, escalated: session.escalated };
   }
 
@@ -415,31 +417,52 @@ async function escalateSession(
   return { ok: true, sid: session.id, reply: notice, status: session.status, escalated: true };
 }
 
-function buildTranscriptPayload(session: CsSession, reason: EscalationReason): string {
-  const firstCustomer = session.messages.find((m) => m.role === "customer")?.text || "(없음)";
-  const orderCtx = session.orderRefs.length
-    ? session.orderRefs.join(", ")
-    : "없음";
-  const lines: string[] = [
-    "🎫 N°1 CS 상담 요청",
-    "",
-    `대화: ${session.id}`,
-    `고객: ${session.customer.label} (${session.customer.type})`,
-    `주문: ${orderCtx}`,
-    `사유: ${reason}`,
-    `첫 문의: "${firstCustomer.slice(0, 120)}"`,
-    "",
-    "──── 대화 원문 ────",
-  ];
+/**
+ * §8 — Telegram 상담 요청 표준 포맷.
+ * 상단에 고객 label + conversation id (라우팅 안내), 하단에 답장 방법.
+ * 고객 label은 운영자 컨텍스트 전용 — 웹 고객 UI에는 노출되지 않는다 (§6).
+ */
+export function buildTranscriptPayload(session: CsSession, reason: EscalationReason): string {
   const SENDER_KO: Record<string, string> = {
     customer: "고객",
-    ai: "N°1 상담",
+    ai: "AI",
     agent: "상담원",
     system: "시스템",
   };
-  for (const m of session.messages) {
-    lines.push(`[${SENDER_KO[m.role] || m.role}] ${m.text}`);
+  const firstCustomer = session.messages.find((m) => m.role === "customer")?.text || "(없음)";
+  const lines: string[] = [
+    "[N°1 전문상담 요청]",
+    "",
+    "고객:",
+    session.customer.label,
+    "",
+    "Conversation:",
+    session.id,
+    "",
+    "상태:",
+    session.status,
+    "",
+  ];
+  if (session.orderRefs.length) {
+    lines.push("관련 주문:", session.orderRefs.join(", "), "");
   }
+  lines.push(
+    "문의 요약:",
+    firstCustomer.slice(0, 200),
+    "",
+    "연결 사유:",
+    reason,
+    "",
+    "──── 전체 대화 ────",
+  );
+  for (const m of session.messages) {
+    lines.push(`${SENDER_KO[m.role] || m.role}: ${m.text}`);
+  }
+  lines.push(
+    "",
+    "──── 답변 방법 ────",
+    "이 고객에게 답변하려면 이 Telegram 메시지에 '답장(Reply)' 기능으로 메시지를 보내주세요.",
+  );
   return lines.join("\n");
 }
 
@@ -451,7 +474,14 @@ async function sendEscalationTranscript(session: CsSession, reason: EscalationRe
     return false;
   }
   const r = await sendTelegramLong(token, chat, buildTranscriptPayload(session, reason));
-  if (r.ok && r.messageId) session.telegramMsgIds.push(r.messageId);
+  if (r.ok && r.messageIds?.length) {
+    // §13 — 분할 청크 전부를 conversation에 매핑한다. 운영자가 마지막 청크에 답장해도
+    // 같은 고객으로 라우팅되어야 하므로 첫 청크만으로는 부족하다.
+    for (const id of r.messageIds) {
+      if (!session.telegramMsgIds.includes(id)) session.telegramMsgIds.push(id);
+    }
+    console.log(`[cs] escalation 매핑: conversation=${session.id} telegram_messages=[${r.messageIds.join(",")}]`);
+  }
   return r.ok;
 }
 
@@ -472,17 +502,26 @@ async function appendCsMemoToOrder(session: CsSession, reason: string): Promise<
 
 // ───────────────────── 운영자 지원 ─────────────────────
 
-/** 상담원 응대 중 고객 추가 메시지 → Telegram 짧은 알림 (원문은 폴링 시 전체 전송) */
+/**
+ * §12·§13 — HUMAN_* 중 고객 후속 메시지를 기존 상담 context로 전달.
+ * - 새 상담 요청을 만들지 않고, 원래 escalation 스레드에 답장 형태로 연결한다.
+ * - 이 알림의 message_id도 같은 conversation에 매핑 → 운영자가 이 알림에 답장하면
+ *   동일 고객에게 라우팅된다 (메시지 패밀리 매핑).
+ */
 async function notifyOperatorNewCustomerMessage(session: CsSession): Promise<void> {
   const token = process.env.N1_CS_BOT_TOKEN || "";
   const chat = process.env.N1_CS_CHAT_ID || "";
   if (!token || !chat) return;
   const last = session.messages[session.messages.length - 1];
-  await sendTelegramLong(
-    token,
-    chat,
-    `💬 ${session.id} (${session.customer.label}) 고객 추가 메시지:\n${last?.text.slice(0, 500) || ""}`,
-  ).catch(() => undefined);
+  const text = `[${session.customer.label} · 새 답변]\n\n고객:\n${last?.text.slice(0, 1000) || ""}`;
+  const anchor = session.telegramMsgIds[0]; // 원래 상담 thread에 연결 (§12) — 앵커가 없으면 일반 발송
+  const r = await sendTelegramLong(token, chat, text, anchor);
+  if (r.ok && r.messageIds?.length) {
+    for (const id of r.messageIds) {
+      if (!session.telegramMsgIds.includes(id)) session.telegramMsgIds.push(id);
+    }
+    console.log(`[cs] 후속 알림 매핑: conversation=${session.id} telegram_messages=[${r.messageIds.join(",")}]`);
+  }
 }
 
 async function safeViewOf(orderId: string) {

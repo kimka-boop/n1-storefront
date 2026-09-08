@@ -1,113 +1,151 @@
 /**
- * N°1 CS — Telegram 운영자 답장 → 고객 VERBATIM 릴레이 (미션 §27·§28·§29)
+ * N°1 CS — Telegram 운영자 답장 → 고객 VERBATIM 릴레이 (P0: reply-to 단일 라우팅)
  *
- * 매핑 우선순위:
- *   1) 운영자가 티켓 메시지에 '답장(reply)'한 경우 → 해당 conversation
- *   2) HUMAN_PENDING/HUMAN_ACTIVE 대화가 정확히 1개 → 그 대화
- *   3) 그 외 → 지정 요청 안내 (추측 라우팅 금지)
+ * 라우팅 규칙 (미션 §2·§5·§9·§13·§14):
+ *   reply_to_message.message_id → conversation 매핑이 유일한 라우팅 근거다.
+ *   - 답장 없는 standalone 메시지 → 어느 고객에게도 전달 금지, 안내 응답
+ *   - 답장했으나 미매핑 message   → 어느 고객에게도 전달 금지, 안내 응답
+ *   - "유일한 HUMAN_PENDING", "최근 상담" 등 추측 라우팅 금지 (해석·휴리스틱 없음 — deterministic)
  *
- * AI는 상담원 답변을 요약·교정·완곡화하지 않고 원문 그대로 전달한다.
+ * 그 외 (미션 §4·§15·§17·§20):
+ *   - 릴레이 채널(HERMES 관리 N1_CS_CHAT_ID) 외부 발신은 처리하지 않는다 (설정 없으면 fail-closed).
+ *   - update_id / message_id 가드로 중복 처리·이중 전달을 막는다.
+ *   - 운영자 원문은 요약·교정·trim 없이 그대로 저장·전달한다 (LLM 호출 0).
  */
-import { appendMessage, getStore, type CsSession } from "@/lib/csStore";
+import {
+  appendMessage,
+  getStore,
+  markOperatorMessageSeen,
+  markUpdateSeen,
+  type CsSession,
+} from "@/lib/csStore";
 import { sendTelegramMessage } from "@/lib/telegram";
 
 export interface RelayOutcome {
   handled: boolean;
+  /** 고객 conversation에 실제로 기록(전달)되었는가 */
+  delivered?: boolean;
   info: string;
 }
 
-const USAGE_HINT = [
-  "N°1 CS 릴레이 봇입니다.",
-  "티켓 메시지에 '답장'하면 해당 고객에게 원문 그대로 전달됩니다.",
-  "대화가 1개뿐이면 답장 없이 입력해도 그 대화로 전달됩니다.",
-  "/ai — 해당 대화를 AI 상담으로 다시 넘기기",
+export const STANDALONE_GUIDANCE = [
+  "어느 상담에 대한 답변인지 확인할 수 없습니다.",
+  "답변할 고객의 상담 요청 메시지에서 '답장(Reply)' 기능을 사용해주세요.",
 ].join("\n");
 
-function humanSessions(): CsSession[] {
-  const store = getStore();
-  return Object.values(store.sessions).filter(
-    (s) => s.status === "HUMAN_PENDING" || s.status === "HUMAN_ACTIVE",
-  );
+export const UNMAPPED_GUIDANCE = [
+  "연결된 N°1 상담을 찾지 못했습니다.",
+  "해당 고객의 상담 요청 메시지에 답장해주세요.",
+].join("\n");
+
+const USAGE_HINT = [
+  "N°1 CS 릴레이 봇입니다.",
+  "상담 요청 메시지에 '답장(Reply)'하면 해당 고객에게 원문 그대로 전달됩니다.",
+  "답장 없이 보낸 메시지는 어느 고객에게도 전달되지 않습니다.",
+  "/ai — 답장한 대화를 AI 상담으로 다시 넘기기",
+].join("\n");
+
+export interface OperatorMessage {
+  message_id: number;
+  text?: string;
+  from?: { id?: number; username?: string };
+  chat?: { id: number | string };
+  reply_to_message?: { message_id: number };
 }
 
-function sessionByTelegramMessage(messageId: number): CsSession | null {
-  const store = getStore();
-  for (const s of Object.values(store.sessions)) {
-    if (s.telegramMsgIds.includes(messageId)) return s;
+/** authorized operator 채널 — HERMES가 주입한 운영 설정 (값은 이 모듈 밖으로 노출 금지) */
+function authorizedChatId(): string {
+  return (process.env.N1_CS_CHAT_ID || "").trim();
+}
+
+/** §15 — 설정된 운영 채널 발신만 처리. 선택 N1_CS_OPERATOR_IDS 로 발신자까지 한정. */
+function isAuthorized(msg: OperatorMessage): boolean {
+  const chat = authorizedChatId();
+  if (!chat) return false; // 운영 채널 미설정 → 전달 경로 자체를 닫는다 (fail-closed)
+  if (String(msg.chat?.id ?? "") !== chat) return false;
+  const allow = (process.env.N1_CS_OPERATOR_IDS || "").trim();
+  if (allow) {
+    const ids = allow.split(",").map((s) => s.trim()).filter(Boolean);
+    const fromId = msg.from?.id;
+    if (!fromId || !ids.includes(String(fromId))) return false;
   }
-  return null;
+  return true;
 }
 
 export async function processTelegramUpdate(update: {
-  message?: {
-    message_id: number;
-    text?: string;
-    chat?: { id: number | string };
-    reply_to_message?: { message_id: number };
-  };
+  update_id?: number;
+  message?: OperatorMessage;
 }): Promise<RelayOutcome> {
+  const store = getStore();
   const msg = update.message;
+
+  // §17 — update 1회 처리 가드 (Telegram 재전송, webhook/poll 겹침 모두 흡수)
+  if (typeof update.update_id === "number" && !markUpdateSeen(store, update.update_id)) {
+    return { handled: true, delivered: false, info: "중복 update — 스킵" };
+  }
   if (!msg || typeof msg.text !== "string" || !msg.text.trim()) {
-    return { handled: false, info: "텍스트 메시지 아님" };
+    return { handled: false, delivered: false, info: "텍스트 메시지 아님" };
   }
-  const text = msg.text.trim();
-
-  // ── 명령
-  if (text === "/start" || text === "/help") {
-    await replyToOperator(msg.chat?.id, USAGE_HINT);
-    return { handled: true, info: "usage hint 발송" };
+  // §17 — 동일 message_id 재도착 가드 (update_id가 달라져도 이중 전달 금지)
+  if (!markOperatorMessageSeen(store, msg.message_id)) {
+    return { handled: true, delivered: false, info: "중복 message — 스킵" };
+  }
+  // §15 — authorized operator가 아닌 발신은 조용히 무시 (응답도 보내지 않는다)
+  if (!isAuthorized(msg)) {
+    return { handled: false, delivered: false, info: "미인가 발신 — 무시" };
   }
 
-  // ── /ai: AI 상담으로 복귀 (미션 §29 명시적 control)
-  if (text === "/ai") {
-    const target = resolveTarget(msg);
+  const raw = msg.text; // 원문 그대로 — trim/정규화하지 않는다 (§20)
+
+  // ── 운영자 명령 (고객 전달 대상 아님)
+  if (raw === "/start" || raw === "/help") {
+    await replyToOperator(msg, USAGE_HINT);
+    return { handled: true, delivered: false, info: "usage hint 발송" };
+  }
+  if (raw === "/ai") {
+    const target = resolveByReply(msg);
     if (!target.session) {
-      await replyToOperator(msg.chat?.id, target.hint || "대상 대화를 특정할 수 없습니다 — 티켓 메시지에 답장해 주세요.");
-      return { handled: false, info: "target 없음" };
+      await replyToOperator(msg, target.guidance || UNMAPPED_GUIDANCE, msg.message_id);
+      return { handled: false, delivered: false, info: "target 없음" };
     }
     target.session.status = "AI_ACTIVE";
     appendMessage(target.session, "system", "상담원이 확인을 마치고 AI 상담으로 전환했습니다. 이어서 도움을 드리겠습니다.");
-    await replyToOperator(msg.chat?.id, `✓ ${target.session.id} → AI 상담 전환`);
-    return { handled: true, info: `ai 전환: ${target.session.id}` };
+    await replyToOperator(msg, `✓ ${target.session.id} → AI 상담 전환`, msg.message_id);
+    return { handled: true, delivered: false, info: `ai 전환: ${target.session.id}` };
   }
 
-  // ── 일반 텍스트 → 고객에게 VERBATIM 전달
-  const target = resolveTarget(msg);
+  // ── 일반 텍스트: reply-to 매핑만이 고객 전달 경로다 (§9)
+  const target = resolveByReply(msg);
   if (!target.session) {
-    await replyToOperator(msg.chat?.id, target.hint || "대상 대화를 특정할 수 없습니다 — 티켓 메시지에 답장해 주세요.");
-    return { handled: false, info: "target 없음" };
+    await replyToOperator(msg, target.guidance || UNMAPPED_GUIDANCE, msg.message_id);
+    return { handled: false, delivered: false, info: target.guidance === STANDALONE_GUIDANCE ? "standalone — 전달 없음" : "미매핑 reply — 전달 없음" };
   }
-  appendMessage(target.session, "agent", msg.text); // 원문 그대로 (요약/수정/교정 없음)
-  target.session.status = "HUMAN_ACTIVE";
-  return { handled: true, info: `전달됨: ${target.session.id}` };
+  appendMessage(target.session, "agent", raw); // VERBATIM — 요약·교정·완곡화 없음 (§4)
+  target.session.status = "HUMAN_ACTIVE"; // §11 — 첫 성공 전달로 takeover 확정
+  await replyToOperator(msg, `✓ ${target.session.id} 고객에게 전달했습니다.`, msg.message_id);
+  return { handled: true, delivered: true, info: `전달됨: ${target.session.id}` };
 }
 
-function resolveTarget(msg: { reply_to_message?: { message_id: number } }): {
-  session: CsSession | null;
-  hint?: string;
-} {
-  // 1) 티켓 원문에 대한 답장 매핑
-  if (msg.reply_to_message?.message_id) {
-    const byReply = sessionByTelegramMessage(msg.reply_to_message.message_id);
-    if (byReply) return { session: byReply };
+/**
+ * §2·§9·§13 — reply_to_message.message_id 만이 라우팅 근거.
+ * conversation 관련 Telegram 메시지 전체(escalation 전체 청크 + 후속 알림)가
+ * telegramMsgIds 에 매핑되어 있으므로, 그중 무엇에 답장해도 같은 고객에게 전달된다.
+ */
+function resolveByReply(msg: OperatorMessage): { session: CsSession | null; guidance?: string } {
+  const replied = msg.reply_to_message?.message_id;
+  if (!replied) return { session: null, guidance: STANDALONE_GUIDANCE };
+  const store = getStore();
+  for (const s of Object.values(store.sessions)) {
+    if (s.telegramMsgIds.includes(replied)) return { session: s };
   }
-  // 2) 활성 대화가 정확히 1개일 때만 자동 라우팅
-  const actives = humanSessions();
-  if (actives.length === 1) return { session: actives[0] };
-  if (actives.length === 0) {
-    return { session: null, hint: "대기 중인 상담이 없습니다." };
-  }
-  return {
-    session: null,
-    hint: `대기 중인 대화가 ${actives.length}개입니다 — 전달할 티켓 메시지에 '답장'해 주세요.`,
-  };
+  return { session: null, guidance: UNMAPPED_GUIDANCE };
 }
 
-/** 운영자 채널 응답 (chat id는 봇 채널과 일치할 때만 — 외부 입력으로 발송하지 않는다) */
-async function replyToOperator(chatId: number | string | undefined, text: string): Promise<void> {
+/** 운영자 채널 응답 — authorized 채널로만 발송하며, 가능하면 운영자 메시지에 답장으로 스레드를 맞춘다 */
+async function replyToOperator(msg: OperatorMessage | null, text: string, replyToMessageId?: number): Promise<void> {
   const token = process.env.N1_CS_BOT_TOKEN || "";
-  const chat = process.env.N1_CS_CHAT_ID || "";
-  if (!token || !chat || chatId === undefined) return;
-  if (String(chatId) !== String(chat)) return; // 릴레이 채널 외부에서 온 명령에는 응답하지 않음
-  await sendTelegramMessage(token, chat, text);
+  const chat = authorizedChatId();
+  if (!token || !chat) return;
+  if (msg && msg.chat !== undefined && String(msg.chat.id ?? "") !== chat) return;
+  await sendTelegramMessage(token, chat, text, replyToMessageId);
 }
