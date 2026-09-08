@@ -218,12 +218,13 @@ export default function Home() {
   const [genderTab, setGenderTab] = useState<GenderKey>("all");
   const [query, setQuery] = useState("");
   useEffect(() => {
+    // §8: N°1은 destination이고 '전체'가 collection 기본 — home은 세션에 저장/복원하지 않는다.
     const saved = localStorage.getItem("n1_gender_tab");
-    if (saved === "male" || saved === "female" || saved === "genderless" || saved === "home") setGenderTab(saved);
+    if (saved === "male" || saved === "female" || saved === "genderless") setGenderTab(saved);
   }, []);
   const changeTab = (t: GenderKey) => {
     setGenderTab(t);
-    if (t === "all") localStorage.removeItem("n1_gender_tab");
+    if (t === "all" || t === "home") localStorage.removeItem("n1_gender_tab");
     else localStorage.setItem("n1_gender_tab", t);
     if (t === "home") window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -254,14 +255,19 @@ export default function Home() {
       track?.querySelector<HTMLElement>(`[data-tab="${genderTab}"]`) ??
       track?.querySelector<HTMLElement>('[data-tab="all"]');
     if (!track || !lens || !btn) return;
-    // 텍스트가 아니라 interaction zone 기준 — 좌우 이웃 간극의 절반까지 점유(최소폭 보장)
-    const trackGap = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap) || 0;
-    const prev = btn.previousElementSibling as HTMLElement | null;
-    const next = btn.nextElementSibling as HTMLElement | null;
-    const extra = (side: HTMLElement | null) => (side ? trackGap / 2 : 0);
-    const width = Math.max(64, btn.offsetWidth + extra(prev) + extra(next) - 8);
-    lens.style.width = `${width}px`;
-    lens.style.transform = `translate3d(${btn.offsetLeft - (width - btn.offsetWidth) / 2}px, 0, 0)`;
+    // Glass Lab §9: 텍스트 폭이 아니라 탭 중심 midpoint 사이 interaction zone × 78%.
+    // 짧은 탭("전체")도 작은 pill로 쪼그라들지 않게 최소폭 보장.
+    const labels = Array.from(track.querySelectorAll<HTMLElement>("[data-tab]"));
+    const trackW = track.clientWidth;
+    const centers = labels.map((c) => c.offsetLeft + c.offsetWidth / 2);
+    const i = labels.indexOf(btn);
+    const prevC = i > 0 ? centers[i - 1] : 0;
+    const nextC = i < centers.length - 1 ? centers[i + 1] : trackW;
+    const zoneL = (prevC + centers[i]) / 2;
+    const zoneR = (centers[i] + nextC) / 2;
+    const w = Math.max(64, (zoneR - zoneL) * 0.78);
+    lens.style.width = `${w}px`;
+    lens.style.transform = `translate3d(${centers[i] - w / 2}px, 0, 0)`;
   }, [genderTab]);
   useEffect(() => { syncLens(); }, [syncLens, products.length]); // 카운트 변화로 탭 폭 변해도 재계산
   useEffect(() => {

@@ -264,9 +264,9 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   border-radius: 13px 11px 12px 14px / 16px 13px 14px 15px;
   font-size: 13px; font-weight: 600; letter-spacing: 0.04em;
   color: var(--ink); cursor: pointer;
-  background: var(--n1-glass-bg);
-  -webkit-backdrop-filter: var(--n1-glass-blur);
-  backdrop-filter: var(--n1-glass-blur);
+  background: var(--n1-glass-fill);
+  -webkit-backdrop-filter: var(--n1-glass-optics);
+  backdrop-filter: var(--n1-glass-optics);
   box-shadow: var(--n1-glass-shadow), var(--n1-glass-edge);
   transition: opacity var(--n1-glass-transition), background var(--n1-glass-transition),
     box-shadow var(--n1-glass-transition), transform 160ms ease;
@@ -277,7 +277,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   -webkit-backdrop-filter: blur(4px) saturate(1.05);
   backdrop-filter: blur(4px) saturate(1.05);
 }
-.cs-send:not(:disabled):hover { background: var(--n1-glass-bg-active); }
+.cs-send:not(:disabled):hover { background: var(--n1-glass-fill-active); }
 .cs-send:not(:disabled):active { transform: scale(0.96); }
 .cs-send.sent { animation: csSendGlow 500ms ease-out; }
 @keyframes csSendGlow {
@@ -701,29 +701,17 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
   border-radius: 18px; /* 부드럽되 장난감같지 않은 곡률 */
   padding: 30px 28px 24px;
   color: var(--ink);
-  background:
-    linear-gradient(165deg,
-      rgba(255, 255, 254, 0.88) 0%,
-      rgba(250, 248, 243, 0.80) 42%,
-      rgba(243, 241, 234, 0.85) 100%);
-  -webkit-backdrop-filter: blur(14px) saturate(1.12);
-  backdrop-filter: blur(14px) saturate(1.12);
-  box-shadow:
-    0 18px 46px rgba(36, 39, 34, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.38),
-    inset 1px 0 0 rgba(255, 255, 255, 0.42),
-    inset -1px 0 0 rgba(255, 255, 255, 0.42);
+  /* C Perfume large surface — density ~60% (면적↑ → 밀도↓, 배경 컨텍스트 투과) */
+  background: var(--n1-glass-fill-surface);
+  -webkit-backdrop-filter: var(--n1-glass-optics);
+  backdrop-filter: var(--n1-glass-optics);
+  box-shadow: var(--n1-glass-shadow), var(--n1-glass-edge);
   animation: lqForm 420ms cubic-bezier(.22, .61, .36, 1);
 }
 /* pointer approach — 재질이 아주 미세하게 또렷해짐 (모션 아님, 상태) */
 @media (hover: hover) {
   .lq-surface:hover {
-    background:
-      linear-gradient(165deg,
-        rgba(255, 255, 255, 0.92) 0%,
-        rgba(251, 249, 244, 0.84) 42%,
-        rgba(244, 242, 236, 0.88) 100%);
+    background: var(--n1-glass-fill-active);
   }
 }
 .lq-out { animation: lqBackdropOut 420ms ease-in forwards; }
@@ -802,12 +790,23 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
 .lq-act {
   width: 100%; min-height: 46px; margin-top: 6px;
   border: none; border-radius: 11px; cursor: pointer;
-  background: rgba(36, 39, 34, 0.88); color: #faf9f7;
+  /* C Perfume action-density — solid black 대신 재질 family의 고밀도 상태(§17).
+     잉크 틴트로 primary hierarchy 유지 + 가독성 확보. */
+  background:
+    linear-gradient(172deg,
+      rgba(58, 60, 52, 0.82) 0%,
+      rgba(44, 46, 40, 0.88) 100%);
+  color: #faf9f7;
   font-size: 13.5px; font-weight: 600;
-  transition: background-color 200ms ease, opacity 200ms ease;
+  box-shadow:
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.22),
+    inset 0 -1.5px 2px -0.5px rgba(0, 0, 0, 0.3),
+    var(--n1-glass-shadow);
+  transition: filter var(--n1-glass-transition), box-shadow var(--n1-glass-transition), opacity 200ms ease;
 }
-.lq-act:hover:not(:disabled) { background: rgba(36, 39, 34, 0.95); }
+.lq-act:hover:not(:disabled) { filter: brightness(1.12); }
 .lq-act:disabled { opacity: 0.4; cursor: default; }
+.lq-act:focus-visible { outline: 1.5px solid #555e4c; outline-offset: 2px; }
 .lq-ghost {
   background: none; border: none; cursor: pointer; padding: 8px 4px;
   font-size: 12px; color: #66685f; border-bottom: 1px solid #c9c7bd;
@@ -864,37 +863,50 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
    탭 셀렉터 렌즈와 CS 전송 버튼이 같은 재질 언어를 공유한다.
    ════════════════════════════════════════════════════════════════ */
 :root {
-  /* ═══ N°1 Liquid Glass — 수정 4차(2026-09-09): 렌즈 톤을 확실히 다르게 ═══
-     흰 코스틱(배경보다 밝은 번짐)이 흰 원 인상을 만들었다 → 제거.
-     렌즈 내부는 스모키 아이보리(배경보다 어둡게)로 optical density 차를 분명히.
-     광원 상단 좌측 통일. 그림자는 접촉면 바로 아래 작게. */
+  /* ════════════════════════════════════════════════════════════════
+     N°1 CANONICAL GLASS — C PERFUME (2026-09-09, Glass Lab 319d2ba 채택)
+     단일 material family. 차이는 density/geometry/size 뿐.
+     5레이어: Transmission(fill) / Backdrop(optics) / Specular(::before) /
+     Rim(::after, 각도별 밀도) / Contact(작은 접촉 그림자). 광원: 상단 좌측 통일.
+     §22 회귀 금지: opaque ivory fill + large diffuse shadow.
+     ════════════════════════════════════════════════════════════════ */
+  /* density 100% — category lens · contact/cart orb · primary action
+     (Glass Lab 최종 검증값: 내부 밀도 배경 대비 약 -7%) */
   --n1-glass-fill:
-    linear-gradient(168deg,
-      rgba(238, 235, 224, 0.66) 0%,
-      rgba(219, 215, 200, 0.5) 36%,
-      rgba(208, 203, 187, 0.5) 62%,
-      rgba(190, 184, 166, 0.72) 100%);
+    linear-gradient(172deg,
+      rgba(178, 172, 154, 0.28) 0%,
+      rgba(178, 172, 154, 0.16) 40%,
+      rgba(172, 166, 148, 0.22) 70%,
+      rgba(164, 158, 140, 0.42) 100%);
   --n1-glass-fill-active:
-    linear-gradient(168deg,
-      rgba(238, 235, 224, 0.76) 0%,
-      rgba(219, 215, 200, 0.6) 36%,
-      rgba(208, 203, 187, 0.58) 62%,
-      rgba(190, 184, 166, 0.8) 100%);
-  --n1-glass-optics: blur(5px) saturate(1.6) brightness(0.965) contrast(1.06);
-  --n1-glass-optics-active: blur(6px) saturate(1.8) brightness(0.94) contrast(1.09);
+    linear-gradient(172deg,
+      rgba(178, 172, 154, 0.36) 0%,
+      rgba(178, 172, 154, 0.22) 40%,
+      rgba(172, 166, 148, 0.28) 70%,
+      rgba(164, 158, 140, 0.5) 100%);
+  /* density ~60% — Smart Fit / Auth large surface (면적↑ → 밀도↓, §6) */
+  --n1-glass-fill-surface:
+    linear-gradient(172deg,
+      rgba(178, 172, 154, 0.17) 0%,
+      rgba(178, 172, 154, 0.1) 40%,
+      rgba(172, 166, 148, 0.13) 70%,
+      rgba(164, 158, 140, 0.25) 100%);
+  --n1-glass-optics: blur(6px) saturate(1.5) brightness(0.965) contrast(1.1);
+  --n1-glass-optics-active: blur(7px) saturate(1.65) brightness(0.95) contrast(1.13);
   --n1-glass-specular:
-    radial-gradient(62% 42% at 28% 10%,
-      rgba(255, 255, 255, 0.55) 0%,
-      rgba(255, 255, 255, 0.14) 52%,
-      rgba(255, 255, 255, 0) 78%);
+    radial-gradient(95% 60% at 24% 10%,
+      rgba(255, 255, 255, 0.45) 0%,
+      rgba(255, 255, 255, 0.07) 50%,
+      rgba(255, 255, 255, 0) 75%),
+    linear-gradient(102deg, rgba(255, 255, 255, 0) 58%, rgba(255, 255, 255, 0.14) 74%, rgba(255, 255, 255, 0) 88%);
   --n1-glass-edge:
-    inset 0 1px 0.5px rgba(255, 255, 255, 0.95),
-    inset 0 -2px 2.5px -1px rgba(104, 98, 80, 0.55),
-    inset 1.5px 0 2px -1px rgba(255, 255, 255, 0.3),
-    inset -1.5px 0 2px -1px rgba(255, 255, 255, 0.3);
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.88),
+    inset 0 -2px 2.5px -0.5px rgba(110, 104, 86, 0.62),
+    inset 1.5px 0 1.5px -1px rgba(255, 255, 255, 0.32),
+    inset -1.5px 0 1.5px -1px rgba(255, 255, 255, 0.32);
   --n1-glass-shadow:
-    0 1px 2px rgba(50, 48, 40, 0.06),
-    0 4px 8px -3px rgba(60, 58, 48, 0.14);
+    0 1px 2px rgba(50, 48, 40, 0.05),
+    0 5px 10px -3px rgba(60, 58, 48, 0.09);
   --n1-glass-transition: 240ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
