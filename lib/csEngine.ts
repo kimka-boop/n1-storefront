@@ -34,7 +34,7 @@ import {
   resolveOrCreateSession,
   type CsSession,
 } from "@/lib/csStore";
-import { testPrefix } from "@/lib/cs";
+import { testId, testPrefix } from "@/lib/cs";
 import { fetchCatalog, matchCatalogProduct, type CatalogProduct } from "@/lib/catalog";
 import {
   findOrderById,
@@ -447,6 +447,9 @@ export function buildTranscriptPayload(session: CsSession, reason: EscalationRea
     "고객:",
     session.customer.label,
     "",
+    "유형:",
+    session.customer.type, // MEMBER | GUEST — 운영자 식별용 안전 컨텍스트 (미션 §5)
+    "",
     "Conversation:",
     session.id,
     "",
@@ -454,6 +457,9 @@ export function buildTranscriptPayload(session: CsSession, reason: EscalationRea
     session.status,
     "",
   ];
+  if (session.isTest) {
+    lines.push("테스트:", testId(), "");
+  }
   if (session.orderRefs.length) {
     lines.push("관련 주문:", session.orderRefs.join(", "), "");
   }

@@ -61,6 +61,11 @@ export function testPrefix(isTest: boolean): string {
   return isTest ? "[TEST] " : "";
 }
 
+/** 테스트 식별자 (예: TEST-N1-CS) — is_test 세션의 Telegram 페이로드에 표기된다 */
+export function testId(): string {
+  return (process.env.N1_CS_TEST_ID || "TEST").trim();
+}
+
 export const AI_GREETING = [
   "안녕하세요, N°1 고객센터입니다.",
   "주문·배송, 사이즈·핏, 소재·세탁 등 궁금한 내용을 편하게 남겨주세요.",

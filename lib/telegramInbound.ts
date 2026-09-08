@@ -65,25 +65,34 @@ function sleep(ms: number): Promise<void> {
 }
 
 /**
- * canonical 소비자를 띄운다 (이미 떠 있으면 no-op).
- * Telegram webhook이 등록되어 있으면 이 프로세스는 getUpdates를 하지 않는다 —
+ * canonical 소비자를 띄운다. 이미 떠 있으면 no-op.
+ *
+ * race 주의: 시작 플래그는 어떤 await보다 먼저 동기적으로 세팅된다 — 그렇지 않으면
+ * 동시 요청 2개가 함께 시작 절차에 진입해 소비자 루프 2개가 뜨고, 서로의 getUpdates
+ * long-poll을 409로 킥하는 요청 폭풍으로 이벤트 루프가 굶는다 (SESSION D 실측 장애).
+ * webhook이 등록되어 있으면 이 프로세스는 getUpdates를 하지 않는다 —
  * webhook과 getUpdates는 동시에 쓸 수 없고(§23), 그때 소비자는 Telegram 자체다.
  */
 export async function ensureTelegramInbound(): Promise<void> {
   const st = state();
   if (st.running) return;
+  st.running = true; // 동기 선점 — 이중 기동 방지 (단일 canonical 소비자)
   const token = (process.env.N1_CS_BOT_TOKEN || "").trim();
-  if (!token) return;
+  if (!token) {
+    st.running = false;
+    return;
+  }
 
   // webhook 등록 여부 확인 (읽기 전용, lib/telegram SSRF 가드 경유) —
   // 등록되어 있으면 소비 책임을 webhook에 양보한다.
   const info = await getWebhookInfo(token);
+  if (!st.running) return; // 재진입 종료 방어
   if (info?.webhookUrl) {
+    st.running = false; // webhook이 소비자다 — 이 프로세스는 폴링하지 않는다
     console.log("[cs:audit] event=TELEGRAM_INBOUND_CONSUMER webhook 모드 — 프로세스 폴링 양보");
     return;
   }
 
-  st.running = true;
   st.startedAt = new Date().toISOString();
   console.log("[cs:audit] event=TELEGRAM_INBOUND_CONSUMER_STARTED mode=long_poll");
   void runLoop(token, st);
@@ -93,26 +102,16 @@ async function runLoop(token: string, st: InboundState): Promise<void> {
   while (st.running) {
     st.lastTickAt = new Date().toISOString();
     try {
-      const updates = await getTelegramUpdates(token, st.confirmedOffset, LONG_POLL_SECONDS);
-      if (!updates) {
-        // 네트워크/일시 오류 — 백오프 후 재시도
+      const result = await getTelegramUpdates(token, st.confirmedOffset, LONG_POLL_SECONDS);
+      if (!result) {
         st.lastError = "getUpdates 실패";
         await sleep(ERROR_BACKOFF_MS);
         continue;
       }
-      st.lastError = null;
-      for (const u of updates) {
-        st.lastProcessedUpdateId = u.update_id;
-        st.confirmedOffset = Math.max(st.confirmedOffset, u.update_id + 1);
-        st.processedCount += 1;
-        await processTelegramUpdate(u); // webhook과 동일한 단일 처리 경로 (idempotency 포함)
-      }
-      st.conflictSince = null;
-    } catch (e) {
-      const message = e instanceof Error ? e.message : String(e);
-      if (/409|conflict|terminated/i.test(message)) {
+      if (result.conflict) {
         // 제2 소비자 존재 — 미션 §23 위반 상태를 기록하고 길게 백오프한다.
-        st.lastError = message;
+        // 짧은 재시도를 반복하면 상대 long-poll을 계속 킥해 요청 폭풍이 된다.
+        st.lastError = "getUpdates 409 conflict";
         if (!st.conflictSince) {
           st.conflictSince = new Date().toISOString();
           console.warn("[cs:audit] event=TELEGRAM_INBOUND_CONFLICT — 다른 getUpdates 소비자 감지, 30s 백오프");
@@ -120,7 +119,16 @@ async function runLoop(token: string, st: InboundState): Promise<void> {
         await sleep(CONFLICT_BACKOFF_MS);
         continue;
       }
-      st.lastError = message;
+      st.conflictSince = null;
+      st.lastError = null;
+      for (const u of result.updates) {
+        st.lastProcessedUpdateId = u.update_id;
+        st.confirmedOffset = Math.max(st.confirmedOffset, u.update_id + 1);
+        st.processedCount += 1;
+        await processTelegramUpdate(u); // webhook과 동일한 단일 처리 경로 (idempotency 포함)
+      }
+    } catch (e) {
+      st.lastError = e instanceof Error ? e.message : String(e);
       await sleep(ERROR_BACKOFF_MS);
     }
   }
