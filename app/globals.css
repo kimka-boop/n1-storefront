@@ -201,7 +201,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 
 /* ── CS 채팅 위젯 (좌측 끝에 도킹 — 장바구니와 x축 끝 미러) ── */
 .cs-fab {
-  position: fixed; left: 0; bottom: 28px; z-index: 999;
+  position: fixed; left: 4px; bottom: 28px; z-index: 999;
   width: 52px; height: 52px; border-radius: 50%;
   background: #fff; color: #0a0a0a;
   border: 1px solid var(--line, #e8e8e5); cursor: pointer;
@@ -210,7 +210,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   transition: border-color 0.2s, transform 0.25s cubic-bezier(.22,.61,.36,1);
 }
 .cs-fab:hover { border-color: #0a0a0a; transform: translateY(-2px); }
-@media (max-width: 640px) { .cs-fab { left: 0; bottom: 14px; } } /* .float-bar right:0/bottom:14 미러 */
+@media (max-width: 640px) { .cs-fab { left: 4px; bottom: 14px; } } /* .float-bar right:4/bottom:14 미러 */
 .cs-window {
   position: fixed; left: 20px; bottom: 20px; z-index: 1000;
   width: 320px; max-width: calc(100vw - 32px); height: 440px;
@@ -367,7 +367,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 
 /* ═══ 우측 끝 도킹 플로팅 바 (V2: 벡터 쇼핑백 아이콘, 리퀴드 글래스) ═══ */
 .float-bar {
-  position: fixed; right: 0; bottom: 28px; z-index: 900;
+  position: fixed; right: 4px; bottom: 28px; z-index: 900;
   width: 52px; height: 52px; border-radius: 50%;
   background: #fff; color: #0a0a0a; border: 1px solid var(--line, #e8e8e5);
   box-shadow: 0 4px 18px rgba(10,10,10,0.10);
@@ -393,7 +393,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   display: flex; justify-content: space-between; align-items: center;
   padding: 12px 14px; background: #111; color: #fff; font-size: 13px;
 }
-@media (max-width: 640px) { .float-bar { right: 0; bottom: 14px; } }
+@media (max-width: 640px) { .float-bar { right: 4px; bottom: 14px; } }
 
 /* ── 리퀴드 글래스 플로팅 버튼 (iOS 26 컨트롤 레퍼런스) — 장바구니·문의하기 공통·완전 동일 ──
    유리는 행동에만: 두 액션 버튼에만 프로스틱 유리를 입히고, 팝업 본체는 불투명 유지.
