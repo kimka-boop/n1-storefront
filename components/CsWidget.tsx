@@ -18,6 +18,22 @@ export default function CsWidget() {
   const [sid, setSid] = useState<string | null>(null);
   const [typing, setTyping] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const fabRef = useRef<HTMLButtonElement>(null);
+  // outside-dismiss: pointerdown→up 이동 거리 체크로 스와이프 오타 방지 (§16)
+  const pressStart = useRef<{ x: number; y: number } | null>(null);
+
+  const closePanel = () => {
+    setOpen(false);
+    fabRef.current?.focus(); // 닫히면 문의하기 트리거로 포커스 반환 (§20)
+  };
+
+  // ESC 닫기 (§12 CLOSE METHOD C)
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") closePanel(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -85,6 +101,7 @@ export default function CsWidget() {
       {/* 채팅 버튼 */}
       {!open && (
         <button
+          ref={fabRef}
           className="cs-fab"
           onClick={() => setOpen(true)}
           aria-label="고객센터 채팅"
@@ -93,12 +110,28 @@ export default function CsWidget() {
         </button>
       )}
 
+      {/* outside-dismiss — 투명한 interaction layer (어두운 backdrop 아님, §14).
+          실제 탭 intent(click)만 닫힘: pointerdown→up 이동이 크면 스와이프로 보고 유지(§16). */}
+      {open && (
+        <div
+          className="cs-outside"
+          aria-hidden="true"
+          onPointerDown={(e) => { pressStart.current = { x: e.clientX, y: e.clientY }; }}
+          onClick={(e) => {
+            const s = pressStart.current;
+            const moved = s ? Math.hypot(e.clientX - s.x, e.clientY - s.y) : 0;
+            if (moved < 8) closePanel();
+            pressStart.current = null;
+          }}
+        />
+      )}
+
       {/* 채팅창 */}
       {open && (
-        <div className="cs-window">
+        <div className="cs-window" role="dialog" aria-label="N°1 고객센터">
           <div className="cs-header">
             <span>N°1 고객센터</span>
-            <button className="cs-close" onClick={() => setOpen(false)}>✕</button>
+            <button className="cs-close" onClick={closePanel} aria-label="고객센터 닫기">✕</button>
           </div>
           <div className="cs-messages">
             {msgs.length === 0 && (

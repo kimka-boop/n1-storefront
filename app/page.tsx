@@ -238,25 +238,25 @@ export default function Home() {
     selectCollection(products, GENDER_API[g]).length;
 
   // ── Liquid Glass 탭 셀렉터 — glass 자체가 드래그되는 살아 있는 selection material ──
-  // 상태 소스는 genderTab 단일(중복 내비 상태 없음). 드래그 중엔 lens DOM을 직접
-  // 조작(리렌더 없음), 놓으면 가장 가까운 탭으로 스냅 → 기존 changeTab 로직 실행.
+  // 상태 소스는 genderTab 단일(중복 내비 상태 없음). 렌즈 배치는 React state
+  // (Glass Lab TabZoneDemo와 동일 패턴 — DOM 직접 조작의 리렌더 경합 제거).
+  // 드래그 중엔 lens DOM을 직접 조작(리렌더 없음), 놓으면 가장 가까운 탭으로 스냅.
   const GLASS_TABS: GenderKey[] = ["home", "all", "male", "female", "genderless"];
   const trackRef = useRef<HTMLDivElement>(null);
   const lensRef = useRef<HTMLSpanElement>(null);
   const dragRef = useRef<{ pointerId: number; startX: number; baseLeft: number; active: boolean; lastHover: number } | null>(null);
-
-  const lensLeft = (lens: HTMLElement) =>
-    parseFloat(lens.style.transform.match(/translate3d\(([-\d.]+)px/)?.[1] ?? "0") || 0;
+  const [lensPlacement, setLensPlacement] = useState<{ left: number; width: number } | null>(null);
 
   const syncLens = useCallback(() => {
-    const track = trackRef.current, lens = lensRef.current;
+    const track = trackRef.current;
     // 모바일 등에서 활성 탭이 감춰져 있으면(예: N°1 브랜드) 동일 컬렉션을 보여주는 '전체'에 렌즈
     const btn =
       track?.querySelector<HTMLElement>(`[data-tab="${genderTab}"]`) ??
       track?.querySelector<HTMLElement>('[data-tab="all"]');
-    if (!track || !lens || !btn) return;
-    // Glass Lab §9: 텍스트 폭이 아니라 탭 중심 midpoint 사이 interaction zone × 78%.
-    // 짧은 탭("전체")도 작은 pill로 쪼그라들지 않게 최소폭 보장.
+    if (!track || !btn) return;
+    // Glass Lab §9 + 긴 라벨 규칙(§4): 렌즈 폭은 interaction zone과
+    // 라벨+카운트 group(+breathing) 중 큰 값, 최소폭 64px 보장.
+    // offsetLeft는 track(offsetParent) 기준이라 rect 방식보다 안정적.
     const labels = Array.from(track.querySelectorAll<HTMLElement>("[data-tab]"));
     const trackW = track.clientWidth;
     const centers = labels.map((c) => c.offsetLeft + c.offsetWidth / 2);
@@ -265,11 +265,24 @@ export default function Home() {
     const nextC = i < centers.length - 1 ? centers[i + 1] : trackW;
     const zoneL = (prevC + centers[i]) / 2;
     const zoneR = (centers[i] + nextC) / 2;
-    const w = Math.max(64, (zoneR - zoneL) * 0.78);
-    lens.style.width = `${w}px`;
-    lens.style.transform = `translate3d(${centers[i] - w / 2}px, 0, 0)`;
+    const zone = zoneR - zoneL;
+    const byGroup = btn.offsetWidth + 24; // 라벨+카운트 group + breathing room
+    const byZone = zone * 0.78;
+    const cap = zone * 0.92; // 이웃 zone 침범 방지 상한
+    const w = Math.max(64, Math.min(Math.max(byGroup, Math.min(byZone, cap)), cap));
+    const left = centers[i] - w / 2;
+    setLensPlacement((prev) =>
+      prev && Math.abs(prev.left - left) < 0.5 && Math.abs(prev.width - w) < 0.5 ? prev : { left, width: w });
   }, [genderTab]);
   useEffect(() => { syncLens(); }, [syncLens, products.length]); // 카운트 변화로 탭 폭 변해도 재계산
+  useEffect(() => {
+    // 폰트 로딩 전 측정한 offsetWidth 고착 방지 — 로딩 완료 시점에 재계산
+    if (document.fonts?.ready) document.fonts.ready.then(() => syncLens()).catch(() => {});
+  }, [syncLens]);
+  useEffect(() => {
+    // dev-lab 디버그: 콘솔에서 __glabPlace()로 재계산 강제 가능 (제거 예정)
+    (window as unknown as Record<string, unknown>).__glabPlace = () => syncLens();
+  }, [syncLens]);
   useEffect(() => {
     // 리사이즈 감지: documentElement/track 관찰 + 분기 전환(matchMedia) 보강
     if (typeof ResizeObserver === "undefined") return;
@@ -285,8 +298,11 @@ export default function Home() {
   const onLensPointerDown = (e: React.PointerEvent<HTMLSpanElement>) => {
     const lens = lensRef.current;
     if (!lens) return;
-    try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* 일부 환경/합성 포인터 — 없어도 lens 핸들러로 동작 */ }
-    dragRef.current = { pointerId: e.pointerId, startX: e.clientX, baseLeft: lensLeft(lens), active: false, lastHover: -1 };
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* 합성 포인터 등 — 없어도 동작 */ }
+    dragRef.current = {
+      pointerId: e.pointerId, startX: e.clientX,
+      baseLeft: lensPlacement?.left ?? 0, active: false, lastHover: -1,
+    };
   };
   const onLensPointerMove = (e: React.PointerEvent<HTMLSpanElement>) => {
     const ds = dragRef.current;
@@ -310,7 +326,7 @@ export default function Home() {
     });
     if (hover !== ds.lastHover) {
       btns.forEach((b) => b?.classList.remove("lens-hover"));
-      if (hover >= 0 && btns[hover]) btns[hover]!.classList.add("lens-hover");
+      if (hover >= 0 && btns[hover]) btns[hover].classList.add("lens-hover");
       ds.lastHover = hover;
     }
   };
@@ -322,7 +338,8 @@ export default function Home() {
     track?.querySelectorAll(".lens-hover").forEach((el) => el.classList.remove("lens-hover"));
     if (!ds || !ds.active || !lens || !track || e.pointerId !== ds.pointerId) return;
     // 가장 가까운 탭으로 스냅 — 기존 상태 로직 재사용 (glass state == category state)
-    const center = lensLeft(lens) + lens.offsetWidth / 2;
+    const lensLeft = parseFloat(lens.style.transform.match(/translate3d\(([-\d.]+)px/)?.[1] ?? "0") || 0;
+    const center = lensLeft + lens.offsetWidth / 2;
     let best: GenderKey = genderTab, bestD = Infinity;
     GLASS_TABS.forEach((k) => {
       const b = track.querySelector<HTMLElement>(`[data-tab="${k}"]`);
@@ -597,6 +614,11 @@ export default function Home() {
             ref={lensRef}
             className="gtab-lens"
             aria-hidden="true"
+            style={
+              lensPlacement
+                ? { width: lensPlacement.width, transform: `translate3d(${lensPlacement.left}px, 0, 0)` }
+                : undefined
+            }
             onPointerDown={onLensPointerDown}
             onPointerMove={onLensPointerMove}
             onPointerUp={onLensPointerEnd}

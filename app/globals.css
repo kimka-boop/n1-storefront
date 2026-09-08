@@ -253,6 +253,12 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 }
 .cs-typing { font-size: 11.5px; color: #aaa; }
 .cs-input-row { display: flex; align-items: stretch; border-top: 1px solid #e5e5e5; padding: 8px; gap: 8px; background: rgba(36, 39, 34, 0.025); }
+/* outside-dismiss — 투명 interaction layer: 문의창 아래, 페이지 위 (§14·15).
+   시각적 변화 없음 — 클릭/tap intent만 감지 */
+.cs-outside {
+  position: fixed; inset: 0; z-index: 998; /* cs-window 1000 아래, 페이지 위 */
+  background: transparent;
+}
 .cs-input-row input {
   flex: 1; border: none; padding: 10px 12px; font-size: 13px; outline: none;
   background: rgba(255, 255, 255, 0.65); border-radius: 12px;
@@ -924,13 +930,18 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
   display: flex; align-items: stretch; gap: 26px;
 }
 .gtab-lens {
-  position: absolute; top: 3px; bottom: 3px; left: 0; z-index: 0;
-  width: 60px; /* syncLens가 활성 탭 히트영역+이웃 간극 절반 폭으로 기록 */
+  position: absolute; top: 2px; bottom: 2px; left: 0; z-index: 0;
+  width: 60px; /* syncLens가 interaction zone 폭으로 기록 */
   border-radius: 20px 17px 18px 21px / 23px 18px 19px 22px; /* 유기적인 광학 렌즈 곡률 */
   background: var(--n1-glass-fill);
   -webkit-backdrop-filter: var(--n1-glass-optics);
   backdrop-filter: var(--n1-glass-optics);
-  box-shadow: var(--n1-glass-shadow), var(--n1-glass-edge);
+  /* Category variant — contact depth를 orb보다 약하게: pressed pill이 아니라
+     내비 위에 얹힌 얇은 광학 렌즈 (C Perfume 재질 자체는 유지) */
+  box-shadow:
+    0 1px 1.5px rgba(50, 48, 40, 0.03),
+    0 2px 5px -3px rgba(60, 58, 48, 0.05),
+    var(--n1-glass-edge);
   transition: transform var(--n1-glass-transition), width var(--n1-glass-transition),
     background var(--n1-glass-transition), box-shadow var(--n1-glass-transition);
   touch-action: pan-y; /* 세로 스크롤은 브라우저에 — 가로 드래그만 렌즈가 */
@@ -942,8 +953,8 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
   -webkit-backdrop-filter: var(--n1-glass-optics-active);
   backdrop-filter: var(--n1-glass-optics-active);
   box-shadow:
-    0 1px 2px rgba(50, 48, 40, 0.07),
-    0 6px 13px -4px rgba(60, 58, 48, 0.15),
+    0 1px 2px rgba(50, 48, 40, 0.06),
+    0 4px 9px -3px rgba(60, 58, 48, 0.11),
     var(--n1-glass-edge);
 }
 .gtab-lens.dragging::before { opacity: 1; transform: translateX(3%); }
