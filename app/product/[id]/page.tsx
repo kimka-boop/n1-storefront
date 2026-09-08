@@ -313,6 +313,9 @@ export default function ProductPage() {
             <p className={styles.yourFact}>{guidance.fact}</p>
             <p className={styles.yourFitText}>{guidance.preference}</p>
             <p className={styles.yourFitNote}>{guidance.note}</p>
+            <button className={styles.yourFitEntry} style={{ marginTop: 14 }} onClick={() => setShowFitFlow(true)}>
+              수정하기 →
+            </button>
           </div>
         ) : (
           <button className={styles.yourFitEntry} onClick={() => setShowFitFlow(true)}>
@@ -330,6 +333,7 @@ export default function ProductPage() {
             authLogin(token, email, profile);
           }}
           onClose={() => setShowFitFlow(false)}
+          product={{ name: product.name, fitShape: product.fit?.shape, sizeChart: product.sizeChart }}
         />
       )}
 

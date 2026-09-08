@@ -254,7 +254,7 @@ export default function Home() {
     setFitProfile(p);
     localStorage.setItem("n1_fit_profile", JSON.stringify(p));
     if (authToken) authUpdateProfile(p); // AuthProvider.updateProfile이 서버(Users 시트)에도 반영
-    setShowFitModal(false);
+    // 닫기는 SmartFitFlow가 '기억했어요' confirm 후 스스로 소멸하며 처리
   };
   useEffect(() => { if (authProfile) setFitProfile(authProfile); }, [authProfile]);
 

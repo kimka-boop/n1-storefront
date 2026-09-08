@@ -7,6 +7,8 @@
  */
 import { useEffect, useState } from "react";
 import { useAuth, FitProfile } from "./AuthProvider";
+import LiquidSurface from "./LiquidSurface";
+import LqSeg from "./LqSeg";
 
 export default function AuthNav() {
   const { token, email, profile, login, logout, updateProfile } = useAuth();
@@ -20,6 +22,7 @@ export default function AuthNav() {
   const [fit, setFit] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
+  const [confirmMsg, setConfirmMsg] = useState<string | null>(null);
   // 게스트가 이미 만든 핏 프로필 — 회원가입 2단계에서 재질문하지 않고 재사용
   const [savedFit, setSavedFit] = useState<FitProfile | null>(null);
   const [showFitQuestions, setShowFitQuestions] = useState(false);
@@ -43,7 +46,7 @@ export default function AuthNav() {
         body: JSON.stringify({ action: "register", email: regEmail, password: pw, profile: p }),
       });
       const data = await res.json();
-      if (data.ok) { login(data.token, regEmail, data.profile); setModal(null); }
+      if (data.ok) { login(data.token, regEmail, data.profile); setConfirmMsg("시작했어요 — 이 핏을 기억할게요"); }
       else setErr(data.error);
     } catch { setErr("서버 오류"); } finally { setBusy(false); }
   };
@@ -56,7 +59,7 @@ export default function AuthNav() {
         body: JSON.stringify({ action: "login", email: regEmail, password: pw }),
       });
       const data = await res.json();
-      if (data.ok) { login(data.token, regEmail, data.profile); setModal(null); }
+      if (data.ok) { login(data.token, regEmail, data.profile); setConfirmMsg("기억했어요"); }
       else setErr(data.error);
     } catch { setErr("서버 오류"); } finally { setBusy(false); }
   };
@@ -80,88 +83,95 @@ export default function AuthNav() {
       </div>
 
       {modal && (
-        <div className="fit-modal-bg" onClick={() => setModal(null)}>
-          <div className="fit-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="fit-close" onClick={() => setModal(null)}>✕</button>
-            <p className="fit-progress">{modal === "register" ? "회원가입 (2단계)" : "로그인"}</p>
-
-            {modal === "login" && (
+        <LiquidSurface
+          label={modal === "register" ? "나의 N°1 시작하기" : "다음에도 기억하기"}
+          onClose={() => { setModal(null); setConfirmMsg(null); setStep(1); setErr(""); }}
+          autoDissipateMs={confirmMsg ? 950 : undefined}
+        >
+          <div className="lq-stage" key={confirmMsg ? "confirm" : `${modal}-${step}-${showFitQuestions ? "q" : "p"}`}>
+            {confirmMsg ? (
+              <div className="lq-confirm">
+                <p className="lq-confirm-mark">{confirmMsg}</p>
+                <p className="lq-confirm-sub">이 핏으로 이어서 보여드릴게요.</p>
+              </div>
+            ) : modal === "login" ? (
               <>
-                <h3 className="fit-q">로그인</h3>
-                <input className="order-input" placeholder="이메일" type="email" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} />
-                <input className="order-input" placeholder="비밀번호" type="password" value={pw} onChange={(e) => setPw(e.target.value)} />
-                {err && <p className="stock-alert">{err}</p>}
-                <button className="fit-next" disabled={busy || !regEmail || !pw} onClick={doLogin}>로그인</button>
-                <p className="fit-alt">계정이 없으신가요? <button onClick={() => { setModal("register"); setStep(1); }}>회원가입</button></p>
+                <p className="lq-kicker">다음에도 기억하기</p>
+                <h3 className="lq-title">돌아오세요</h3>
+                <div style={{ marginTop: 12 }}>
+                  <input className="lq-input" placeholder="이메일" type="email" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} aria-label="이메일" />
+                  <input className="lq-input" placeholder="비밀번호" type="password" value={pw} onChange={(e) => setPw(e.target.value)} aria-label="비밀번호" />
+                  {err && <p className="lq-row-note" role="alert" style={{ color: "#a0432d", marginBottom: 10 }}>{err}</p>}
+                  <button className="lq-act" disabled={busy || !regEmail || !pw} onClick={doLogin}>
+                    {busy ? "확인 중..." : "들어가기"}
+                  </button>
+                  <div className="lq-ghost-row">
+                    <button className="lq-ghost" onClick={() => { setModal("register"); setStep(1); setErr(""); }}>
+                      계정이 없나요? 나의 N°1 시작하기
+                    </button>
+                  </div>
+                </div>
               </>
-            )}
-
-            {modal === "register" && step === 1 && (
+            ) : step === 1 ? (
               <>
-                <h3 className="fit-q">1단계 — 계정 생성</h3>
-                <input className="order-input" placeholder="이메일" type="email" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} />
-                <input className="order-input" placeholder="비밀번호 (6자 이상)" type="password" value={pw} onChange={(e) => setPw(e.target.value)} />
-                <input className="order-input" placeholder="비밀번호 확인" type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} />
-                {err && <p className="stock-alert">{err}</p>}
-                <button className="fit-next" disabled={busy || !regEmail || !pw || pw !== pw2}
-                  onClick={() => { if (pw.length < 6) { setErr("비밀번호는 6자 이상"); return; } setErr(""); setStep(2); }}>
-                  다음 → 핏 프로필
-                </button>
+                <p className="lq-kicker">나의 N°1 시작하기</p>
+                <h3 className="lq-title">기억을 시작할게요</h3>
+                <p className="lq-sub">이메일과 비밀번호만 준비되면 충분해요.</p>
+                <div style={{ marginTop: 12 }}>
+                  <input className="lq-input" placeholder="이메일" type="email" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} aria-label="이메일" />
+                  <input className="lq-input" placeholder="비밀번호 (6자 이상)" type="password" value={pw} onChange={(e) => setPw(e.target.value)} aria-label="비밀번호" />
+                  <input className="lq-input" placeholder="비밀번호 확인" type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} aria-label="비밀번호 확인" />
+                  {err && <p className="lq-row-note" role="alert" style={{ color: "#a0432d", marginBottom: 10 }}>{err}</p>}
+                  <button className="lq-act" disabled={busy || !regEmail || !pw || pw !== pw2}
+                    onClick={() => { if (pw.length < 6) { setErr("비밀번호는 6자 이상"); return; } setErr(""); setStep(2); }}>
+                    {busy ? "처리 중..." : "다음 → 핏 프로필"}
+                  </button>
+                </div>
               </>
-            )}
-
-            {modal === "register" && step === 2 && savedFit && !showFitQuestions ? (
+            ) : step === 2 && savedFit && !showFitQuestions ? (
               <>
-                <h3 className="fit-q">2단계 — 핏 프로필</h3>
-                <p className="fit-acct-note">
-                  이미 만드신 핏 프로필이 있어요 — {savedFit.gender} · {savedFit.size} ·
-                  {FIT_KO[savedFit.fit] || savedFit.fit}. 다시 답하지 않고 이대로 가입할 수 있어요.
+                <p className="lq-kicker">핏 프로필</p>
+                <h3 className="lq-title">이미 만드신 핏이 있어요</h3>
+                <p className="lq-sub">
+                  {savedFit.gender} · {savedFit.size} · {FIT_KO[savedFit.fit] || savedFit.fit} —
+                  다시 답하지 않고 이대로 시작할 수 있어요.
                 </p>
-                <button className="fit-next" disabled={busy}
+                <button className="lq-act" style={{ marginTop: 16 }} disabled={busy}
                   onClick={() => doRegister({ gender: savedFit.gender, size: savedFit.size, fit: savedFit.fit })}>
-                  {busy ? "처리 중..." : "이 핏 프로필로 가입 완료"}
+                  {busy ? "처리 중..." : "이 핏으로 시작하기"}
                 </button>
-                <div className="fit-save-sub">
-                  <button className="fit-link" onClick={() => { setGender(savedFit.gender); setSize(savedFit.size); setFit(savedFit.fit); setShowFitQuestions(true); }}>
+                <div className="lq-ghost-row">
+                  <button className="lq-ghost" onClick={() => { setGender(savedFit.gender); setSize(savedFit.size); setFit(savedFit.fit); setShowFitQuestions(true); }}>
                     다시 설정할래요
                   </button>
                 </div>
               </>
-            ) : modal === "register" && step === 2 && (
+            ) : (
               <>
-                <h3 className="fit-q">2단계 — 스마트 핏 프로필</h3>
-                <p className="fit-progress">Q1. 성별</p>
-                <div className="fit-opts">
-                  {["남성", "여성"].map((g) => (
-                    <button key={g} className={`fit-opt ${gender === g ? "selected" : ""}`} onClick={() => setGender(g)}>{g}</button>
-                  ))}
-                </div>
-                <p className="fit-progress">Q2. 기준 체형</p>
-                <div className="fit-opts">
-                  {(gender === "여성" ? BOTTOM : TOP).map((s) => (
-                    <button key={s} className={`fit-opt ${size === s ? "selected" : ""}`} onClick={() => setSize(s)}>{s}</button>
-                  ))}
-                </div>
-                <p className="fit-progress">Q3. 선호 실루엣</p>
-                <div className="fit-opts fit-vertical">
-                  {[
-                    { v: "A", t: "정핏", d: "딱 맞는 정사이즈" },
-                    { v: "B", t: "세미오버 (기본) ⭐", d: "자켓은 1치수 여유" },
-                    { v: "C", t: "오버핏", d: "박시하고 넉넉하게" },
-                  ].map((o) => (
-                    <button key={o.v} className={`fit-opt-v ${fit === o.v ? "selected" : ""}`} onClick={() => setFit(o.v)}>
-                      <b>{o.t}</b><span>{o.d}</span>
-                    </button>
-                  ))}
-                </div>
-                {err && <p className="stock-alert">{err}</p>}
-                <button className="fit-next" disabled={busy || !gender || !size || !fit} onClick={() => doRegister()}>
-                  {busy ? "처리 중..." : "가입 완료 — 자동 사이즈 추천 시작"}
+                <p className="lq-kicker">핏 프로필 — N°1이 나를 기억하는 방식</p>
+                <h3 className="lq-title">세 가지만 알려주세요</h3>
+                <p className="lq-row-label">성별</p>
+                <LqSeg options={[{ v: "남성", t: "남성" }, { v: "여성", t: "여성" }]}
+                  value={gender} onChange={setGender} ariaLabel="성별" />
+                <p className="lq-row-label">평소 사이즈</p>
+                <LqSeg
+                  options={(gender === "여성" ? BOTTOM : TOP).map((s) => ({ v: s, t: s }))}
+                  value={TOP.includes(size) || BOTTOM.includes(size) ? size : (TOP.find(s => s.replace(/\(.*\)/, "") === size) || BOTTOM.find(s => s.replace(/\(.*\)/, "") === size) || "")}
+                  onChange={setSize} ariaLabel="평소 사이즈" vertical />
+                <p className="lq-row-label">선호하는 핏</p>
+                <LqSeg options={[
+                  { v: "A", t: "정핏", d: "딱 맞는 정사이즈" },
+                  { v: "B", t: "세미오버", d: "자켓은 한 치수 여유" },
+                  { v: "C", t: "오버핏", d: "박시하고 넉넉하게" },
+                ]} value={fit} onChange={setFit} ariaLabel="선호하는 핏" />
+                {err && <p className="lq-row-note" role="alert" style={{ color: "#a0432d", marginTop: 10 }}>{err}</p>}
+                <button className="lq-act" style={{ marginTop: 16 }} disabled={busy || !gender || !size || !fit} onClick={() => doRegister()}>
+                  {busy ? "처리 중..." : "가입 완료"}
                 </button>
               </>
             )}
           </div>
-        </div>
+        </LiquidSurface>
       )}
     </>
   );

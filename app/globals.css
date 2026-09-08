@@ -277,62 +277,8 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   font-weight: 500; letter-spacing: 0.08em; white-space: nowrap;
 }
 
-/* ═══ STEP 2: 스마트 핏 모달 ═══ */
-.fit-modal-bg {
-  position: fixed; inset: 0; z-index: 1100;
-  background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
-  padding: 16px;
-}
-.fit-modal {
-  position: relative; width: 380px; max-width: 100%;
-  background: #fff; color: #111; padding: 28px 24px 20px;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
-  max-height: 90vh; overflow-y: auto;
-}
-.fit-close { position: absolute; top: 10px; right: 12px; background: none; border: none; font-size: 15px; cursor: pointer; color: #888; }
-.fit-progress { font-size: 11px; letter-spacing: 0.12em; color: #999; margin: 0 0 14px; text-transform: uppercase; }
-.fit-q { font-size: 16px; font-weight: 600; margin: 0 0 16px; }
-.fit-opts { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-.fit-opt {
-  padding: 10px 20px; font-size: 13.5px;
-  border: 1px solid #ddd; background: #fff; cursor: pointer; border-radius: 4px;
-  transition: all 0.12s;
-}
-.fit-opt.selected { border-color: #111; background: #111; color: #fff; font-weight: 600; }
-.fit-cat-toggle { display: flex; gap: 6px; margin-bottom: 12px; }
-.fit-cat-toggle button {
-  padding: 6px 14px; font-size: 12px; border: 1px solid #ddd; background: #fafafa;
-  cursor: pointer; border-radius: 14px; color: #777;
-}
-.fit-cat-toggle button.on { border-color: #111; color: #111; font-weight: 600; background: #fff; }
-.fit-vertical { flex-direction: column; }
-.fit-opt-v {
-  text-align: left; padding: 13px 16px; border: 1px solid #ddd; background: #fff;
-  cursor: pointer; display: flex; flex-direction: column; gap: 3px; border-radius: 4px;
-  transition: all 0.12s;
-}
-.fit-opt-v b { font-size: 13.5px; }
-.fit-opt-v span { font-size: 11.5px; color: #888; }
-.fit-opt-v.selected { border-color: #111; background: #f7f7f7; }
-.fit-btns { display: flex; gap: 8px; margin-top: 4px; }
-
-/* ── Smart Fit 결과·저장 제안·계정 서페이스 (단일 모달 내 상태 전환) ── */
-.fit-result-body { margin: 10px 0 4px; font-size: 13px; color: #55534e; line-height: 1.7; }
-.fit-save { margin-top: 14px; padding-top: 16px; border-top: 1px solid var(--line); }
-.fit-save-q { font-size: 13.5px; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
-.fit-save-sub { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; }
-.fit-link { background: none; border: none; padding: 6px 2px; font-size: 12px; color: #66685f;
-  cursor: pointer; border-bottom: 1px solid #c9c7bd; }
-.fit-link:hover { color: var(--ink); }
-.fit-edit { display: block; margin: 14px auto 0; }
-.fit-acct-note { margin: 8px 0 14px; font-size: 12.5px; color: #66685f; line-height: 1.6; }
-.fit-acct .order-input { width: 100%; margin-bottom: 10px; }
-.fit-prev { padding: 12px 18px; border: 1px solid #ddd; background: #fff; cursor: pointer; font-size: 13px; }
-.fit-next {
-  flex: 1; padding: 12px; border: none; background: #111; color: #fff;
-  font-size: 13.5px; font-weight: 600; cursor: pointer;
-}
-.fit-next:disabled { opacity: 0.35; cursor: not-allowed; }
+/* ═══ STEP 2: 스마트 핏 모달 → N1 Liquid Surface System(.lq-*)으로 대체됨(2026-09-08).
+   fit-grid/fit-cell는 PDP 치수 표시용으로 유지, fit-badge는 주문 모달용으로 유지. ═══ */
 
 /* ═══ 체크아웃 페이지 ═══ */
 .checkout-page { min-height: 70vh; padding: 60px 6vw; display: flex; flex-direction: column; align-items: center; }
@@ -477,8 +423,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 .auth-link.primary { border-bottom: 1px solid var(--muted, #8a8a86); padding-bottom: 2px; }
 .auth-link.primary:hover { border-color: var(--ink, #0a0a0a); }
 .auth-user { color: var(--ink, #0a0a0a); font-weight: 500; }
-.fit-alt { font-size: 12px; color: #888; text-align: center; margin: 12px 0 0; }
-.fit-alt button { background: none; border: none; color: #111; text-decoration: underline; cursor: pointer; font-size: 12px; }
+/* fit-alt는 .lq-ghost-row/.lq-ghost로 대체됨 */
 
 /* ══════════════════════════════════════════════════════════════
    2026-09-07 MAIN PAGE REDESIGN
@@ -689,3 +634,179 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
 .site-brand-tag { font-size: 8.5px; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; }
 .site-brand-block:hover .site-brand-mark { opacity: 0.7; }
 .site-header .auth-nav { grid-column: 3; justify-self: end; padding: 0; }
+
+/* ════════════════════════════════════════════════════════════════
+   N1 LIQUID SURFACE SYSTEM (2026-09-08, Liquid Glass Modal 미션)
+   Sign Up · Login · Smart Fit 전용 — 하나의 연속 유리 재질.
+   규칙: 서페이스 내부에 유리 카드를 만들지 않는다(재질의 상태 변환).
+   배경은 '보이지만 조용히'(backdrop-filter는 서페이스 1곳만 — 성능).
+   ════════════════════════════════════════════════════════════════ */
+.lq-backdrop {
+  position: fixed; inset: 0; z-index: 1100;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  background: rgba(36, 39, 34, 0.16); /* 공간이 부드러워진다 — 콘텐츠 형태는 남는다 */
+  animation: lqBackdropIn 380ms ease-out;
+}
+.lq-surface {
+  position: relative; width: 400px; max-width: 100%;
+  max-height: min(86vh, 720px); overflow-y: auto;
+  border-radius: 18px; /* 부드럽되 장난감같지 않은 곡률 */
+  padding: 30px 28px 24px;
+  color: var(--ink);
+  background:
+    linear-gradient(165deg,
+      rgba(255, 255, 254, 0.88) 0%,
+      rgba(250, 248, 243, 0.80) 42%,
+      rgba(243, 241, 234, 0.85) 100%);
+  -webkit-backdrop-filter: blur(14px) saturate(1.12);
+  backdrop-filter: blur(14px) saturate(1.12);
+  box-shadow:
+    0 18px 46px rgba(36, 39, 34, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.38),
+    inset 1px 0 0 rgba(255, 255, 255, 0.42),
+    inset -1px 0 0 rgba(255, 255, 255, 0.42);
+  animation: lqForm 420ms cubic-bezier(.22, .61, .36, 1);
+}
+/* pointer approach — 재질이 아주 미세하게 또렷해짐 (모션 아님, 상태) */
+@media (hover: hover) {
+  .lq-surface:hover {
+    background:
+      linear-gradient(165deg,
+        rgba(255, 255, 255, 0.92) 0%,
+        rgba(251, 249, 244, 0.84) 42%,
+        rgba(244, 242, 236, 0.88) 100%);
+  }
+}
+.lq-out { animation: lqBackdropOut 420ms ease-in forwards; }
+.lq-dissipating { animation: lqDissipate 480ms ease-in forwards; }
+
+/* 단계 전환 — 새 모달이 아니라 같은 재질 안에서 정보가 이어짐 */
+.lq-stage { animation: lqStage 340ms cubic-bezier(.22, .61, .36, 1); }
+@keyframes lqBackdropIn { from { opacity: 0; } }
+@keyframes lqBackdropOut { to { opacity: 0; } }
+@keyframes lqForm {
+  from { opacity: 0; transform: translateY(12px) scale(0.985); filter: blur(6px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+@keyframes lqDissipate {
+  to { opacity: 0; transform: translateY(8px) scale(0.99); filter: blur(7px); }
+}
+@keyframes lqStage {
+  from { opacity: 0; transform: translateY(7px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes lqConfirm {
+  0% { opacity: 0; transform: scale(0.96); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* ── 서페이스 콘텐츠: 유리 안의 요소들은 박스가 아니라 재질의 상태 ── */
+.lq-kicker { font-size: 9.5px; letter-spacing: 0.26em; text-transform: uppercase; color: #8f8b80; margin: 0 0 10px; }
+.lq-title { font-size: 17px; font-weight: 600; letter-spacing: 0.01em; line-height: 1.5; margin: 0 0 6px; color: var(--ink); }
+.lq-sub { font-size: 12.5px; color: #5d5b53; line-height: 1.65; margin: 6px 0 0; }
+.lq-row-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #8f8b80; margin: 18px 0 6px; }
+.lq-row-text { font-size: 13.5px; color: var(--ink); line-height: 1.65; margin: 0; }
+.lq-row-note { font-size: 12px; color: #6d6a60; line-height: 1.6; margin: 3px 0 0; }
+.lq-sep { height: 1px; background: rgba(36, 39, 34, 0.09); margin: 18px 0; border: none; }
+
+/* 연속 재질 세그먼트 컨트롤 — 선택 시 밀도가 이동한다(새 카드가 아니라) */
+.lq-seg {
+  position: relative; display: flex; gap: 3px; padding: 3px;
+  border-radius: 11px; background: rgba(36, 39, 34, 0.05);
+}
+.lq-seg-thumb {
+  position: absolute; top: 3px; bottom: 3px; left: 3px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 1px 4px rgba(36, 39, 34, 0.10);
+  transition: transform 200ms cubic-bezier(.22, .61, .36, 1), opacity 200ms ease;
+  pointer-events: none;
+}
+.lq-seg button {
+  position: relative; z-index: 1; flex: 1; min-height: 44px;
+  background: none; border: none; cursor: pointer;
+  font-size: 13px; color: #55534e; border-radius: 9px;
+  transition: color 200ms ease; padding: 8px 6px;
+}
+.lq-seg button.on { color: var(--ink); font-weight: 600; }
+/* 세로형(사이즈 등 5개 옵션) */
+.lq-seg-v { display: flex; flex-direction: column; }
+.lq-seg-v .lq-seg-thumb { top: 3px; left: 3px; right: 3px; bottom: auto; height: calc((100% - 6px) / 5); }
+.lq-seg-v button { width: 100%; text-align: center; }
+
+/* 입력 — 유리 안의 함몰(focus 시 재질이 더 선명해짐) */
+.lq-input {
+  width: 100%; padding: 11px 2px; font-size: 14px; color: var(--ink);
+  background: transparent; border: none;
+  border-bottom: 1px solid rgba(36, 39, 34, 0.18);
+  transition: border-color 200ms ease, background-color 200ms ease;
+  margin-bottom: 12px;
+}
+.lq-input::placeholder { color: #a19d92; }
+.lq-input:focus {
+  outline: none; border-bottom-color: var(--ink);
+  background: rgba(36, 39, 34, 0.035);
+}
+.lq-surface :focus-visible { outline: 1.5px solid #555e4c; outline-offset: 2px; }
+
+/* 서페이스 내 액션 — 재질의 일부(별도 카드 버튼 아님) */
+.lq-act {
+  width: 100%; min-height: 46px; margin-top: 6px;
+  border: none; border-radius: 11px; cursor: pointer;
+  background: rgba(36, 39, 34, 0.88); color: #faf9f7;
+  font-size: 13.5px; font-weight: 600;
+  transition: background-color 200ms ease, opacity 200ms ease;
+}
+.lq-act:hover:not(:disabled) { background: rgba(36, 39, 34, 0.95); }
+.lq-act:disabled { opacity: 0.4; cursor: default; }
+.lq-ghost {
+  background: none; border: none; cursor: pointer; padding: 8px 4px;
+  font-size: 12px; color: #66685f; border-bottom: 1px solid #c9c7bd;
+}
+.lq-ghost:hover { color: var(--ink); }
+.lq-ghost-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 12px; }
+.lq-close {
+  position: absolute; top: 12px; right: 14px;
+  background: none; border: none; font-size: 14px; cursor: pointer; color: #8f8b80;
+  width: 34px; height: 34px; border-radius: 50%;
+  transition: color 200ms ease, background-color 200ms ease;
+}
+.lq-close:hover { color: var(--ink); background: rgba(36, 39, 34, 0.06); }
+
+/* 짧은 확인 — '기억했어요' */
+.lq-confirm { text-align: center; padding: 34px 0 26px; animation: lqConfirm 300ms ease-out; }
+.lq-confirm-mark { font-size: 15px; letter-spacing: 0.04em; color: var(--ink); font-weight: 600; }
+.lq-confirm-sub { font-size: 12px; color: #6d6a60; margin-top: 8px; }
+
+/* ── 모바일: 바텀시트와 풀스크린의 중간 — 블러는 줄이고 재질은 더 불투명 ── */
+@media (max-width: 640px) {
+  .lq-backdrop { align-items: flex-end; justify-content: center; padding: 0; background: rgba(36, 39, 34, 0.12); }
+  .lq-surface {
+    width: 100%; max-width: none; border-radius: 18px 18px 0 0;
+    max-height: 88vh; padding: 26px 20px 22px;
+    -webkit-backdrop-filter: blur(9px) saturate(1.08);
+    backdrop-filter: blur(9px) saturate(1.08);
+    background:
+      linear-gradient(165deg,
+        rgba(255, 255, 254, 0.93) 0%,
+        rgba(250, 248, 243, 0.88) 42%,
+        rgba(243, 241, 234, 0.92) 100%);
+  }
+  @keyframes lqForm {
+    from { opacity: 0; transform: translateY(28px); filter: blur(4px); }
+    to   { opacity: 1; transform: none; filter: none; }
+  }
+}
+
+/* ── reduced motion — 기능 유지, 전환은 opacity 중심으로 최소화 ── */
+@media (prefers-reduced-motion: reduce) {
+  .lq-backdrop, .lq-surface, .lq-stage, .lq-confirm { animation-duration: 1ms; }
+  .lq-seg-thumb { transition: none; }
+  .lq-seg button, .lq-input, .lq-act, .lq-close { transition: none; }
+}
+.lq-seg button .lq-seg-sub {
+  display: block; font-size: 10.5px; color: #8f8b80; font-weight: 400;
+  margin-top: 2px; letter-spacing: 0.01em;
+}
+.lq-seg button.on .lq-seg-sub { color: #6d6a60; }
