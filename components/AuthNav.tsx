@@ -2,60 +2,62 @@
 
 /**
  * [헤더 네비] 로그인/회원가입 + 로그인 상태 표시 + 회원가입 모달(2단계)
- * 회원가입 2단계 — 게스트가 이미 만든 핏 프로필(n1_fit_profile)이 있으면
- * 다시 묻지 않고 그 프로필로 바로 가입할 수 있다 (질문 무반복 원칙).
+ * 회원가입 2단계 — 게스트가 이미 만든 핏 컨텍스트가 있으면 다시 묻지 않고
+ * 그대로 계정으로 승격한다(질문 무반복 원칙). 성별은 질문하지 않는다 —
+ * /api/auth 계약 유지를 위해 '미지정'으로 저장한다(lib/fitContext.ts).
+ * 로그인 성공 시 컨텍스트 병합은 AuthProvider.login이 담당(§11).
  */
-import { useEffect, useState } from "react";
-import { useAuth, FitProfile } from "./AuthProvider";
+import { useState } from "react";
+import { useAuth } from "./AuthProvider";
 import LiquidSurface from "./LiquidSurface";
 import LqSeg from "./LqSeg";
+import { FIT_LABEL } from "@/lib/fit";
+import { type FitContext, type PreferredFit, encodeProfileForServer } from "@/lib/fitContext";
+
+const TOP_SIZES = ["95(M)", "100(L)", "105(XL)", "110(2XL)", "FREE"];
 
 export default function AuthNav() {
-  const { token, email, profile, login, logout, updateProfile } = useAuth();
+  const { token, email, fit, login, logout, saveFit } = useAuth();
   const [modal, setModal] = useState<null | "register" | "login">(null);
   const [step, setStep] = useState(1);
   const [regEmail, setRegEmail] = useState("");
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
-  const [gender, setGender] = useState("");
-  const [size, setSize] = useState("");
-  const [fit, setFit] = useState("");
+  const [qFit, setQFit] = useState<PreferredFit | "">("");
+  const [qSize, setQSize] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [confirmMsg, setConfirmMsg] = useState<string | null>(null);
-  // 게스트가 이미 만든 핏 프로필 — 회원가입 2단계에서 재질문하지 않고 재사용
-  const [savedFit, setSavedFit] = useState<FitProfile | null>(null);
+  // 게스트가 이미 만든 핏 컨텍스트 — 회원가입 2단계에서 재질문하지 않고 재사용
   const [showFitQuestions, setShowFitQuestions] = useState(false);
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("n1_fit_profile");
-      if (raw && modal === "register") setSavedFit(JSON.parse(raw));
-    } catch {}
-  }, [modal]);
-  const FIT_KO: Record<string, string> = { A: "정핏", B: "세미오버", C: "오버핏" };
+  const sizeValue = TOP_SIZES.find((s) => s === qSize || s.replace(/\(.*\)/, "") === qSize) ?? "";
 
-  const TOP = ["95(M)", "100(L)", "105(XL)", "110(2XL)", "FREE"];
-  const BOTTOM = ["28~29", "30~31", "32~33", "34~35", "FREE"];
-
-  const doRegister = async (profileOverride?: { gender: string; size: string; fit: string }) => {
-    setBusy(true); setErr("");
-    const p = profileOverride || { gender, size: size.replace(/\(.*\)/, ""), fit };
-    try {
-      const res = await fetch("/api/auth", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "register", email: regEmail, password: pw, profile: p }),
-      });
-      const data = await res.json();
-      if (data.ok) { login(data.token, regEmail, data.profile); setConfirmMsg("시작했어요 — 이 핏을 기억할게요"); }
-      else setErr(data.error);
-    } catch { setErr("서버 오류"); } finally { setBusy(false); }
+  const doRegister = (profileOverride?: FitContext) => {
+    const base: FitContext | null =
+      profileOverride ??
+      (qFit && sizeValue ? { v: 2, preferredFit: qFit, topSize: sizeValue.replace(/\(.*\)/, "") } : null);
+    if (!base) { setErr("선호하는 핏과 평소 사이즈를 알려주세요"); return; }
+    void (async () => {
+      setBusy(true); setErr("");
+      try {
+        const res = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "register", email: regEmail, password: pw, profile: encodeProfileForServer(base) }),
+        });
+        const data = await res.json();
+        if (data.ok) { login(data.token, regEmail, data.profile); setConfirmMsg("시작했어요 — 이 핏을 기억할게요"); }
+        else setErr(data.error);
+      } catch { setErr("서버 오류"); } finally { setBusy(false); }
+    })();
   };
 
   const doLogin = async () => {
     setBusy(true); setErr("");
     try {
       const res = await fetch("/api/auth", {
-        method: "POST", headers: { "Content-Type": "application/json" },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "login", email: regEmail, password: pw }),
       });
       const data = await res.json();
@@ -64,14 +66,16 @@ export default function AuthNav() {
     } catch { setErr("서버 오류"); } finally { setBusy(false); }
   };
 
-  const fitLabel = profile ? `${profile.size} · ${{A: "정핏", B: "세미오버", C: "오버핏"}[profile.fit as "A"|"B"|"C"] || profile.fit}` : "";
+  const fitLabel = fit
+    ? `${FIT_LABEL[fit.preferredFit] ?? fit.preferredFit} · 평소 ${fit.topSize || fit.bottomSize || "사이즈 준비 중"}`
+    : "";
 
   return (
     <>
       <div className="auth-nav">
         {token && email ? (
           <>
-            <span className="auth-user">{email.split("@")[0]}님{profile && ` (${fitLabel})`} ⚙️</span>
+            <span className="auth-user">{email.split("@")[0]}님{fit && ` (${fitLabel})`} ⚙️</span>
             <button className="auth-link" onClick={logout}>로그아웃</button>
           </>
         ) : (
@@ -128,20 +132,22 @@ export default function AuthNav() {
                   </button>
                 </div>
               </>
-            ) : step === 2 && savedFit && !showFitQuestions ? (
+            ) : fit && !showFitQuestions ? (
               <>
                 <p className="lq-kicker">핏 프로필</p>
                 <h3 className="lq-title">이미 만드신 핏이 있어요</h3>
                 <p className="lq-sub">
-                  {savedFit.gender} · {savedFit.size} · {FIT_KO[savedFit.fit] || savedFit.fit} —
+                  {FIT_LABEL[fit.preferredFit] ?? fit.preferredFit}
+                  {fit.topSize ? ` · 평소 상의 ${fit.topSize}` : ""}
+                  {fit.bottomSize ? ` · 평소 하의 ${fit.bottomSize}` : ""} —
                   다시 답하지 않고 이대로 시작할 수 있어요.
                 </p>
                 <button className="lq-act" style={{ marginTop: 16 }} disabled={busy}
-                  onClick={() => doRegister({ gender: savedFit.gender, size: savedFit.size, fit: savedFit.fit })}>
+                  onClick={() => doRegister(fit)}>
                   {busy ? "처리 중..." : "이 핏으로 시작하기"}
                 </button>
                 <div className="lq-ghost-row">
-                  <button className="lq-ghost" onClick={() => { setGender(savedFit.gender); setSize(savedFit.size); setFit(savedFit.fit); setShowFitQuestions(true); }}>
+                  <button className="lq-ghost" onClick={() => { setQFit(fit.preferredFit); setQSize(fit.topSize || ""); setShowFitQuestions(true); }}>
                     다시 설정할래요
                   </button>
                 </div>
@@ -149,23 +155,20 @@ export default function AuthNav() {
             ) : (
               <>
                 <p className="lq-kicker">핏 프로필 — N°1이 나를 기억하는 방식</p>
-                <h3 className="lq-title">세 가지만 알려주세요</h3>
-                <p className="lq-row-label">성별</p>
-                <LqSeg options={[{ v: "남성", t: "남성" }, { v: "여성", t: "여성" }]}
-                  value={gender} onChange={setGender} ariaLabel="성별" />
-                <p className="lq-row-label">평소 사이즈</p>
-                <LqSeg
-                  options={(gender === "여성" ? BOTTOM : TOP).map((s) => ({ v: s, t: s }))}
-                  value={TOP.includes(size) || BOTTOM.includes(size) ? size : (TOP.find(s => s.replace(/\(.*\)/, "") === size) || BOTTOM.find(s => s.replace(/\(.*\)/, "") === size) || "")}
-                  onChange={setSize} ariaLabel="평소 사이즈" vertical />
+                <h3 className="lq-title">두 가지만 알려주세요</h3>
                 <p className="lq-row-label">선호하는 핏</p>
                 <LqSeg options={[
-                  { v: "A", t: "정핏", d: "딱 맞는 정사이즈" },
-                  { v: "B", t: "세미오버", d: "자켓은 한 치수 여유" },
-                  { v: "C", t: "오버핏", d: "박시하고 넉넉하게" },
-                ]} value={fit} onChange={setFit} ariaLabel="선호하는 핏" />
+                  { v: "A", t: "슬림 · 정핏", d: "깔끔하게 닿는 실루엣" },
+                  { v: "B", t: "정사이즈 · 세미오버", d: "이너는 정핏, 겉옷은 여유" },
+                  { v: "C", t: "여유롭게 · 오버", d: "전체적으로 넉넉한 실루엣" },
+                ]} value={qFit} onChange={(v) => setQFit(v as PreferredFit)} ariaLabel="선호하는 핏" />
+                <p className="lq-row-label">평소 상의 사이즈</p>
+                <LqSeg
+                  options={TOP_SIZES.map((s) => ({ v: s, t: s }))}
+                  value={sizeValue}
+                  onChange={(v) => setQSize(v)} ariaLabel="평소 상의 사이즈" vertical />
                 {err && <p className="lq-row-note" role="alert" style={{ color: "#a0432d", marginTop: 10 }}>{err}</p>}
-                <button className="lq-act" style={{ marginTop: 16 }} disabled={busy || !gender || !size || !fit} onClick={() => doRegister()}>
+                <button className="lq-act" style={{ marginTop: 16 }} disabled={busy || !qFit || !sizeValue} onClick={() => doRegister()}>
                   {busy ? "처리 중..." : "가입 완료"}
                 </button>
               </>
