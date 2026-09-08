@@ -203,7 +203,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
    fixed 요소의 100% = ICB(스크롤바 제외) → 컬럼 중심 기준과 정확히 일치.
    여백 중앙 = (뷰포트-컬럼)/4 + 6vw의 절반 - 버튼 절반. 좁으면 16px. */
 .cs-fab {
-  position: fixed; left: max(16px, calc((100% - 1160px) / 4 + 3% - 18px)); bottom: 28px; z-index: 999;
+  position: fixed; left: max(16px, calc((100% - 1160px) / 4 + 3% - 22px)); bottom: 28px; z-index: 999;
   width: 36px; height: 36px; border-radius: 50%;
   background: #fff; color: #0a0a0a;
   border: 1px solid var(--line, #e8e8e5); cursor: pointer;
@@ -214,7 +214,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 .cs-fab:hover { border-color: #0a0a0a; transform: translateY(-2px); }
 @media (max-width: 640px) { .cs-fab { left: 16px; bottom: 14px; } } /* .float-bar right:16/bottom:14 미러 */
 .cs-window {
-  position: fixed; left: max(16px, calc((100% - 1160px) / 4 + 3% - 18px)); bottom: 20px; z-index: 1000;
+  position: fixed; left: max(16px, calc((100% - 1160px) / 4 + 3% - 22px)); bottom: 20px; z-index: 1000;
   width: 320px; max-width: calc(100vw - 32px); height: 440px;
   background: #fff; color: #111; border: 1px solid #e5e5e5;
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
@@ -327,7 +327,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 
 /* ═══ 우측 여백 중앙 플로팅 바 (V2: 벡터 쇼핑백 아이콘, 리퀴드 글래스) ═══ */
 .float-bar {
-  position: fixed; right: max(16px, calc((100% - 1160px) / 4 + 3% - 18px)); bottom: 28px; z-index: 900;
+  position: fixed; right: max(16px, calc((100% - 1160px) / 4 + 3% - 22px)); bottom: 28px; z-index: 900;
   width: 36px; height: 36px; border-radius: 50%;
   background: #fff; color: #0a0a0a; border: 1px solid var(--line, #e8e8e5);
   box-shadow: 0 4px 18px rgba(10,10,10,0.10);
@@ -344,7 +344,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 }
 .float-bar .float-status.done { background: #0b7a3e; }
 .float-popup {
-  position: fixed; right: max(16px, calc((100% - 1160px) / 4 + 3% - 18px)); bottom: 72px; z-index: 901;
+  position: fixed; right: max(16px, calc((100% - 1160px) / 4 + 3% - 22px)); bottom: 72px; z-index: 901;
   width: 290px; max-width: calc(100vw - 32px);
   background: #fff; color: #111; border: 1px solid #e5e5e5;
   box-shadow: 0 8px 30px rgba(0,0,0,0.2); border-radius: 10px; overflow: hidden;
