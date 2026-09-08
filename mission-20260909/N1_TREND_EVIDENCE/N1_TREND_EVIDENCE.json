@@ -1,0 +1,2129 @@
+{
+ "mission": "N1 LAUNCH 20260910 — FW26 trend research",
+ "captured_at": "2026-09-09",
+ "method": "4 parallel evidence researchers (editorial/commerce/brand/community), public access only, no bot bypass (§8). Popularity claims prohibited (§14) — prevalence language only.",
+ "temporal_window": "2026-08 ~ 2026-09 우선",
+ "cluster_count": 10,
+ "clusters": {
+  "T01": {
+   "name": "슬림·스트레이트 회귀",
+   "confidence": "HIGH",
+   "statement": "FW26 남성 실루엣이 오버사이즈에서 슬림/스트레이트로 피벗 (Vogue Korea 'Slender Man' 2026-09-08; 블로거 간 wide-vs-straight 논쟁 자체가 전환기 신호)"
+  },
+  "T02": {
+   "name": "니트 퍼스트 레이어링",
+   "confidence": "HIGH",
+   "statement": "브이넥·터틀넥·하프/쿼터집업·가디건 등 니트가 간절기 탑의 기본값; 니트×데님/슬랙스가 기본 공식"
+  },
+  "T04": {
+   "name": "브라운·어스 팔레트 + 버건디 포인트",
+   "confidence": "HIGH",
+   "statement": "카멜/초콜릿/차콜 베이스 + 버건디 포인트가 가장 강한 크로스소스 수렴 (5+ 독립 소스). Elle Korea는 올리브를 시즌 컬러로 지목"
+  },
+  "T05": {
+   "name": "워싱·빈티지 파브",
+   "confidence": "HIGH",
+   "statement": "워싱 데님·피그먼트·톤다운 가공이 남성 탑/바텀 전반 (thisisneverthat FW26, Covernat 'lowered saturation')"
+  },
+  "T06": {
+   "name": "셔츠 레이어링 레시피",
+   "confidence": "HIGH",
+   "statement": "셔츠 카라·커프스 노출, 쿼터집업+옥스퍼드, 셔츠+니트 레이어 공식 반복 관찰"
+  },
+  "T07": {
+   "name": "체크 셋업",
+   "confidence": "MEDIUM",
+   "statement": "타탄/버팔로체크 풀 셋업·체크 클래싱 (에디토리얼 4소스; 도매 소재 가용성은 셔츠/스커트 수준)"
+  },
+  "T08": {
+   "name": "울·플리스 코지",
+   "confidence": "MEDIUM",
+   "statement": "울블렌드 니트·기모·플리스 — 초겨울 보온축. 그래놀라 코어 무드와 결합"
+  },
+  "T09": {
+   "name": "올블랙 텍스처",
+   "confidence": "MEDIUM",
+   "statement": "블랙 온 블랙을 컬러가 아닌 소재 대비로 스타일링 (W Korea 2026-08-27, Marie Claire 'reinforced black')"
+  },
+  "T10": {
+   "name": "미디 스커트 리바이벌",
+   "confidence": "MEDIUM",
+   "statement": "H라인 펜슬 미디·스커트 수트 부활 (Elle·Bazaar·W Korea; 블로거 펜슬스커트 언급)"
+  },
+  "T03": {
+   "name": "스웨이드·레더 텍스처 아우터",
+   "confidence": "HIGH — RC 스코프 제외",
+   "statement": "29CM 거래액 +124% YoY(2026-08-07~18 실측 데이터), GQ·무신사스탠다드·복수 리테일 확인. 그러나 RC 카탈로그는 TOP×BOTTOM 페어 모델 전용이라 아우터 SKU 제외 — 이미지/아우터 후속 미션에서 최우선 검토"
+  }
+ },
+ "evidence_record_count": 73,
+ "unique_source_count": 57,
+ "evidence_records": [
+  {
+   "source_name": "Vogue Korea",
+   "source_type": "editorial",
+   "source_url": "https://www.vogue.co.kr/2026/08/31/판타지와-현실을-오가는-2026-가을-겨울-주요-트렌드/",
+   "publication_date": "2026-08-31",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "styling",
+   "observed_item": "Gothic/medieval-fantasy mood: flowing capes (Gabriela Hearst), femme-fatale corsets with diffused lace (McQueen), botanical embroidery + Art Deco jewelry on eveningwear (Givenchy)",
+   "color": "dark/jewel tones",
+   "silhouette": "flowing capes; corseted waists",
+   "material": "lace, embroidery",
+   "keywords": [
+    "gothic",
+    "cape",
+    "corset",
+    "lace",
+    "medieval",
+    "fantasy"
+   ],
+   "notes": "Season-framing piece by Vogue Korea: F/W 2026 defined by 'fantasy vs reality'. Signals escapism-leaning styling for party/occasion wear relevant to Korean 20s-30s evening contexts.",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "Vogue Korea",
+   "source_type": "editorial",
+   "source_url": "https://www.vogue.co.kr/2026/08/31/판타지와-현실을-오가는-2026-가을-겨울-주요-트렌드/",
+   "publication_date": "2026-08-31",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "styling",
+   "observed_item": "1920s Art Deco eveningwear: beaded tunic dresses (Lanvin, Prada), beaded embroidery for red-carpet/party; tulle cited as the material that opened the season; article explicitly frames this as a departure from several seasons of 'quiet luxury' minimalism",
+   "color": "n/a",
+   "silhouette": "tunic dresses",
+   "material": "beads, tulle, lace",
+   "keywords": [
+    "art deco",
+    "beading",
+    "tunic dress",
+    "party dressing",
+    "end of quiet luxury"
+   ],
+   "notes": "Direct claim that ornament/beading replaces minimalism this season — a key directional signal for occasion wear bought by Korean 20s-early30s consumers.",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "Vogue Korea",
+   "source_type": "editorial",
+   "source_url": "https://www.vogue.co.kr/2026/09/08/2026-가을-겨울-남성복-트렌드-12/",
+   "publication_date": "2026-09-08",
+   "observation_type": "direct",
+   "gender_relevance": "MEN",
+   "category": "outer",
+   "observed_item": "12 F/W menswear trends incl.: Preppy 3.0 (corduroy duffle coats with toggle buttons, sporty mix, Yohji Yamamoto/Sacai), Matrix-style long black coats, ski sweaters, 1960s clean-silhouette tailoring (Thom Browne, Junya Watanabe), boiler suits (utility), white suits/pants as luxury code",
+   "color": "black; white; military green",
+   "silhouette": "long overcoat; 1960s slim-clean tailoring; boiler suit",
+   "material": "corduroy, wool",
+   "keywords": [
+    "menswear",
+    "duffle coat",
+    "long coat",
+    "ski sweater",
+    "boiler suit",
+    "white suit",
+    "preppy"
+   ],
+   "notes": "Vogue Korea's own 12-trend menswear map for the exact season target. Duffle coats, Matrix long coats and preppy styling map directly to Korean menswear retail.",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "Vogue Korea",
+   "source_type": "editorial",
+   "source_url": "https://www.vogue.co.kr/2026/09/08/2026-가을-겨울-남성복-트렌드-12/",
+   "publication_date": "2026-09-08",
+   "observation_type": "direct",
+   "gender_relevance": "MEN",
+   "category": "materials",
+   "observed_item": "Texture push in menswear: jacquard and cut velvet across men's collections (Jonathan Anderson/Paul Poiret inspiration); small fur trims at neck and cuffs as 'texture + warmth + quiet luxury'; heavy black leather with sharp silhouettes (punk/Richard Hell/CBGB)",
+   "color": "black (leather)",
+   "silhouette": "sharp/sharp-cut",
+   "material": "jacquard, cut velvet, fur trim, black leather",
+   "keywords": [
+    "jacquard",
+    "velvet",
+    "fur trim",
+    "leather",
+    "punk",
+    "texture"
+   ],
+   "notes": "Men's fabrics explicitly borrow 'women's luxury materials' — a concrete material trend for Korean menswear 20s-30s (velvet/leather outer, fur-trim collars).",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "Vogue Korea",
+   "source_type": "editorial",
+   "source_url": "https://www.vogue.co.kr/2026/09/08/2026-가을-겨울-남성복-트렌드-12/",
+   "publication_date": "2026-09-08",
+   "observation_type": "direct",
+   "gender_relevance": "MEN",
+   "category": "styling",
+   "observed_item": "Silk scarf 'foulard' described as crossing gender lines: scarf dressing (tied at neck or worn as full-pattern covering) appears across collections; also lumberjack/outdoor codes — buffalo check, camouflage, military green — plus a pink wave in menswear following the J.Crew pink-sweater debate (Nov 2025)",
+   "color": "military green; pink",
+   "silhouette": "n/a",
+   "material": "silk (scarf)",
+   "keywords": [
+    "scarf dressing",
+    "foulard",
+    "buffalo check",
+    "camouflage",
+    "military green",
+    "pink menswear",
+    "genderless"
+   ],
+   "notes": "Explicit genderless styling claim (scarves) + outdoor-lumberjack palette + pink as a men's color. Scarf dressing is an accessible entry point for Korean male consumers.",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "Vogue Korea",
+   "source_type": "editorial",
+   "source_url": "https://www.vogue.co.kr/2026/09/08/새로운-남성복-실루엣이-등장하고-있다/",
+   "publication_date": "2026-09-08",
+   "observation_type": "direct",
+   "gender_relevance": "MEN",
+   "category": "styling",
+   "observed_item": "'Slender Man' silhouette shift: after years of oversize, Prada (Miuccia Prada/Raf Simons), Dior Men (Jonathan Anderson) and Gucci (Demna) all cut volume out — skinny pants matched with same-material suit jacket with bare waist exposed; cropped-at-waist wool bar jackets; sparkly party tops with rock'n'roll jeans; body-skimming shirts showing muscle line; Prada S/S 2027 continues fitted jacket + slim pants",
+   "color": "n/a",
+   "silhouette": "slim/skinny trousers; cropped boxy-bar jacket; fitted jacket",
+   "material": "wool; denim",
+   "keywords": [
+    "slender man",
+    "slim pants",
+    "cropped bar jacket",
+    "skinny",
+    "tailoring",
+    "visible waist",
+    "menswear"
+   ],
+   "notes": "Strongest single directional claim for Korean menswear: editorial explicitly says oversize is ending and slim is returning — ahead of the F/W buying window for 20s-30s men.",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "Elle Korea",
+   "source_type": "editorial",
+   "source_url": "https://www.elle.co.kr/article/1906519",
+   "publication_date": "2026-09",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "styling",
+   "observed_item": "F/W 2026 trend themes: couture-level handcraft in RTW (stitch embroidery, crochet, sequins, lace, swinging fringe — Rabanne/Dior/Chanel/Etro/Miu Miu); H-line knee-length pencil midi skirts in leather/glitter/wool styled with cinched waist + heels (Victoria Beckham, Isabel Marant, Marni, Mugler); black jackets with bold statement buttons buttoned to the top (Dior, LV)",
+   "color": "black",
+   "silhouette": "H-line pencil midi skirt; single/double-breasted jacket, buttoned-to-neck",
+   "material": "leather, glitter, wool, sequins, crochet, fringe",
+   "keywords": [
+    "pencil midi skirt",
+    "h-line",
+    "statement buttons",
+    "black jacket",
+    "craft detail",
+    "fringe",
+    "sequin"
+   ],
+   "notes": "Concrete tops-bottoms pairing guidance: black button-up jacket × pencil midi skirt × heels = 'city chic' — directly replicable styling for Korean office-to-evening wear.",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "Elle Korea",
+   "source_type": "editorial",
+   "source_url": "https://www.elle.co.kr/article/1906519",
+   "publication_date": "2026-09",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "styling",
+   "observed_item": "New Romanticism: white-to-soft-pastel palette, sheer fabrics and delicate lace in bold voluminous shapes; 17th-century rococo corset details, petticoats, bow trims (McQueen, Chloé, Zimmermann, Alberta Ferretti, Simone Rocha). Also 1980s punk return: vintage slogan tees, destroyed pants, big-shoulder jackets, black leather accessories, studs, tartan check",
+   "color": "white, pastel",
+   "silhouette": "voluminous; strong-shouldered jacket; destroyed slim pants",
+   "material": "sheer fabric, lace, leather",
+   "keywords": [
+    "romantic",
+    "sheer",
+    "corset detail",
+    "petticoat",
+    "bow",
+    "punk",
+    "slogan tee",
+    "studs",
+    "tartan"
+   ],
+   "notes": "Two-opposite-poles season (romantic sheer/volume vs punk leather/studs) — both youth-culture-friendly codes for Korean 20s audience.",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "Elle Korea",
+   "source_type": "editorial",
+   "source_url": "https://www.elle.co.kr/article/1908852",
+   "publication_date": "2026-09",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "colors",
+   "observed_item": "Olive named THE fall color: cropped olive jackets to floor-length olive trench coats (Zimmermann belted jacket, Valentino long lean coat); olive suede jacket styled with denim or cream pants; olive leather coat with brown accessories; olive silk dress (Tory Burch NYFW); olive lace mini and slip dress (Saint Laurent); olive suede shoulder bags/totes (Bottega, Chanel, Ferragamo Hug East-West); olive pumps (LV), olive suede shoes (Mugler)",
+   "color": "olive (with brown, caramel, burgundy, cream, khaki pairings)",
+   "silhouette": "cropped jacket; long trench; slip dress; mini dress",
+   "material": "suede, leather, silk, lace",
+   "keywords": [
+    "olive",
+    "military",
+    "suede",
+    "trench coat",
+    "belted waist",
+    "earth tones",
+    "color trend"
+   ],
+   "notes": "Full head-to-toe olive color story with explicit styling rules (olive suede × denim/cream pants; texture-mixing over color-matching). Highly actionable for Korean fall wardrobes.",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "Harper's Bazaar Korea",
+   "source_type": "editorial",
+   "source_url": "https://www.harpersbazaar.co.kr/article/1908528",
+   "publication_date": "2026-08-30",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "styling",
+   "observed_item": "'2026 F/W Runway Notes' editor round-up: vintage slip dresses return with faded pastels/browns, lace trims, beading, irregular hems — layered OVER capri pants or lace skirts and styled with sneakers; opera gloves worn with knit dresses and minimal tops+pants as daily wear; thigh-high boots restyled with voluminous knits, denim pants and modest tailoring instead of miniskirts",
+   "color": "faded pastel, brown",
+   "silhouette": "slip dress (layered); thigh-high boots",
+   "material": "lace, beads",
+   "keywords": [
+    "slip dress",
+    "layering",
+    "capri pants",
+    "sneakers",
+    "opera gloves",
+    "thigh-high boots"
+   ],
+   "notes": "Concrete layering formulas (slip dress × capri pants × sneakers) that translate directly to Korean 20s street styling — vintage-romantic but worn casually.",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "Harper's Bazaar Korea",
+   "source_type": "editorial",
+   "source_url": "https://www.harpersbazaar.co.kr/article/1908528",
+   "publication_date": "2026-08-30",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "outer",
+   "observed_item": "'Go Big' fur: oversized faux-fur/alternative-material fur coats dominate (Valentino, Tom Ford, Gucci, Balenciaga, Chanel, Bottega); belt-waisted cocoon fur coat (Saint Laurent) called editor's pick; multicolor fur coats/fur vests/fur bags (Chanel, Diesel, Fendi); 'shrinkmaxxing' counterpoint — contracted silhouettes in gray coats, e.g. Miu Miu's narrow rounded shoulders and short sleeves exposing wrists",
+   "color": "multicolor; gray",
+   "silhouette": "oversized fur coat; belted cocoon coat; shrunken narrow-shoulder coat",
+   "material": "faux fur, alternative fur",
+   "keywords": [
+    "faux fur",
+    "oversized coat",
+    "cocoon coat",
+    "colorful fur",
+    "shrinkmaxxing",
+    "gray coat"
+   ],
+   "notes": "Volume fur is the season's outer statement, with a shrunken-silhouette counter-trend — two clear outerwear directions for the Korean winter coat market.",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "Harper's Bazaar Korea",
+   "source_type": "editorial",
+   "source_url": "https://www.harpersbazaar.co.kr/article/1908528",
+   "publication_date": "2026-08-30",
+   "observation_type": "direct",
+   "gender_relevance": "MIXED",
+   "category": "styling",
+   "observed_item": "'Wrap it up': scarves/mufflers promoted to focal styling item — exaggerated mufflers changing coat proportions (Celine/Michael Rider), air-inflated tube scarves maximizing neck volume (Loewe), color-block mufflers worn casually (Prada); 'Purple Rain': purple leather trench coat + bag (Celine), purple puff-sleeve blouse with two-tone purple pants (Chloé); animal print surge — leopard coats (Celine, Givenchy), calf-hair coat + animal-print shoes (Marni), tiger-print vest/coat (Fendi); pearls extending into menswear in the 'gender-cross era'; sporty wraparound sunglasses worn with dresses/tailoring; sculptural oversized hats (Jacquemus, Loewe, Givenchy)",
+   "color": "purple",
+   "silhouette": "leather trench coat; puff-sleeve blouse",
+   "material": "leather; fur",
+   "keywords": [
+    "muffler",
+    "tube scarf",
+    "scarf styling",
+    "purple",
+    "animal print",
+    "leopard",
+    "pearls menswear",
+    "wraparound sunglasses",
+    "oversized hat"
+   ],
+   "notes": "Dense editor-verified keyword set: scarf-as-styling and purple are the two most actionable items here; pearls-into-menswear is a direct gender-expression observation.",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "Harper's Bazaar Korea",
+   "source_type": "editorial",
+   "source_url": "https://www.harpersbazaar.co.kr/article/1908522",
+   "publication_date": "2026-08",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "styling",
+   "observed_item": "'Troublesome Student' preppy: ruffle blouses + tiered check skirts + oversize blazers (Chloé bohemian preppy), ankle-length long coats + avant-garde jacket + shirt + tie + thigh-high boots (Dries Van Noten) — preppy recast as a rebellious, just-ran-out-of-class attitude rather than Ivy neatness; also 'Simple Life': clean cotton poplin/linen shirts and skirts (Prada, Jil Sander, The Row, Gucci); 'Code Red': vivid red across elegant dresses (Chanel, Alaïa), sheer red dresses (Chloé, Bluemarine), sharp red leather (Balenciaga)",
+   "color": "red; purple",
+   "silhouette": "oversize blazer; tiered skirt; long ankle coat",
+   "material": "cotton poplin, linen",
+   "keywords": [
+    "preppy",
+    "tie",
+    "oversize blazer",
+    "tiered skirt",
+    "minimalism",
+    "red",
+    "shirt"
+   ],
+   "notes": "Korean editors explicitly redefine preppy as 'rebellious student' — matches the Vogue Korea menswear 'Preppy 3.0' claim from another publisher, strengthening the preppy signal.",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "Harper's Bazaar Korea",
+   "source_type": "editorial",
+   "source_url": "https://www.harpersbazaar.co.kr/article/1908521",
+   "publication_date": "2026-08",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "styling",
+   "observed_item": "'Classic Woman Returns': skirt suits in gold-sequin tweed (Chanel), 1950s cinched-waist suits (Lanvin), pencil skirt + pocket-detail tailored jacket (Tom Ford); 'The New Match': white × beige tonal layering worn head-to-toe with matching bags/shoes (Celine, Bottega, Toteme, Miu Miu, Tory Burch); 'Powerful Checks': big tartan/plaid worn as full set-ups, not accent pieces (LV, Chloé, Loewe, Acne Studios); big shoulder bags incl. laptop-size; oversized 3D flower brooch/corsage in feather/ribbon/leather/crystal; train details on satin tops and tuxedos; T-strap heels with midi skirts; sculptural ear cuffs (Saint Laurent); slimmed Celine tailoring with off-angle flare pants + bucket/derby hats + stiff scarves",
+   "color": "white, beige",
+   "silhouette": "skirt suit; pencil skirt; full check set-up; flare pants",
+   "material": "tweed, sequin",
+   "keywords": [
+    "skirt suit",
+    "white on beige",
+    "tonal layering",
+    "tartan set-up",
+    "shoulder bag",
+    "flower brooch",
+    "train",
+    "t-strap",
+    "ear cuff"
+   ],
+   "notes": "Most styling-dense single page found: tonal white-beige layering and check set-ups are concrete, copyable Korean-fall looks; skirt-suit revival crosses office/occasion contexts.",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "W Korea",
+   "source_type": "editorial",
+   "source_url": "https://www.wkorea.com/2026/08/27/올가을-블랙을-입는-방법이-조금-달라집니다/",
+   "publication_date": "2026-08-27",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "styling",
+   "observed_item": "All-black restyled via texture and silhouette instead of color: Demna's Gucci — fitted black jacket + slim pants + black bag + pointed shoes (90s sensual code); black top × wide Bermuda pants + long silver necklace (office-to-weekend); Chanel (Matthieu Blazy) — black knit jacket + pencil skirt + gold buttons lifted by burgundy bag/shoes; D&G — waist-emphasized black jacket × full midi skirt; black turtleneck sleeveless + slim pants with ankle exposed + strappy sandals",
+   "color": "black (accent burgundy, silver)",
+   "silhouette": "fitted jacket + slim pants; wide Bermuda pants; pencil skirt; full midi skirt",
+   "material": "leather, lace, knit",
+   "keywords": [
+    "all black",
+    "texture contrast",
+    "bermuda pants",
+    "pencil skirt",
+    "midi skirt",
+    "pointed shoes",
+    "silver necklace"
+   ],
+   "notes": "Concrete top×bottom all-black formulas (incl. Bermuda pants pairing) framed around Korean office-to-weekend use — directly reusable for a Korean 20s-30s wardrobe.",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "Marie Claire Korea",
+   "source_type": "editorial",
+   "source_url": "https://www.marieclairekorea.com/fashion/2026/09/2026-f-w/",
+   "publication_date": "2026-09",
+   "observation_type": "direct",
+   "gender_relevance": "MIXED",
+   "category": "general",
+   "observed_item": "7 F/W runway keywords: (1) flower motifs on dresses/jackets/accessories (Chanel, Dior, Givenchy, Erdem); (2) bold colorful checks + mixed-scale check-clashing (Celine, Chloé, Chanel, Dries Van Noten, Acne); (3) fluffy fur outerwear from twee to monumental oversized (Chanel, Bottega, Saint Laurent, Gucci, Burberry); (4) gender-boundary-erasing office suiting — widened shoulders, precisely cut jackets, pants suits framed as the new 'career woman uniform' (Dior, D&G, Givenchy, Saint Laurent); (5) minimal body-con dresses (Alaïa, Gucci) with Prada/Miu Miu relaxed alternative; (6) leather turned soft/fluid — body-following leather looks (Gucci, Hermès), clean glossy leather (Prada, Ferragamo); (7) reinforced black — power shoulders, structural tailoring, mixed-material black-on-black (Alaïa, Balenciaga)",
+   "color": "black",
+   "silhouette": "power shoulder; body-con dress; relaxed shirting",
+   "material": "fur, leather, poplin",
+   "keywords": [
+    "floral",
+    "check clash",
+    "fluffy fur",
+    "genderless suit",
+    "body-con",
+    "soft leather",
+    "power shoulder",
+    "black"
+   ],
+   "notes": "Independent Korean confirmation of fur/black/check/leather trends and an explicit genderless-suiting claim; covers both occasion and office wear for the target demo.",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "Vogue.com (international)",
+   "source_type": "editorial",
+   "source_url": "https://www.vogue.com/article/fall-2026-color-trends",
+   "publication_date": "unknown",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "colors",
+   "observed_item": "Fall 2026 color list: red everywhere incl. bright turtlenecks (Celine, Lii) and tonal red-on-pink layering (Celine); royal purple across RTW and accessories (Celine, Loewe, Mugler, Tory Burch, Balenciaga); electric/cobalt blue incl. Klein-blue textured look (Bottega) and cobalt with navy (Givenchy) or gray (Jil Sander); butter yellow (Dior, Kallmeyer, Tod's, Chloé); juicy peach/melon in knits and corduroys (Tory Burch), embellished dresses (Chanel), minis (Miu Miu); turquoise entering fall; burgundy as cold-weather classic",
+   "color": "red, royal purple, cobalt blue, butter yellow, peach/melon, turquoise, burgundy",
+   "silhouette": "n/a",
+   "material": "corduroy, knit",
+   "keywords": [
+    "red",
+    "purple",
+    "cobalt",
+    "butter yellow",
+    "peach",
+    "burgundy",
+    "turtleneck",
+    "color trend"
+   ],
+   "notes": "International color map aligning with Korean editors (purple, red) plus extensions (cobalt, peach, butter yellow) usable to widen a Korean fall palette.",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "Vogue.com (international)",
+   "source_type": "editorial",
+   "source_url": "https://www.vogue.com/article/fall-winter-2026-fashion-trends",
+   "publication_date": "unknown",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "styling",
+   "observed_item": "6 key F/W 2026 trends: 'Power of Styling' — re-pairing existing staples like cardigans and workwear jackets, layered basics, unexpected accessories (Prada-led); 'Updated Lady' — softened power suiting with gently sloping waists and sculpted jackets (Chanel, Givenchy, Balenciaga, Celine); 'Go Figure' — body-conscious: second-skin dresses (Alaïa), sheer layers (Khaite), lingerie slips (Valentino), styled as knit bustier + slim trouser (Jil Sander) or sheer mini + slip + over-the-knee boots (Cos); 1920s Art Deco touches (Khaite, Dries Van Noten, Loro Piana); reworked proportions (Ashlyn, Christopher John Rogers)",
+   "color": "nude/flesh tones",
+   "silhouette": "sculpted jacket; sloping waist; second-skin dress; slim trouser",
+   "material": "sheer, knit",
+   "keywords": [
+    "layering",
+    "cardigan",
+    "workwear jacket",
+    "softened suiting",
+    "sheer",
+    "slip dress",
+    "bustier",
+    "art deco",
+    "body-conscious"
+   ],
+   "notes": "International anchor source: 'staging over newness' layering and softened-tailoring narrative matches Korean coverage; confirms sheer/slip + OTK boot formulas seen in Bazaar Korea.",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "Elle Korea",
+   "source_type": "editorial",
+   "source_url": "https://www.elle.co.kr/article/1906596",
+   "publication_date": "2026-09",
+   "observation_type": "secondary",
+   "gender_relevance": "WOMEN",
+   "category": "styling",
+   "observed_item": "Article claims 1970s-80s leopard full coats/jackets are a 2026 F/W trend ('올가을은 애니멀 프린트 참지 말고 입어도 됩니다') — title/summary only, page not fully fetched",
+   "color": "leopard/brown",
+   "silhouette": "full leopard coat; leopard jacket",
+   "material": "unknown",
+   "keywords": [
+    "animal print",
+    "leopard",
+    "70s",
+    "80s"
+   ],
+   "notes": "SECONDARY claim from search-level summary, corroborating Bazaar Korea's animal-print runway note. Treat as article's claim, not independently verified page content.",
+   "record_family": "editorial"
+  },
+  {
+   "source_name": "Musinsa Editorial - 무신사 에디터 픽, 2026 인기 트렌드",
+   "source_type": "commerce",
+   "source_url": "https://www.musinsa.com/content/1452877813830509855",
+   "publication_date": "2026-01-05 (observed 2026-09-09)",
+   "observation_type": "direct",
+   "gender_relevance": "MIXED",
+   "category": "general",
+   "observed_item": "Three named trends: (1) 그래놀라 코어/Granola Core - nature-inspired outdoor casual; (2) 밤비 코어/Bambi Core - soft fur street mood; (3) 쿼터집/Quarter-zip as the post-'nerd look' versatile knit top",
+   "color": "Granola: brown/green/beige neutrals; Bambi: brown+white deer combo; bright accent colors on sneakers/zip-ups",
+   "silhouette": "Relaxed outdoor layering; quarter-zip half-zipped for 'chic hip' effect",
+   "material": "Fleece (Partimento), fur (The Museum Visitor), cowichan pattern knit (Fallett)",
+   "keywords": [
+    "granola core",
+    "bambi core",
+    "quarter zip",
+    "cowichan",
+    "fleece",
+    "fur",
+    "layering",
+    "dandy",
+    "neutral tones"
+   ],
+   "notes": "Musinsa's own editor-pick trend framing for 2026. Styling: quarter-zip layered with shirt+tie (dandy) or striped inner (casual); granola styled with bright sneaker as point accent; fur used boldly or as bag accent.",
+   "record_family": "commerce"
+  },
+  {
+   "source_name": "Musinsa Editorial - 지금 알아야 할 2026 패션 트렌드 3",
+   "source_type": "commerce",
+   "source_url": "https://www.musinsa.com/content/1460916785052579323",
+   "publication_date": "2026-01-15 (observed 2026-09-09)",
+   "observation_type": "direct",
+   "gender_relevance": "MIXED",
+   "category": "colors",
+   "observed_item": "(1) 적토마/Red Horse year goods - red point accessories, horse keyrings; (2) 포엣 코어/Poet Core - glasses + frayed vintage shirt + faded denim; (3) 로맨틱 고스/Romantic Goth - black lace, sheer fabrics, corset belt, slim outerwear",
+   "color": "Intense red (Year of Red Horse); black base + burgundy accent (Romantic Goth)",
+   "silhouette": "Corset belt + slim outerwear to define waist/silhouette (Romantic Goth)",
+   "material": "Black lace, see-through/sheer fabrics with texture contrast",
+   "keywords": [
+    "romantic goth",
+    "poet core",
+    "sheer",
+    "lace",
+    "burgundy",
+    "corset belt",
+    "vintage shirt",
+    "faded denim",
+    "red accent"
+   ],
+   "notes": "Page tags 89 brands incl. Matin Kim, Ganni, Levi's, LMC; has separate men's/women's coordi sections for each trend. Dark-romance direction aligns with Bazaar's 2026 F/W 'dark sensual romance' framing seen in search context.",
+   "record_family": "commerce"
+  },
+  {
+   "source_name": "Musinsa Editorial - 고감도 브랜드 26FW 신상 (FA26 season launch)",
+   "source_type": "commerce",
+   "source_url": "https://www.musinsa.com/content/1541751438425673057",
+   "publication_date": "posted 2026-08-24; on-page coupon window 09.01-09.09 (observed 2026-09-09)",
+   "observation_type": "direct",
+   "gender_relevance": "MIXED",
+   "category": "outer",
+   "observed_item": "26FW merchandising: Vanson Leathers leather capsule; thisisneverthat Fall'26 'BINGO' (knitwear, sweatshirts, windbreakers, blousons, trucker jackets, patterned shirts+pants, Pertex 'VIK' weather gear, SKOGAR down + fleece jacket); Sunlove Tour light down/field parka/fur jacket; Rains weatherproof outer; True Religion 'Big-T' heritage denim with basic shirts and fleece",
+   "color": "Not specified on page",
+   "silhouette": "Natural flowing silhouette (The Museum Visitor pre-fall); relaxed silhouettes, functional details (Sunlove Tour down); restrained minimal (Rains)",
+   "material": "Leather, Pertex lightweight technical, down, fleece, denim",
+   "keywords": [
+    "26FW",
+    "blouson",
+    "trucker jacket",
+    "leather",
+    "light down",
+    "field parka",
+    "layering",
+    "weatherproof",
+    "heritage denim",
+    "간절기"
+   ],
+   "notes": "Current-season (Aug 24 - Sep 9, 2026) Musinsa flagship brand editorial positioning 간절기 outerwear + knit as the season's core. No KRW prices rendered.",
+   "record_family": "commerce"
+  },
+  {
+   "source_name": "29CM 판매 데이터 - 스웨이드 아우터 (via TENANT news)",
+   "source_type": "commerce",
+   "source_url": "https://tnnews.co.kr/archives/291079",
+   "publication_date": "2026-08-20 (data window 2026-08-07 to 08-18)",
+   "observation_type": "secondary",
+   "gender_relevance": "MIXED",
+   "category": "materials",
+   "observed_item": "29CM (Musinsa-operated) reports suede outer transaction value +124% YoY and '스웨이드 자켓' keyword search +140% WoW; 29CM statement: '올가을 핵심 트렌드는 스웨이드'. Merchandised items: 루에브르 '포 스웨이드 카라리스 레이어드 재킷' (collarless layered suede jacket), 오버듀플레어 '웨스턴 스웨이드 재킷' (western suede jacket, cut-line seam, two-way zip)",
+   "color": "Not stated in article",
+   "silhouette": "Diversifying beyond tailored into western, high-neck, collarless(카라리스), layered-collar",
+   "material": "Suede, leather; knitwear named as 간절기 category alongside leather jacket and trench coat; heavy outer: coat, mustang",
+   "keywords": [
+    "suede jacket",
+    "카라리스",
+    "western",
+    "high neck",
+    "leather jacket",
+    "trench coat",
+    "mustang",
+    "knitwear",
+    "FW preorder"
+   ],
+   "notes": "Actual commerce transaction/search data for current window. 29CM ran 'FW 프리오더' 기획전 through Aug 31 covering 간절기-to-heavy outer. Driver cited: cooler-than-usual weather + 처서 solar term.",
+   "record_family": "commerce"
+  },
+  {
+   "source_name": "Zigzag 2026 여름 소비 트렌드 결산 (via Apparelnews)",
+   "source_type": "commerce",
+   "source_url": "https://m.apparelnews.co.kr/news/news_view/?idx=227471",
+   "publication_date": "2026-09-08 (data window 2026-06-01 to 08-31)",
+   "observation_type": "secondary",
+   "gender_relevance": "WOMEN",
+   "category": "tops",
+   "observed_item": "Zigzag search/purchase data: 민소매 #1 search (~420,000), 블라우스 #2, 하객룩 #3, 원피스 #4, 란제리코어 ~27,000 searches; transitional items entering top searches: summer knit + cardigan ('살안타템'); 7부 하렘팬츠 6,000+, 하렘 조거팬츠 2,000+ searches",
+   "color": "Not stated",
+   "silhouette": "Harem pants cropped (7부) and jogger variants visible in bottoms searches",
+   "material": "Not stated",
+   "keywords": [
+    "sleeveless",
+    "blouse",
+    "lingeriecore",
+    "slip",
+    "cardigan",
+    "summer knit",
+    "harem pants",
+    "하객룩",
+    "dress"
+   ],
+   "notes": "Zigzag = female-skewing style commerce. Shows the 夏->秋 handoff: cardigan/knit entering top searches at end of window; slip-as-outer (란제리코어) carrying into fall layering. Peak ordering Mon 23:00; 8pm-midnight = ~33% of orders.",
+   "record_family": "commerce"
+  },
+  {
+   "source_name": "Musinsa Girls - 미리 확인하는 올가을 트렌드",
+   "source_type": "commerce",
+   "source_url": "https://www.musinsa.com/content/1407554592982536188",
+   "publication_date": "2025-08-25 (campaign 08.25-09.04; observed 2026-09-09)",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "bottoms",
+   "observed_item": "Three autumn trends for young women: 스칸트/Skant (skirt layered over pants), 소프트 스포티룩/Soft sporty (easy techwear + girlish touch), 발레코어/Balletcore ('continuing from last year')",
+   "color": "No specific colors; 'color & pattern standout items' recommended",
+   "silhouette": "Balloon silhouette (balletcore); skirt-over-pants layering",
+   "material": "Lace, frill",
+   "keywords": [
+    "skant",
+    "skirt-pants layering",
+    "balletcore",
+    "soft sporty",
+    "techwear",
+    "hood zip-up",
+    "sweatshirt",
+    "여친룩",
+    "balloon"
+   ],
+   "notes": "IMPORTANT: this is the 2025 autumn edition - used as seasonal-precedent evidence only, not current 2026 merchandising. 63 participating brands (Matin Kim, Luvistrue, Dr. Martins, Timberland, Puma, Adidas). Styling: skant for street/girlfriend look; balletcore mixed with hood zip-up/sweatshirt for casual.",
+   "record_family": "commerce"
+  },
+  {
+   "source_name": "Musinsa Girls - 가을 니트 플레이리스트",
+   "source_type": "commerce",
+   "source_url": "https://m.musinsa.com/content/1426880479377769932",
+   "publication_date": "2025-10-14 (observed 2026-09-09)",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "tops",
+   "observed_item": "Autumn knit styling tracks: cardigan (worn alone / with denim / with skirt), crop knit (+ wide-fit pants, ball cap or beanie, over skirt), relaxed pullover knit (+ sweatpants or mini skirt)",
+   "color": "Brown and pink cited via Adidas sneaker colorways",
+   "silhouette": "Crop knit short-length; pullover relaxed/cozy silhouette; wide pants pairing",
+   "material": "Knit",
+   "keywords": [
+    "cardigan",
+    "crop knit",
+    "pullover knit",
+    "wide pants",
+    "beanie",
+    "ball cap",
+    "layering"
+   ],
+   "notes": "2025 autumn seasonal precedent for women's knit styling playbook (crop+wide, cardigan-as-top). No prices shown. Brand showcase: Marithe+Francois Girbaud x Adidas.",
+   "record_family": "commerce"
+  },
+  {
+   "source_name": "Musinsa - 58만 조회수 인기 코디 (coordination ranking analysis)",
+   "source_type": "commerce",
+   "source_url": "https://www.musinsa.com/content/1475353204361786440",
+   "publication_date": "2026-02-23 (coordination views ranked 2025-01-19 to 2026-02-18; observed 2026-09-09)",
+   "observation_type": "direct",
+   "gender_relevance": "MIXED",
+   "category": "styling",
+   "observed_item": "Category TOP5 coordination formats: knit as inner layer (classic mood), ton-on-tone outer-to-shoes color matching, concise silhouettes + light layering, campus 开学 look, calm date look. Outer archetypes listed: lightweight padding, fleece, varsity jacket, short coat, leather jacket, fishtail parka, bomber, suede jacket",
+   "color": "'Cloud Dancer' (Pantone neutral white); warm tones beige/brown",
+   "silhouette": "간결한 실루엣 (clean/concise) + light layering",
+   "material": "Suede, leather, fleece named in outer archetypes",
+   "keywords": [
+    "knit inner",
+    "ton-on-tone",
+    "cloud dancer",
+    "beige",
+    "brown",
+    "leather jacket",
+    "suede jacket",
+    "varsity",
+    "bomber",
+    "fishtail parka"
+   ],
+   "notes": "Musinsa's own ranking-of-coordination-views (580k monthly views claimed in title) - I can attest only that the page presents this as a coordination-view ranking for that period. Warm neutral + suede/leather outer archetypes corroborate the FW26 material direction.",
+   "record_family": "commerce"
+  },
+  {
+   "source_name": "Cross-retailer autumn demand surge cluster (Newsis/Seoul Economic/Money Today headlines via search)",
+   "source_type": "commerce",
+   "source_url": "https://www.newsis.com/view/NISX20260821_0003757752",
+   "publication_date": "2026-08-20/23 headlines (observed via search 2026-09-09; article body NOT fetched - timeout)",
+   "observation_type": "secondary",
+   "gender_relevance": "MIXED",
+   "category": "outer",
+   "observed_item": "Headline-level figures only: trench coat search +465% after 입추; Beanpole Men outer +343%; Handsome(한섬) leather outer sales ~6x; Shinsegae 일라일(illy/ILOOL?) leather jacket revenue 10x+; Money Today: suede outer expanding from classic jacket into western/collarless/high-neck silhouettes",
+   "color": "Segye headline: deep/rich fall color depth ('가볍지만 깊이 있게')",
+   "silhouette": "Western, collarless, high-neck suede jacket variants (Money Today headline)",
+   "material": "Leather, suede, shearling, tweed (headline cluster)",
+   "keywords": [
+    "trench coat",
+    "leather outer",
+    "shearling",
+    "tweed",
+    "suede",
+    "search surge",
+    "입추",
+    "처서"
+   ],
+   "notes": "CAUTION: figures come from search-result snippets/headlines, not from full article loads (newsis fetch timed out). Treat as directional corroboration of the 29CM data record, not as verified page content.",
+   "record_family": "commerce"
+  },
+  {
+   "source_name": "LF / Isabel Marant fall outer expansion (Daily Fashion News via Daum)",
+   "source_type": "commerce",
+   "source_url": "https://v.daum.net/v/20260822075149300",
+   "publication_date": "2026-08-22 (observed via search snippet 2026-09-09; full page not fetched)",
+   "observation_type": "secondary",
+   "gender_relevance": "WOMEN",
+   "category": "materials",
+   "observed_item": "LF expanding texture-forward women's outer for fall: leather, suede, shearling(시어링), tweed - led by Isabel Marant Korea line-up",
+   "color": "Not visible in snippet",
+   "silhouette": "Not visible in snippet",
+   "material": "Leather, suede, shearling, tweed",
+   "keywords": [
+    "leather",
+    "suede",
+    "shearling",
+    "tweed",
+    "women outer",
+    "Isabel Marant",
+    "LF"
+   ],
+   "notes": "Snippet-level only. Adds a large-SPA/retail (LF) women's confirmation of the material-first FW26 outer strategy alongside 29CM data.",
+   "record_family": "commerce"
+  },
+  {
+   "source_name": "thisisneverthat",
+   "source_type": "brand",
+   "source_url": "https://intl.thisisneverthat.com/features/lookbook/fall-2026-lookbook",
+   "publication_date": "2026-08",
+   "observation_type": "direct",
+   "gender_relevance": "MIXED",
+   "category": "general",
+   "observed_item": "Official Fall 2026 Lookbook page published on brand site; Fall 2026 first drop sold via Seoul Hongdae/Seongsu flagships and online (per brand IG); lookbook imagery is JS-rendered, item text not machine-readable",
+   "color": null,
+   "silhouette": null,
+   "material": null,
+   "keywords": [
+    "Fall 2026 Lookbook",
+    "first drop August 2026",
+    "Seoul flagship"
+   ],
+   "notes": "Page exists and is indexed (title 'Fall 2026 Lookbook'); content must be read via press coverage below. Season framed around '90s subculture, retro athletic + modern street utility.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "thisisneverthat (via Hypebeast)",
+   "source_type": "brand",
+   "source_url": "https://hypebeast.com/2026/8/hisisneverthat-fall-2026-collection-lookbook-release-info",
+   "publication_date": "2026-08",
+   "observation_type": "secondary",
+   "gender_relevance": "MEN",
+   "category": "outer",
+   "observed_item": "PERTEX SP-Logo windbreakers (reversible and tonal variations), VIK Pertex jackets, SKOGAR down pieces",
+   "color": "tonal variations",
+   "silhouette": "relaxed, transitional layering outerwear",
+   "material": "Pertex technical nylon, down insulation",
+   "keywords": [
+    "Pertex windbreaker",
+    "VIK jacket",
+    "SKOGAR down",
+    "reversible",
+    "technical weather gear"
+   ],
+   "notes": "Article published 2026-08-14; first drop available at publication. Transitional outerwear + technical weather gear named as season pillars.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "thisisneverthat (via Hypebeast)",
+   "source_type": "brand",
+   "source_url": "https://hypebeast.com/2026/8/hisisneverthat-fall-2026-collection-lookbook-release-info",
+   "publication_date": "2026-08",
+   "observation_type": "secondary",
+   "gender_relevance": "MEN",
+   "category": "tops",
+   "observed_item": "Washed denim shirts in autumn hues; washed polo shirts; signature graphic tees; casual graphic fleece layers",
+   "color": "burgundy, dark brown, indigo",
+   "silhouette": "relaxed",
+   "material": "vintage-washed fabrications, fleece",
+   "keywords": [
+    "washed denim shirt",
+    "washed polo",
+    "graphic fleece",
+    "vintage wash"
+   ],
+   "notes": "Washed treatment applied across both polos and denim shirts — a key top-item direction for FW26.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "thisisneverthat (via Hypebeast)",
+   "source_type": "brand",
+   "source_url": "https://hypebeast.com/2026/8/hisisneverthat-fall-2026-collection-lookbook-release-info",
+   "publication_date": "2026-08",
+   "observation_type": "secondary",
+   "gender_relevance": "MEN",
+   "category": "bottoms",
+   "observed_item": "Relaxed and loose-fit jeans in dusty navy, brown, and washed blue",
+   "color": "dusty navy, brown, washed blue",
+   "silhouette": "relaxed / loose fit",
+   "material": "vintage-washed denim",
+   "keywords": [
+    "loose-fit jeans",
+    "relaxed jeans",
+    "washed blue",
+    "dusty navy"
+   ],
+   "notes": "Styling message: 'effortless layering through relaxed silhouettes and vintage-washed fabrications'.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "thisisneverthat (via Stupiddope)",
+   "source_type": "brand",
+   "source_url": "https://stupiddope.com/2026/08/thisisneverthat-fall-2026-builds-a-layered-wardrobe-around-street-utility/",
+   "publication_date": "2026-08",
+   "observation_type": "secondary",
+   "gender_relevance": "MEN",
+   "category": "styling",
+   "observed_item": "Fall 2026 styled as a layered street-utility wardrobe: PERTEX outerwear over knitwear/fleece, paired with washed denim",
+   "color": null,
+   "silhouette": "layered, relaxed streetwear",
+   "material": "Pertex, down, fleece, washed denim, knitwear",
+   "keywords": [
+    "layered wardrobe",
+    "street utility",
+    "transitional dressing"
+   ],
+   "notes": "Confirms layering logic of lookbook: technical shell or down over fleece/knit tops, loose washed denim below.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "Covernat",
+   "source_type": "brand",
+   "source_url": "https://covernat.co.kr/product/collection.html?cate_no=3889",
+   "publication_date": "2026-08",
+   "observation_type": "direct",
+   "gender_relevance": "MIXED",
+   "category": "general",
+   "observed_item": "2026 F/W lookbook set live on brand site: '2026 FALL UNI', '2026 FALL WOMAN', '2026 FALL with SANA', '2026 FALL with SOOBIN'; '26 FALL' shop menu split into TOPS / OUTER / BOTTOM / ACC per ambassador line",
+   "color": null,
+   "silhouette": null,
+   "material": null,
+   "keywords": [
+    "26 FALL UNI",
+    "26 FALL WOMAN",
+    "After Aware",
+    "SANA",
+    "SOOBIN",
+    "1st drop August 19"
+   ],
+   "notes": "FW26 theme 'After Aware' announced on brand IG with 1st drop 2026-08-19; site confirms dedicated UNI (unisex) and WOMAN fall lines.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "Covernat",
+   "source_type": "brand",
+   "source_url": "https://covernat.co.kr/product/collection.html?cate_no=3889",
+   "publication_date": "2026-08",
+   "observation_type": "direct",
+   "gender_relevance": "MEN",
+   "category": "bottoms",
+   "observed_item": "Parachute cargo pants in Charcoal (우먼 파라슈트 카고 팬츠) carried in current lineup; pigment-dye tees, oatmeal colorway tees",
+   "color": "Charcoal, Oatmeal, Gray (pigment)",
+   "silhouette": "parachute cargo (voluminous)",
+   "material": "pigment-dye cotton, cool cotton",
+   "keywords": [
+    "parachute cargo pants",
+    "pigment dye",
+    "oatmeal",
+    "charcoal"
+   ],
+   "notes": "Items shown on collection page (summer carryover); naming shows brand's fit/color vocabulary: regular fit, pigment dye, parachute cargo.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "Covernat (via Instagram/YouTube summaries)",
+   "source_type": "brand",
+   "source_url": "https://www.instagram.com/p/DcH6nG4jo8_/",
+   "publication_date": "2026-08",
+   "observation_type": "secondary",
+   "gender_relevance": "MEN",
+   "category": "outer",
+   "observed_item": "26 FALL LOOKBOOK features OG series 'chair coat' (체어 코트) — outfit-design details with lowered-saturation color and washing effects vs previous Hamilton Brown",
+   "color": "lowered saturation tones (muted/washed)",
+   "silhouette": "outfit-designed coat",
+   "material": "washed cotton (washed effect stated)",
+   "keywords": [
+    "chair coat",
+    "OG series",
+    "low saturation",
+    "washing effect",
+    "After Aware"
+   ],
+   "notes": "Explicit brand statement that FW26 outer color direction is desaturated + washed vs prior seasons.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "Covernat WOMAN (via YouTube lookbook)",
+   "source_type": "brand",
+   "source_url": "https://www.youtube.com/watch?v=bjbUID_Bcdg",
+   "publication_date": "2026-08",
+   "observation_type": "secondary",
+   "gender_relevance": "WOMEN",
+   "category": "styling",
+   "observed_item": "COVERNAT WOMAN 26 FALL LOOKBOOK 'GENTLE MOMENTS — AUTUMN': relaxed silhouettes and natural layering shot on a fall ranch",
+   "color": null,
+   "silhouette": "relaxed, natural layering",
+   "material": null,
+   "keywords": [
+    "GENTLE MOMENTS",
+    "AUTUMN",
+    "relaxed silhouette",
+    "natural layering",
+    "ranch"
+   ],
+   "notes": "Women's FW26 styling direction: soft relaxed volume, understated layered looks in rural autumn setting.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "Mahagrid",
+   "source_type": "brand",
+   "source_url": "https://mahagrid.net/product/lookbook_list.html?cate_no=299",
+   "publication_date": "2026-08",
+   "observation_type": "secondary",
+   "gender_relevance": "MEN",
+   "category": "general",
+   "observed_item": "FW26 collection titled 'LAKE CHILD' (2026 F/W LOOKBOOK live on brand site; page shows lookbook thumbnail dated 2026-08)",
+   "color": null,
+   "silhouette": null,
+   "material": null,
+   "keywords": [
+    "LAKE CHILD",
+    "2026 F/W lookbook",
+    "MAHAGRID DESIGN STUDIO"
+   ],
+   "notes": "Lookbook list page confirms 2026 F/W section (cate_no=299); item-level text did not render in fetches (page timed out twice).",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "Mahagrid (via Instagram collection posts)",
+   "source_type": "brand",
+   "source_url": "https://www.instagram.com/p/DbsHKGuygtn/",
+   "publication_date": "2026-08",
+   "observation_type": "secondary",
+   "gender_relevance": "MEN",
+   "category": "outer",
+   "observed_item": "FW26 'LAKE CHILD' includes winter military coat; sibling 2026 A/W collection posts cite raincoat and Aurora Borealis-inspired prints; everyday essentials meet season-specific items",
+   "color": "Aurora Borealis print (multicolor)",
+   "silhouette": "military coat (heavy winter)",
+   "material": null,
+   "keywords": [
+    "winter military coat",
+    "raincoat",
+    "Aurora print",
+    "LAKE CHILD"
+   ],
+   "notes": "Post dated 2026-08-25 directing to mahagrid.com; military outer + allover nature print are the FW26 statements.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "Glowny",
+   "source_type": "brand",
+   "source_url": "https://en.glowny.co.kr/",
+   "publication_date": "2026-09",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "general",
+   "observed_item": "Homepage banner: 'FALL WINTER 26 / COMING SOON / PREVIEW NOW'; 26FW 'UNFILTERED; PRETTY' pre-release sold early in offline stores from Sept 4 (10% off)",
+   "color": null,
+   "silhouette": null,
+   "material": null,
+   "keywords": [
+    "FW26 UNFILTERED; PRETTY",
+    "preview now",
+    "pre-release September 4"
+   ],
+   "notes": "26FW theme is 'UNFILTERED; PRETTY' per brand store IG; global site still in preview/coming-soon state on 2026-09-09.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "Glowny",
+   "source_type": "brand",
+   "source_url": "https://en.glowny.co.kr/",
+   "publication_date": "2026-09",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "tops",
+   "observed_item": "Current bestseller tops entering FW: Mellow V-Neck Stripe Knit, Roan Layered Long Sleeve, Powder Corset Top, V-neck 3/4 sleeve tops ('Angel Puppy', 'Lost Girl', 'Off Duty Girl')",
+   "color": null,
+   "silhouette": "corset fit, layered long sleeve, 3/4 sleeve slim",
+   "material": "knit (V-neck stripe)",
+   "keywords": [
+    "V-neck stripe knit",
+    "corset top",
+    "layered long sleeve",
+    "3/4 sleeve"
+   ],
+   "notes": "Signal of FW top direction: fitted/romantic knits and V-necks rather than oversized tees.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "Glowny",
+   "source_type": "brand",
+   "source_url": "https://en.glowny.co.kr/",
+   "publication_date": "2026-09",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "bottoms",
+   "observed_item": "Damage Cinch Back Roll-Up Jeans; Polly Wrap Skort",
+   "color": null,
+   "silhouette": "cinch-back, roll-up hem, wrap skort",
+   "material": "denim (damaged wash)",
+   "keywords": [
+    "damage jeans",
+    "cinch back",
+    "roll-up",
+    "wrap skort"
+   ],
+   "notes": "Detail-led denim styling (cinch, roll-up, distress) is the women's denim statement.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "Matin Kim",
+   "source_type": "brand",
+   "source_url": "https://matinkim.shop/pages/transition-in-seoul",
+   "publication_date": "2026-08",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "general",
+   "observed_item": "MATIN KIM 2026 FALL COLLECTION 'TRANSITION IN SEOUL' — captures people welcoming seasonal transition against downtown Seoul; visualizes change through wind and motion, swaying garments and moving figures",
+   "color": null,
+   "silhouette": "movement/sway emphasized (flowing)",
+   "material": null,
+   "keywords": [
+    "Transition in Seoul",
+    "26 Autumn",
+    "wind and motion",
+    "swaying garments"
+   ],
+   "notes": "Collection page live; gallery is JS-rendered so item-level data unavailable. Companion drop: MATIN KIM x MOMO 2026 FALL 1ST 'IN MY COLOR'.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "COS (via Odalisque Magazine)",
+   "source_type": "brand",
+   "source_url": "https://odalisquemagazine.com/2026/08/18/cos-launches-autumn-winter-2026-campaign/",
+   "publication_date": "2026-08",
+   "observation_type": "secondary",
+   "gender_relevance": "MIXED",
+   "category": "colors",
+   "observed_item": "AW26 campaign palette: primarily monochromatic black and white, punctuated with surprising purple accents",
+   "color": "black, white, purple",
+   "silhouette": null,
+   "material": null,
+   "keywords": [
+    "monochrome",
+    "black and white",
+    "purple accents"
+   ],
+   "notes": "Campaign launched 2026-08-18; features Korean actor Park Gyuyoung as global ambassador — high Korea-visibility. Collection shows at NYFW on CFDA schedule.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "COS (via Odalisque Magazine)",
+   "source_type": "brand",
+   "source_url": "https://odalisquemagazine.com/2026/08/18/cos-launches-autumn-winter-2026-campaign/",
+   "publication_date": "2026-08",
+   "observation_type": "secondary",
+   "gender_relevance": "MIXED",
+   "category": "materials",
+   "observed_item": "Fabrics: cashmere, wool, leather, suede, waxed cotton, merino, crisp cotton",
+   "color": null,
+   "silhouette": "tailoring loosened through relaxed fits and fluid shapes",
+   "material": "cashmere, wool, leather, suede, waxed cotton, merino",
+   "keywords": [
+    "cashmere",
+    "waxed cotton",
+    "merino",
+    "suede",
+    "relaxed tailoring"
+   ],
+   "notes": "Tactile natural fibers are the FW26 material story.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "COS (via Odalisque + search catalog)",
+   "source_type": "brand",
+   "source_url": "https://www.cos.com/en-au/campaign/autumn-winter-2026-womenswear",
+   "publication_date": "2026-08",
+   "observation_type": "secondary",
+   "gender_relevance": "WOMEN",
+   "category": "tops",
+   "observed_item": "Cashmere funnel-neck jumper; crew-neck merino wool top; merino wool cardigan; fine merino knits; tuxedo-inspired wing-collar shirt with French cuffs",
+   "color": "black, white, purple",
+   "silhouette": "funnel neck, crew neck, fine gauge",
+   "material": "cashmere, merino wool",
+   "keywords": [
+    "funnel-neck jumper",
+    "merino top",
+    "merino cardigan",
+    "wing collar shirt"
+   ],
+   "notes": "Knit-first tops program; menswear side adds waxed-cotton trench and grained flight jacket.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "COS (via Odalisque + WhoWhatWear)",
+   "source_type": "brand",
+   "source_url": "https://www.whowhatwear.com/fashion/affordable/cos-early-autumn-buys-2026",
+   "publication_date": "2026-08",
+   "observation_type": "secondary",
+   "gender_relevance": "WOMEN",
+   "category": "bottoms",
+   "observed_item": "Wool-blend wide-leg pants; balloon tailored trousers; leather blouson styled over stirrup leggings and fine merino knits",
+   "color": null,
+   "silhouette": "wide-leg, balloon, stirrup legging",
+   "material": "wool blend, leather",
+   "keywords": [
+    "wide-leg pants",
+    "balloon trousers",
+    "stirrup leggings"
+   ],
+   "notes": "Two-pole bottom silhouette: volumetric (wide/balloon) or second-skin (stirrup); wide-leg named as expected sell-out.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "Uniqlo LifeWear (via L'Officiel Singapore)",
+   "source_type": "brand",
+   "source_url": "https://www.lofficielsingapore.com/fashion/highlights-from-uniqlo-fall-winter-2026-collection-knitwear-outerwear-fashion-style",
+   "publication_date": "2026-08",
+   "observation_type": "secondary",
+   "gender_relevance": "MIXED",
+   "category": "colors",
+   "observed_item": "FW26 LifeWear palette: vibrant red and energetic blue accenting classic warm brown base",
+   "color": "warm brown, vibrant red, energetic blue",
+   "silhouette": null,
+   "material": null,
+   "keywords": [
+    "warm brown",
+    "vibrant red",
+    "energetic blue",
+    "LifeWear FW26"
+   ],
+   "notes": "Catalog coverage published 2026-08-14. Same color family as thisisneverthat's burgundy/brown/indigo autumn tones.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "Uniqlo LifeWear (via L'Officiel Singapore)",
+   "source_type": "brand",
+   "source_url": "https://www.lofficielsingapore.com/fashion/highlights-from-uniqlo-fall-winter-2026-collection-knitwear-outerwear-fashion-style",
+   "publication_date": "2026-08",
+   "observation_type": "secondary",
+   "gender_relevance": "MEN",
+   "category": "outer",
+   "observed_item": "PUFFTECH jackets, down jackets, faux sheepskin coats, fleece; Harrington Jacket, Blouson Jacket, Light Down Volume Jacket, Seamless Down Jacket, Reversible Down Short Jacket",
+   "color": "warm brown base, red/blue accents",
+   "silhouette": "volume down (Light Down Volume), blouson, Harrington, reversible",
+   "material": "PUFFTECH synthetic padding, down, faux sheepskin, fleece",
+   "keywords": [
+    "PUFFTECH",
+    "Harrington",
+    "blouson",
+    "light down volume",
+    "faux sheepskin",
+    "reversible down"
+   ],
+   "notes": "Outerwear is the headline category; multiple padding technologies at opening price points.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "Uniqlo LifeWear (via L'Officiel Singapore)",
+   "source_type": "brand",
+   "source_url": "https://www.lofficielsingapore.com/fashion/highlights-from-uniqlo-fall-winter-2026-collection-knitwear-outerwear-fashion-style",
+   "publication_date": "2026-08",
+   "observation_type": "secondary",
+   "gender_relevance": "MIXED",
+   "category": "tops",
+   "observed_item": "Souffle Yarn and Merino wool knitwear (turtlenecks, cable crew neck); flannel shirts; corduroy pieces; HEATTECH inner layers",
+   "color": "warm brown, red, blue",
+   "silhouette": null,
+   "material": "Souffle yarn, merino wool, flannel, corduroy, HEATTECH",
+   "keywords": [
+    "Souffle yarn knit",
+    "merino turtleneck",
+    "cable crew neck",
+    "flannel shirt",
+    "corduroy",
+    "HEATTECH layering"
+   ],
+   "notes": "Brand layering formula: HEATTECH top + fleece/tee + lightweight jacket = FW26 styling education.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "Uniqlo LifeWear (via L'Officiel Singapore)",
+   "source_type": "brand",
+   "source_url": "https://www.lofficielsingapore.com/fashion/highlights-from-uniqlo-fall-winter-2026-collection-knitwear-outerwear-fashion-style",
+   "publication_date": "2026-08",
+   "observation_type": "secondary",
+   "gender_relevance": "MIXED",
+   "category": "bottoms",
+   "observed_item": "Men's cargo pants, wide tuck pants; denim in Slim Fit Straight Leg and High-Waist Wide Leg",
+   "color": null,
+   "silhouette": "cargo, wide tuck, slim straight, high-waist wide leg",
+   "material": "denim",
+   "keywords": [
+    "cargo pants",
+    "wide tuck pants",
+    "slim fit straight leg denim",
+    "high-waist wide leg denim"
+   ],
+   "notes": "Two-track denim strategy (slim straight + high-waist wide) signals both poles are being merchandised for FW26.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "Uniqlo (Clare Waight Keller line, via L'Officiel)",
+   "source_type": "brand",
+   "source_url": "https://www.lofficielsingapore.com/fashion/highlights-from-uniqlo-fall-winter-2026-collection-knitwear-outerwear-fashion-style",
+   "publication_date": "2026-08",
+   "observation_type": "secondary",
+   "gender_relevance": "WOMEN",
+   "category": "general",
+   "observed_item": "Women's Lounge & Innerwear by Clare Waight Keller FW26: 'Effortless Charm' and 'Minimalist Classic' themes",
+   "color": null,
+   "silhouette": "lounge/relaxed innerwear",
+   "material": null,
+   "keywords": [
+    "Clare Waight Keller",
+    "Effortless Charm",
+    "Minimalist Classic",
+    "lounge"
+   ],
+   "notes": "Designer capsule framing FW26 women's relaxed minimalism.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "Andersson Bell",
+   "source_type": "brand",
+   "source_url": "https://adsb.co.kr",
+   "publication_date": "2026-09",
+   "observation_type": "direct",
+   "gender_relevance": "MIXED",
+   "category": "general",
+   "observed_item": "Brand site live (Shopify) but FW26 collection page not yet published — 2026 archive shows only S/S 26; FW26 lookbook pending",
+   "color": null,
+   "silhouette": null,
+   "material": null,
+   "keywords": [
+    "FW26 not yet live",
+    "S/S 26 latest"
+   ],
+   "notes": "Brand announced FW26 unveiling across Paris (Mar 5-10), Tokyo (Mar 16-20), Shanghai (Mar 25-30) via official IG.",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "Andersson Bell (via search/press)",
+   "source_type": "brand",
+   "source_url": "https://www.instagram.com/p/DVanI4YCVJm/",
+   "publication_date": "2026-03",
+   "observation_type": "secondary",
+   "gender_relevance": "MIXED",
+   "category": "general",
+   "observed_item": "FW26 celebrated 10th anniversary with Milan Fashion Week debut around 'LAB + LIFE' concept; a tagged FW26 item: 'Trompe L'oeil Denim Layered Tattoo Top'",
+   "color": null,
+   "silhouette": "trompe l'oeil layered look (built-in layering)",
+   "material": "denim + knit hybrid",
+   "keywords": [
+    "LAB + LIFE",
+    "Milan debut",
+    "trompe l'oeil",
+    "tattoo top",
+    "layered"
+   ],
+   "notes": "Item-level FW26 detail is sparse; hybrid/trompe-l'oeil novelty tops consistent with brand's hybrid construction DNA (S/S26 had wrongly-buttoned tops, endless layering).",
+   "record_family": "brand"
+  },
+  {
+   "source_name": "Aj 패션로그 (Tistory)",
+   "source_type": "community",
+   "source_url": "https://luzien2.tistory.com/entry/2026-가을-남성-패션-트렌드-총정리",
+   "publication_date": "2026-08-24",
+   "observation_type": "direct",
+   "gender_relevance": "MEN",
+   "category": "styling",
+   "observed_item": "5 key F/W trends: 소프트 테일러링 (unstructured blazer + drape pants + round knit), retro heritage (아가일 니트, 체크 오버셔츠, 레더 블루종, 매트 스웨이드), 쿼터 집업/스웨터 베스트 layered over white tee or Oxford shirt",
+   "color": "camel, chocolate brown, charcoal + deep burgundy point (scarf/socks/single knit)",
+   "silhouette": "drop shoulder, wide/curved fit, 1-2 tuck pleated wide pants, tapered slacks",
+   "material": "brushed wool, tweed, tartan check, corduroy, textured leather, matte suede; advises wool 70%+ over acrylic",
+   "keywords": [
+    "소프트 테일러링",
+    "레더 블루종",
+    "쿼터 집업",
+    "스웨터 베스트",
+    "드레이프 팬츠",
+    "브러쉬드 울",
+    "아가일",
+    "딥 버건디"
+   ],
+   "notes": "CLAIM (blogger trend round-up, not street observation). Full text fetched directly.",
+   "record_family": "community"
+  },
+  {
+   "source_name": "패션&뷰티 인사이드 (dongseox.com)",
+   "source_type": "community",
+   "source_url": "https://dongseox.com/entry/%F0%9F%8D%82-2026-%EA%B0%80%EC%9D%84-%EB%82%A8%EC%9E%90-%EC%BD%94%EB%94%94-%EC%9D%B4-%EA%B3%B5%EC%8B%9D-%ED%95%98%EB%82%98%EB%A9%B4-%EB%81%9D%EB%82%98%EC%9A%94",
+   "publication_date": "2026-08-26",
+   "observation_type": "direct",
+   "gender_relevance": "MEN",
+   "category": "styling",
+   "observed_item": "Outfit formulas: 출근 cotton blazer+slacks+loafers; 데이트 knit cardigan+straight denim+sneakers; 캐주얼 hoodie+balmacaan coat+cargo pants. Keywords 그래놀라 코어 (functional outer + knit) and 패러독스 드레싱 (sporty + classic coat)",
+   "color": "camel, khaki, burgundy, charcoal; 'Transformative Teal' as accent/accessory only; max 2-3 colors per outfit",
+   "silhouette": "CLAIMS wide-fit denim trend is over and '클래식 스트레이트 데님이 다시 떠올랐어요' (straight denim back); warns against double oversized",
+   "material": "not emphasized",
+   "keywords": [
+    "그래놀라 코어",
+    "패러독스 드레싱",
+    "발마칸 코트",
+    "코튼 블레이저",
+    "니트 카디건",
+    "스트레이트 데님"
+   ],
+   "notes": "CLAIM. Full text fetched directly. Directly contradicts luzien2 (same fortnight) which still recommends wide/curved pants — blogger disagreement over wide vs straight is itself a signal of transition.",
+   "record_family": "community"
+  },
+  {
+   "source_name": "슈슈의 스타일로그 (Naver blog, citing stylist YouTube 옆집언니 최실장)",
+   "source_type": "community",
+   "source_url": "https://m.blog.naver.com/mongi3415/224401228017",
+   "publication_date": "2026-09-04",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "styling",
+   "observed_item": "10 F/W 2026 trends: skinny/cigarette pants return, 정핏 (exact-fit) jackets, shirt collar+cuffs layered out over knits/jackets (unbalanced one-collar styling), peplum, pencil skirt, check mix-match, 3D flower decorations, sporty mix (windbreaker over slacks/skirt), sheer layering, shoulder-drape muffler",
+   "color": "not specified",
+   "silhouette": "explicit slim-regression: '전체 실루엣이 다시 슬림해지는 흐름'; narrow shoulders, shorter sleeves",
+   "material": "leather, mouton, nylon, tulle, PVC, bead decoration",
+   "keywords": [
+    "스키니 회귀",
+    "시가렛 팬츠",
+    "정핏",
+    "펜슬 스커트",
+    "페플럼",
+    "셔츠 레이어링",
+    "체크 믹스매치",
+    "시스루 레이어드"
+   ],
+   "notes": "CLAIM (stylist YouTube content re-blogged). Full text fetched directly. Dated inside target window.",
+   "record_family": "community"
+  },
+  {
+   "source_name": "Naver blog semi169 (2026 가을 옷 뭐 사지?)",
+   "source_type": "community",
+   "source_url": "https://m.blog.naver.com/semi169/224391867788",
+   "publication_date": "2026-08-27",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "styling",
+   "observed_item": "'Buy only 6' list: brown or check blazer, quality basic knit, semi-wide slacks, one point-color item, dark brown loafers, structured bag/scarf. Layer combos named: shirt+knit, knit+jacket, thin turtleneck+cardigan, knit+skirt. Also: brown leather bomber + Oxford shirt + denim called a revived classic; lace camisole under jackets as key F/W item",
+   "color": "basics in gray/cream/brown/charcoal/navy; point colors burgundy, cobalt blue, royal purple, butter yellow, peach, turquoise; rule '기본색 80% + 유행색 20%'",
+   "silhouette": "semi-wide slacks (fitted waist falling straight from hip); oversized top + streamlined bottom (and vice versa)",
+   "material": "soft low-pilling knit fabric prioritized over design; suede pants named among trends",
+   "keywords": [
+    "브라운 블레이저",
+    "체크 블레이저",
+    "세미 와이드 슬랙스",
+    "다크브라운 로퍼",
+    "버건디",
+    "코발트 블루",
+    "레이스 카미솔",
+    "레더 봄버"
+   ],
+   "notes": "CLAIM (shopping-guide blog). Full text fetched directly. Dated inside target window.",
+   "record_family": "community"
+  },
+  {
+   "source_name": "미래스타일리스트 한결 (Naver blog)",
+   "source_type": "community",
+   "source_url": "https://m.blog.naver.com/naphg05/224143962799",
+   "publication_date": "2026-01-12",
+   "observation_type": "direct",
+   "gender_relevance": "WOMEN",
+   "category": "general",
+   "observed_item": "2026 forecast: wide/straight pants as settled default ('편함의 정착'), lace skirts, balloon skirts, drop-waist 'refined retro'; buy list includes mid-width wide denim, straight wool slacks, straight cotton, corduroy; skip list: chunky ugly sneakers, micro bags, loud Y2K points ('already finished consuming')",
+   "color": "monochrome coexisting with lime/vivid; basics black/white/navy/brown/gray for bags-outer-shoes",
+   "silhouette": "medium wide, low-rise relaxed; slinky drop-waist dresses",
+   "material": "wool mary janes, leather bags, lace as texture not decoration",
+   "keywords": [
+    "리파인드 레트로",
+    "벌룬 스커트",
+    "말차 코어",
+    "모노크롬",
+    "와이드 스트레이트 팬츠"
+   ],
+   "notes": "CLAIM. Full text fetched directly. NOTE: published Jan 2026 (forecast for the year, not fall-specific) — used as baseline only.",
+   "record_family": "community"
+  },
+  {
+   "source_name": "trace0426의 티스토리 (20대 남자 가을 코디 완전정복)",
+   "source_type": "community",
+   "source_url": "https://trace0426.tistory.com/40",
+   "publication_date": "2025-10-02",
+   "observation_type": "direct",
+   "gender_relevance": "MEN",
+   "category": "styling",
+   "observed_item": "6 outfit formulas for men in 20s: cream turtleneck knit + corduroy pants + loafers/Chelsea boots; half-zip knit + straight denim + down vest; white Oxford shirt + beige chino + navy knit + trench + white sneakers; flannel check shirt over raglan sweatshirt + denim",
+   "color": "brown, camel, burgundy, olive + neutrals",
+   "silhouette": "relaxed top / straight or slim bottom",
+   "material": "cotton, wool blend, tweed, corduroy",
+   "keywords": [
+    "터틀넥 니트",
+    "코듀로이 팬츠",
+    "하프집업",
+    "셔츠 레이어링",
+    "첼시 부츠",
+    "트렌치코트"
+   ],
+   "notes": "CLAIM. Full text fetched directly. NOTE: dated fall 2025 — one season older than window; included as prior-season baseline, not as 2026 evidence.",
+   "record_family": "community"
+  },
+  {
+   "source_name": "YouTube '패션 참고하기 좋은 2026년 남자 가을 코디 no.13' (search-result title+description)",
+   "source_type": "community",
+   "source_url": "https://www.youtube.com/watch?v=YYfVpPchG7I",
+   "publication_date": "unknown",
+   "observation_type": "secondary",
+   "gender_relevance": "MEN",
+   "category": "outer",
+   "observed_item": "Musinsa Standard '신세틱 스웨이드 미니멀 블루종 재킷' (synthetic suede minimal blouson jacket, 123,390 KRW) featured in a 2026 fall menswear lookbook episode",
+   "color": "unknown",
+   "silhouette": "minimal blouson",
+   "material": "synthetic suede",
+   "keywords": [
+    "블루종",
+    "스웨이드",
+    "무신사스탠다드",
+    "가을 코디"
+   ],
+   "notes": "Evidence from search-result title/description only (video not watched, per method). Title asserts 2026 fall; upload date not confirmed.",
+   "record_family": "community"
+  },
+  {
+   "source_name": "YouTube '패션 참고하기 좋은 2026년 남자 가을 코디 no.8' (search-result title+description)",
+   "source_type": "community",
+   "source_url": "https://www.youtube.com/watch?v=xZdSEJiOWQM",
+   "publication_date": "unknown",
+   "observation_type": "secondary",
+   "gender_relevance": "MEN",
+   "category": "bottoms",
+   "observed_item": "Musinsa Standard '와이드 히든 밴딩 슬랙스' (wide hidden-banding slacks, 39,900 KRW) paired with Haruta penny loafers",
+   "color": "unknown",
+   "silhouette": "wide slacks",
+   "material": "unknown",
+   "keywords": [
+    "와이드 슬랙스",
+    "페니로퍼",
+    "무신사스탠다드"
+   ],
+   "notes": "Evidence from search-result title/description only. Shows wide slacks + penny loafers still being merchandised for fall 2026 menswear.",
+   "record_family": "community"
+  },
+  {
+   "source_name": "YouTube '남자 9월 느좋 가을 코디 10가지 추천' (search-result title+description)",
+   "source_type": "community",
+   "source_url": "https://www.youtube.com/watch?v=CMKflTTvsEs",
+   "publication_date": "unknown",
+   "observation_type": "secondary",
+   "gender_relevance": "MEN",
+   "category": "styling",
+   "observed_item": "10 September '느좋' (vibe-good) fall outfits for men, timestamped looks with height/weight info",
+   "color": "unknown",
+   "silhouette": "unknown",
+   "material": "unknown",
+   "keywords": [
+    "9월 가을 코디",
+    "남자 데일리룩"
+   ],
+   "notes": "Title/description only. Confirms September-dated menswear outfit content volume.",
+   "record_family": "community"
+  },
+  {
+   "source_name": "YouTube Musinsa-collab lookbook '느슨해진 룩북씬에 긴장감을 주는 가성비 가을 코디' (search-result title+description)",
+   "source_type": "community",
+   "source_url": "https://www.youtube.com/watch?v=z6bk6Hkrn1Y",
+   "publication_date": "unknown",
+   "observation_type": "secondary",
+   "gender_relevance": "MIXED",
+   "category": "general",
+   "observed_item": "Musinsa-branded fall lookbook series (#무신사 #가을룩북 #가을코디 #가성비), one-week daily-look format; title frames the lookbook scene as 'loosening up' (느슨해진)",
+   "color": "unknown",
+   "silhouette": "title suggests relaxed/loose fits dominant in lookbook scene",
+   "material": "unknown",
+   "keywords": [
+    "무신사",
+    "가을룩북",
+    "가성비 코디"
+   ],
+   "notes": "Title/description only. Commercial platform (Musinsa) actively publishing fall-2026 lookbook content.",
+   "record_family": "community"
+  },
+  {
+   "source_name": "GQ Korea '옷 잘 입는 남자들의 옷장에서 찾은, 2026년 가을의 포인트 아이템 20'",
+   "source_type": "media",
+   "source_url": "https://www.gqkorea.co.kr/2026/08/28/",
+   "publication_date": "2026-08-28",
+   "observation_type": "secondary",
+   "gender_relevance": "MEN",
+   "category": "outer",
+   "observed_item": "Point items for fall 2026 drawn from well-dressed men's actual wardrobes; search snippet highlights suede jacket incl. reversible suede blouson, and styling advice: oversized knit worn like a T-shirt with straight denim or black slacks",
+   "color": "unknown",
+   "silhouette": "roomy knit treated as a top layer over straight-leg bottoms",
+   "material": "suede",
+   "keywords": [
+    "스웨이드 재킷",
+    "블루종",
+    "니트 스트레이트 진",
+    "포인트 아이템"
+   ],
+   "notes": "Evidence via search-result snippets; direct fetch of the archive URL returned only site navigation, article body not retrieved. Publication date confirmed by URL path (2026/08/28).",
+   "record_family": "community"
+  },
+  {
+   "source_name": "Vogue Korea '평범하거나 화려하거나! 올가을 입고 싶은 모든 니트'",
+   "source_type": "media",
+   "source_url": "https://www.vogue.co.kr/ (article surfaced via search; exact slug not captured)",
+   "publication_date": "2026-09-03",
+   "observation_type": "secondary",
+   "gender_relevance": "GENDERLESS",
+   "category": "tops",
+   "observed_item": "Fall 2026 knit guide; V-neck knit framed as the fall must-have versatile item",
+   "color": "unknown",
+   "silhouette": "unknown",
+   "material": "knitwear (incl. wool 100% classic knits per related GQ piece)",
+   "keywords": [
+    "브이넥 니트",
+    "가을 니트"
+   ],
+   "notes": "Evidence via search-result snippet only (dated 2026.9.3 in search result). Not fetched directly.",
+   "record_family": "community"
+  },
+  {
+   "source_name": "Threads @odhfashion '2026년 남자 가을 코디 Part.4'",
+   "source_type": "community",
+   "source_url": "https://www.threads.com/@odhfashion/post/Dclc6cpGETH/",
+   "publication_date": "2026-08-28",
+   "observation_type": "direct",
+   "gender_relevance": "MEN",
+   "category": "styling",
+   "observed_item": "Pinterest-sourced men's fall outfit compilation post (Part.4 of a series); search snippet lists 울 블렌드 니트 (wool-blend knit) and 오버핏 스웨트셔츠 (oversized sweatshirt)",
+   "color": "unknown",
+   "silhouette": "oversized (per sweatshirt item)",
+   "material": "wool blend",
+   "keywords": [
+    "남자가을코디",
+    "울 블렌드 니트",
+    "오버핏 스웨트셔츠"
+   ],
+   "notes": "Post existence and date confirmed by direct fetch; body is image-based (no text items on page) — item names come from the search-result snippet. Engagement low (2 likes) — single small account, weak popularity signal.",
+   "record_family": "community"
+  },
+  {
+   "source_name": "Reddit r/seoul 'What defines Korean Youth Fashion in 2026?'",
+   "source_type": "community",
+   "source_url": "https://www.reddit.com/r/seoul/comments/1q81oij/what_defines_korean_youth_fashion_in_2026_share/",
+   "publication_date": "unknown",
+   "observation_type": "secondary",
+   "gender_relevance": "MIXED",
+   "category": "general",
+   "observed_item": "Community discussion of 2026 Korean youth fashion; search snippet indicates commenters noting a shift toward comfort-focused styles",
+   "color": "unknown",
+   "silhouette": "comfort-focused",
+   "material": "unknown",
+   "keywords": [
+    "Korean youth fashion 2026",
+    "comfort"
+   ],
+   "notes": "DIRECT FETCH BLOCKED (timeout / network security block) — SOURCE_UNAVAILABLE for full thread. Snippet only. Reddit r/KoreanFashion produced no retrievable fall-2026 threads in any search; Reddit coverage in this report is therefore thin.",
+   "record_family": "community"
+  },
+  {
+   "source_name": "Stay Enko 'What to Wear in South Korea in 2026'",
+   "source_type": "media",
+   "source_url": "https://stay.enko.kr/blog/en/what-to-wear-in-south-korea-in-2026-seasonal-fashion-tips-for-visitors/",
+   "publication_date": "2026-06-29",
+   "observation_type": "secondary",
+   "gender_relevance": "MIXED",
+   "category": "general",
+   "observed_item": "Fall (Sep-Nov) in Korea: blazers, sweater vests, long cardigans, muted-tone knits, tapered slacks or jeans, midi skirts, loafers, ankle boots; earthing palette olive/maroon/tan/charcoal with scarves; avoid chunky dad sneakers",
+   "color": "olive, maroon, tan, charcoal (muted/earthy)",
+   "silhouette": "tapered trousers, midi skirts",
+   "material": "unknown",
+   "keywords": [
+    "sweater vest",
+    "tapered slacks",
+    "loafers",
+    "ankle boots",
+    "earthy palette"
+   ],
+   "notes": "Full fall section fetched directly. CLAIM by a visitor-oriented living guide (English, expat/tourist lens) — corroborating, not primary street evidence.",
+   "record_family": "community"
+  },
+  {
+   "source_name": "Instagram reel (QUEEN CLOSET / 블루종 코디 account) via search snippet",
+   "source_type": "community",
+   "source_url": "https://www.instagram.com/reel/DVVzJCbkSR6/",
+   "publication_date": "unknown",
+   "observation_type": "secondary",
+   "gender_relevance": "WOMEN",
+   "category": "outer",
+   "observed_item": "Blouson styling reel: '레더 재킷 → 강한 존재감 / 블루종 → 데일리 활용도'; 2026 key silhouette described as 넓은 어깨 + 잘록한 허리 (broad shoulders, cinched waist via belt/seaming)",
+   "color": "unknown",
+   "silhouette": "broad shoulder + cinched waist",
+   "material": "leather, soft PU",
+   "keywords": [
+    "블루종",
+    "레더 재킷",
+    "파워숄더",
+    "허리라인"
+   ],
+   "notes": "Instagram direct fetch not attempted (platform blocks non-logged access) — SOURCE_UNAVAILABLE; evidence is search-result snippet text only. Weak date attribution.",
+   "record_family": "community"
+  },
+  {
+   "source_name": "Naver blog coygray '40대 남자 가을 코디'",
+   "source_type": "community",
+   "source_url": "https://blog.naver.com/coygray/224059136665",
+   "publication_date": "unknown",
+   "observation_type": "secondary",
+   "gender_relevance": "MEN",
+   "category": "styling",
+   "observed_item": "Cozy wool knit matched with warm wide slacks; snippet notes '최근에는 이런 와이드 하면서 밑으로…' (recently wide, falling…)",
+   "color": "unknown",
+   "silhouette": "wide slacks",
+   "material": "wool",
+   "keywords": [
+    "울 니트",
+    "와이드 슬랙스"
+   ],
+   "notes": "Desktop Naver blog body iframe-blocked (title only retrievable); snippet from search. AGE CAVEAT: subject is 40s, outside the 20s-30s target — corroboration only.",
+   "record_family": "community"
+  },
+  {
+   "source_name": "Naver blog yoojin-gz '2026 가을 슬래커코어' (search snippet)",
+   "source_type": "community",
+   "source_url": "https://blog.naver.com/yoojin-gz/224390017534",
+   "publication_date": "unknown",
+   "observation_type": "secondary",
+   "gender_relevance": "MIXED",
+   "category": "general",
+   "observed_item": "Fall 2026 'slackercore' trend guide (post ID sequence suggests late-Aug/Sep 2026 publication)",
+   "color": "unknown",
+   "silhouette": "unknown",
+   "material": "unknown",
+   "keywords": [
+    "슬래커코어",
+    "slackercore",
+    "2026 가을"
+   ],
+   "notes": "Snippet only — body not fetched (desktop Naver iframe). Name echoes the '그래놀라 코어'/comfort trend naming cluster.",
+   "record_family": "community"
+  }
+ ],
+ "source_registry": [
+  {
+   "source_name": "Vogue Korea",
+   "source_type": "editorial",
+   "url": "https://www.vogue.co.kr/2026/08/31/판타지와-현실을-오가는-2026-가을-겨울-주요-트렌드/",
+   "publication_date": "2026-08-31",
+   "family": "editorial"
+  },
+  {
+   "source_name": "Vogue Korea",
+   "source_type": "editorial",
+   "url": "https://www.vogue.co.kr/2026/09/08/2026-가을-겨울-남성복-트렌드-12/",
+   "publication_date": "2026-09-08",
+   "family": "editorial"
+  },
+  {
+   "source_name": "Vogue Korea",
+   "source_type": "editorial",
+   "url": "https://www.vogue.co.kr/2026/09/08/새로운-남성복-실루엣이-등장하고-있다/",
+   "publication_date": "2026-09-08",
+   "family": "editorial"
+  },
+  {
+   "source_name": "Elle Korea",
+   "source_type": "editorial",
+   "url": "https://www.elle.co.kr/article/1906519",
+   "publication_date": "2026-09",
+   "family": "editorial"
+  },
+  {
+   "source_name": "Elle Korea",
+   "source_type": "editorial",
+   "url": "https://www.elle.co.kr/article/1908852",
+   "publication_date": "2026-09",
+   "family": "editorial"
+  },
+  {
+   "source_name": "Harper's Bazaar Korea",
+   "source_type": "editorial",
+   "url": "https://www.harpersbazaar.co.kr/article/1908528",
+   "publication_date": "2026-08-30",
+   "family": "editorial"
+  },
+  {
+   "source_name": "Harper's Bazaar Korea",
+   "source_type": "editorial",
+   "url": "https://www.harpersbazaar.co.kr/article/1908522",
+   "publication_date": "2026-08",
+   "family": "editorial"
+  },
+  {
+   "source_name": "Harper's Bazaar Korea",
+   "source_type": "editorial",
+   "url": "https://www.harpersbazaar.co.kr/article/1908521",
+   "publication_date": "2026-08",
+   "family": "editorial"
+  },
+  {
+   "source_name": "W Korea",
+   "source_type": "editorial",
+   "url": "https://www.wkorea.com/2026/08/27/올가을-블랙을-입는-방법이-조금-달라집니다/",
+   "publication_date": "2026-08-27",
+   "family": "editorial"
+  },
+  {
+   "source_name": "Marie Claire Korea",
+   "source_type": "editorial",
+   "url": "https://www.marieclairekorea.com/fashion/2026/09/2026-f-w/",
+   "publication_date": "2026-09",
+   "family": "editorial"
+  },
+  {
+   "source_name": "Vogue.com (international)",
+   "source_type": "editorial",
+   "url": "https://www.vogue.com/article/fall-2026-color-trends",
+   "publication_date": "unknown",
+   "family": "editorial"
+  },
+  {
+   "source_name": "Vogue.com (international)",
+   "source_type": "editorial",
+   "url": "https://www.vogue.com/article/fall-winter-2026-fashion-trends",
+   "publication_date": "unknown",
+   "family": "editorial"
+  },
+  {
+   "source_name": "Elle Korea",
+   "source_type": "editorial",
+   "url": "https://www.elle.co.kr/article/1906596",
+   "publication_date": "2026-09",
+   "family": "editorial"
+  },
+  {
+   "source_name": "Musinsa Editorial - 무신사 에디터 픽, 2026 인기 트렌드",
+   "source_type": "commerce",
+   "url": "https://www.musinsa.com/content/1452877813830509855",
+   "publication_date": "2026-01-05 (observed 2026-09-09)",
+   "family": "commerce"
+  },
+  {
+   "source_name": "Musinsa Editorial - 지금 알아야 할 2026 패션 트렌드 3",
+   "source_type": "commerce",
+   "url": "https://www.musinsa.com/content/1460916785052579323",
+   "publication_date": "2026-01-15 (observed 2026-09-09)",
+   "family": "commerce"
+  },
+  {
+   "source_name": "Musinsa Editorial - 고감도 브랜드 26FW 신상 (FA26 season launch)",
+   "source_type": "commerce",
+   "url": "https://www.musinsa.com/content/1541751438425673057",
+   "publication_date": "posted 2026-08-24; on-page coupon window 09.01-09.09 (observed 2026-09-09)",
+   "family": "commerce"
+  },
+  {
+   "source_name": "29CM 판매 데이터 - 스웨이드 아우터 (via TENANT news)",
+   "source_type": "commerce",
+   "url": "https://tnnews.co.kr/archives/291079",
+   "publication_date": "2026-08-20 (data window 2026-08-07 to 08-18)",
+   "family": "commerce"
+  },
+  {
+   "source_name": "Zigzag 2026 여름 소비 트렌드 결산 (via Apparelnews)",
+   "source_type": "commerce",
+   "url": "https://m.apparelnews.co.kr/news/news_view/?idx=227471",
+   "publication_date": "2026-09-08 (data window 2026-06-01 to 08-31)",
+   "family": "commerce"
+  },
+  {
+   "source_name": "Musinsa Girls - 미리 확인하는 올가을 트렌드",
+   "source_type": "commerce",
+   "url": "https://www.musinsa.com/content/1407554592982536188",
+   "publication_date": "2025-08-25 (campaign 08.25-09.04; observed 2026-09-09)",
+   "family": "commerce"
+  },
+  {
+   "source_name": "Musinsa Girls - 가을 니트 플레이리스트",
+   "source_type": "commerce",
+   "url": "https://m.musinsa.com/content/1426880479377769932",
+   "publication_date": "2025-10-14 (observed 2026-09-09)",
+   "family": "commerce"
+  },
+  {
+   "source_name": "Musinsa - 58만 조회수 인기 코디 (coordination ranking analysis)",
+   "source_type": "commerce",
+   "url": "https://www.musinsa.com/content/1475353204361786440",
+   "publication_date": "2026-02-23 (coordination views ranked 2025-01-19 to 2026-02-18; observed 2026-09-09)",
+   "family": "commerce"
+  },
+  {
+   "source_name": "Cross-retailer autumn demand surge cluster (Newsis/Seoul Economic/Money Today headlines via search)",
+   "source_type": "commerce",
+   "url": "https://www.newsis.com/view/NISX20260821_0003757752",
+   "publication_date": "2026-08-20/23 headlines (observed via search 2026-09-09; article body NOT fetched - timeout)",
+   "family": "commerce"
+  },
+  {
+   "source_name": "LF / Isabel Marant fall outer expansion (Daily Fashion News via Daum)",
+   "source_type": "commerce",
+   "url": "https://v.daum.net/v/20260822075149300",
+   "publication_date": "2026-08-22 (observed via search snippet 2026-09-09; full page not fetched)",
+   "family": "commerce"
+  },
+  {
+   "source_name": "thisisneverthat",
+   "source_type": "brand",
+   "url": "https://intl.thisisneverthat.com/features/lookbook/fall-2026-lookbook",
+   "publication_date": "2026-08",
+   "family": "brand"
+  },
+  {
+   "source_name": "thisisneverthat (via Hypebeast)",
+   "source_type": "brand",
+   "url": "https://hypebeast.com/2026/8/hisisneverthat-fall-2026-collection-lookbook-release-info",
+   "publication_date": "2026-08",
+   "family": "brand"
+  },
+  {
+   "source_name": "thisisneverthat (via Stupiddope)",
+   "source_type": "brand",
+   "url": "https://stupiddope.com/2026/08/thisisneverthat-fall-2026-builds-a-layered-wardrobe-around-street-utility/",
+   "publication_date": "2026-08",
+   "family": "brand"
+  },
+  {
+   "source_name": "Covernat",
+   "source_type": "brand",
+   "url": "https://covernat.co.kr/product/collection.html?cate_no=3889",
+   "publication_date": "2026-08",
+   "family": "brand"
+  },
+  {
+   "source_name": "Covernat (via Instagram/YouTube summaries)",
+   "source_type": "brand",
+   "url": "https://www.instagram.com/p/DcH6nG4jo8_/",
+   "publication_date": "2026-08",
+   "family": "brand"
+  },
+  {
+   "source_name": "Covernat WOMAN (via YouTube lookbook)",
+   "source_type": "brand",
+   "url": "https://www.youtube.com/watch?v=bjbUID_Bcdg",
+   "publication_date": "2026-08",
+   "family": "brand"
+  },
+  {
+   "source_name": "Mahagrid",
+   "source_type": "brand",
+   "url": "https://mahagrid.net/product/lookbook_list.html?cate_no=299",
+   "publication_date": "2026-08",
+   "family": "brand"
+  },
+  {
+   "source_name": "Mahagrid (via Instagram collection posts)",
+   "source_type": "brand",
+   "url": "https://www.instagram.com/p/DbsHKGuygtn/",
+   "publication_date": "2026-08",
+   "family": "brand"
+  },
+  {
+   "source_name": "Glowny",
+   "source_type": "brand",
+   "url": "https://en.glowny.co.kr/",
+   "publication_date": "2026-09",
+   "family": "brand"
+  },
+  {
+   "source_name": "Matin Kim",
+   "source_type": "brand",
+   "url": "https://matinkim.shop/pages/transition-in-seoul",
+   "publication_date": "2026-08",
+   "family": "brand"
+  },
+  {
+   "source_name": "COS (via Odalisque Magazine)",
+   "source_type": "brand",
+   "url": "https://odalisquemagazine.com/2026/08/18/cos-launches-autumn-winter-2026-campaign/",
+   "publication_date": "2026-08",
+   "family": "brand"
+  },
+  {
+   "source_name": "COS (via Odalisque + search catalog)",
+   "source_type": "brand",
+   "url": "https://www.cos.com/en-au/campaign/autumn-winter-2026-womenswear",
+   "publication_date": "2026-08",
+   "family": "brand"
+  },
+  {
+   "source_name": "COS (via Odalisque + WhoWhatWear)",
+   "source_type": "brand",
+   "url": "https://www.whowhatwear.com/fashion/affordable/cos-early-autumn-buys-2026",
+   "publication_date": "2026-08",
+   "family": "brand"
+  },
+  {
+   "source_name": "Uniqlo LifeWear (via L'Officiel Singapore)",
+   "source_type": "brand",
+   "url": "https://www.lofficielsingapore.com/fashion/highlights-from-uniqlo-fall-winter-2026-collection-knitwear-outerwear-fashion-style",
+   "publication_date": "2026-08",
+   "family": "brand"
+  },
+  {
+   "source_name": "Andersson Bell",
+   "source_type": "brand",
+   "url": "https://adsb.co.kr",
+   "publication_date": "2026-09",
+   "family": "brand"
+  },
+  {
+   "source_name": "Andersson Bell (via search/press)",
+   "source_type": "brand",
+   "url": "https://www.instagram.com/p/DVanI4YCVJm/",
+   "publication_date": "2026-03",
+   "family": "brand"
+  },
+  {
+   "source_name": "Aj 패션로그 (Tistory)",
+   "source_type": "community",
+   "url": "https://luzien2.tistory.com/entry/2026-가을-남성-패션-트렌드-총정리",
+   "publication_date": "2026-08-24",
+   "family": "community"
+  },
+  {
+   "source_name": "패션&뷰티 인사이드 (dongseox.com)",
+   "source_type": "community",
+   "url": "https://dongseox.com/entry/%F0%9F%8D%82-2026-%EA%B0%80%EC%9D%84-%EB%82%A8%EC%9E%90-%EC%BD%94%EB%94%94-%EC%9D%B4-%EA%B3%B5%EC%8B%9D-%ED%95%98%EB%82%98%EB%A9%B4-%EB%81%9D%EB%82%98%EC%9A%94",
+   "publication_date": "2026-08-26",
+   "family": "community"
+  },
+  {
+   "source_name": "슈슈의 스타일로그 (Naver blog, citing stylist YouTube 옆집언니 최실장)",
+   "source_type": "community",
+   "url": "https://m.blog.naver.com/mongi3415/224401228017",
+   "publication_date": "2026-09-04",
+   "family": "community"
+  },
+  {
+   "source_name": "Naver blog semi169 (2026 가을 옷 뭐 사지?)",
+   "source_type": "community",
+   "url": "https://m.blog.naver.com/semi169/224391867788",
+   "publication_date": "2026-08-27",
+   "family": "community"
+  },
+  {
+   "source_name": "미래스타일리스트 한결 (Naver blog)",
+   "source_type": "community",
+   "url": "https://m.blog.naver.com/naphg05/224143962799",
+   "publication_date": "2026-01-12",
+   "family": "community"
+  },
+  {
+   "source_name": "trace0426의 티스토리 (20대 남자 가을 코디 완전정복)",
+   "source_type": "community",
+   "url": "https://trace0426.tistory.com/40",
+   "publication_date": "2025-10-02",
+   "family": "community"
+  },
+  {
+   "source_name": "YouTube '패션 참고하기 좋은 2026년 남자 가을 코디 no.13' (search-result title+description)",
+   "source_type": "community",
+   "url": "https://www.youtube.com/watch?v=YYfVpPchG7I",
+   "publication_date": "unknown",
+   "family": "community"
+  },
+  {
+   "source_name": "YouTube '패션 참고하기 좋은 2026년 남자 가을 코디 no.8' (search-result title+description)",
+   "source_type": "community",
+   "url": "https://www.youtube.com/watch?v=xZdSEJiOWQM",
+   "publication_date": "unknown",
+   "family": "community"
+  },
+  {
+   "source_name": "YouTube '남자 9월 느좋 가을 코디 10가지 추천' (search-result title+description)",
+   "source_type": "community",
+   "url": "https://www.youtube.com/watch?v=CMKflTTvsEs",
+   "publication_date": "unknown",
+   "family": "community"
+  },
+  {
+   "source_name": "YouTube Musinsa-collab lookbook '느슨해진 룩북씬에 긴장감을 주는 가성비 가을 코디' (search-result title+description)",
+   "source_type": "community",
+   "url": "https://www.youtube.com/watch?v=z6bk6Hkrn1Y",
+   "publication_date": "unknown",
+   "family": "community"
+  },
+  {
+   "source_name": "GQ Korea '옷 잘 입는 남자들의 옷장에서 찾은, 2026년 가을의 포인트 아이템 20'",
+   "source_type": "media",
+   "url": "https://www.gqkorea.co.kr/2026/08/28/",
+   "publication_date": "2026-08-28",
+   "family": "community"
+  },
+  {
+   "source_name": "Vogue Korea '평범하거나 화려하거나! 올가을 입고 싶은 모든 니트'",
+   "source_type": "media",
+   "url": "https://www.vogue.co.kr/ (article surfaced via search; exact slug not captured)",
+   "publication_date": "2026-09-03",
+   "family": "community"
+  },
+  {
+   "source_name": "Threads @odhfashion '2026년 남자 가을 코디 Part.4'",
+   "source_type": "community",
+   "url": "https://www.threads.com/@odhfashion/post/Dclc6cpGETH/",
+   "publication_date": "2026-08-28",
+   "family": "community"
+  },
+  {
+   "source_name": "Reddit r/seoul 'What defines Korean Youth Fashion in 2026?'",
+   "source_type": "community",
+   "url": "https://www.reddit.com/r/seoul/comments/1q81oij/what_defines_korean_youth_fashion_in_2026_share/",
+   "publication_date": "unknown",
+   "family": "community"
+  },
+  {
+   "source_name": "Stay Enko 'What to Wear in South Korea in 2026'",
+   "source_type": "media",
+   "url": "https://stay.enko.kr/blog/en/what-to-wear-in-south-korea-in-2026-seasonal-fashion-tips-for-visitors/",
+   "publication_date": "2026-06-29",
+   "family": "community"
+  },
+  {
+   "source_name": "Instagram reel (QUEEN CLOSET / 블루종 코디 account) via search snippet",
+   "source_type": "community",
+   "url": "https://www.instagram.com/reel/DVVzJCbkSR6/",
+   "publication_date": "unknown",
+   "family": "community"
+  },
+  {
+   "source_name": "Naver blog coygray '40대 남자 가을 코디'",
+   "source_type": "community",
+   "url": "https://blog.naver.com/coygray/224059136665",
+   "publication_date": "unknown",
+   "family": "community"
+  },
+  {
+   "source_name": "Naver blog yoojin-gz '2026 가을 슬래커코어' (search snippet)",
+   "source_type": "community",
+   "url": "https://blog.naver.com/yoojin-gz/224390017534",
+   "publication_date": "unknown",
+   "family": "community"
+  }
+ ],
+ "family_syntheses": [
+  {
+   "family": "editorial",
+   "synthesis_tail": "\r\n\r\n# source_registry\r\n\r\n| URL attempted | Status |\r\n|---|---|\r\n| https://www.vogue.co.kr/2026/08/31/판타지와-현실을-오가는-2026-가을-겨울-주요-트렌드/ | OK |\r\n| https://www.vogue.co.kr/2026/09/08/2026-가을-겨울-남성복-트렌드-12/ | OK |\r\n| https://www.vogue.co.kr/2026/09/08/새로운-남성복-실루엣이-등장하고-있다/ | OK |\r\n| https://www.vogue.co.kr/2026/09/04/올가을-브라운은-다크-초콜릿처럼-진하고-달콤합니다/ | SOURCE_UNAVAILABLE — HTTP 404 even though URL is linked from Vogue Korea's own pages; dark-chocolate-brown trend not captured from this source |\r\n| https://www.vogue.co.kr/2026/08/17/실용성과-판타지-사이-2026-가을-겨울-신발-트렌드-5/ | SOURCE_UNAVAILABLE — not fetched (budget); URL located and valid |\r\n| https://www.elle.co.kr/article/1906519 | OK |\r\n| https://www.elle.co.kr/article/1908852 | OK |\r\n| https://www.elle.co.kr/article/1906596 | PARTIAL — title/summary via search only; listed as secondary evidence |\r\n| https://www.harpersbazaar.co.kr/article/1908528 | OK |\r\n| https://www.harpersbazaar.co.kr/article/1908522 | OK |\r\n| https://www.harpersbazaar.co.kr/article/1908521 | OK |\r\n| https://www.wkorea.com/2026/08/27/올가을-블랙을-입는-방법이-조금-달라집니다/ | OK |\r\n| https://www.marieclairekorea.com/fashion/2026/09/2026-f-w/ | OK |\r\n| https://www.vogue.com/article/fall-2026-color-trends | OK |\r\n| https://www.vogue.com/article/fall-winter-2026-fashion-trends | OK |\r\n| https://www.dazedkorea.com/ (+ /fashion/) | SOURCE_UNAVAILABLE for trend evidence — pages render, but Aug-Sep 2026 fashion section contains celebrity/cover content, no trend roundups; article links not machine-extractable |\r\n| WebFetch tool on vogue.co.kr / vogue.com | SOURCE_UNAVAILABLE — tool-level timeouts (60s); circumvented via direct curl, no protection bypassed |\r\n\r\n# synthesis\r\n\r\nCandidate trend statements for Korean F/W 2026 (editorial prevalence language only; confidence by independent source count):\r\n\r\n1. **BLACK AS THE SEASON'S BASE, STYLED BY TEXTURE NOT COLOR** — all-black looks driven by material contrast (leather×lace×knit) and silhouette. Supported by: W Korea black article, Marie Claire \"reinforced black\", Bazaar Korea Midnight Bloom, Vogue Korea gothic/black menswear, Elle black statement-button jackets. Confidence: **HIGH** (5 sources).\r\n2. **MEN'S SILHOUETTE PIVOTS FROM OVERSIZE TO SLIM (\"Slender Man\")** — skinny/slim trousers, fitted jackets, cropped bar jackets, visible waist. Supported by: Vogue Korea \"Slender Man\" article, Vogue Korea menswear-12 (1960s clean tailoring, Matrix long coats), Bazaar \"Modern Tailoring\" (slimmed Celine), W Korea (Gucci fitted jacket + slim pants). Confidence: **HIGH** (4 sources).\r\n3. **FAUX-FUR / FLUFFY OUTERWEAR AS THE WINTER STATEMENT (incl. colorful fur)** — oversized fur coats, belted cocoon fur, fur bags; fur-trim collars in menswear. Supported by: Bazaar \"Go Big\" + \"Color Clash\", Marie Claire fluffy outer, Vogue Korea menswear fur trims. Confidence: **HIGH** (3 sources).\r\n4. **CHECK/TARTAN AS FULL SET-UPS, NOT ACCENTS** — big tartan/plaid suits, check pattern-clashing, buffalo check in menswear. Supported by: Bazaar \"Powerful Checks\", Marie Claire checks keyword, Vogue Korea menswear lumberjack/buffalo check, Elle punk tartan. Confidence: **HIGH** (4 sources).\r\n5. **SKIRT SUITS + H-LINE PENCIL MIDI SKIRTS REVIVAL** — 1950s-style cinched-waist suits, pencil midi in leather/glitter/wool, buttoned-up black jackets. Supported by: Elle H-line pencil, Bazaar \"Classic Woman Returns\", W Korea (Chanel knit jacket + pencil skirt). Confidence: **HIGH** (3 sources).\r\n6. **PURPLE (ROYAL PURPLE) AS THE KEY FASHION COLOR OF F/W 2026** — purple leather trenches, puff-sleeve blouses, RTW+accessories. Supported by: Bazaar \"Purple Rain\", Vogue.com color trends. Confidence: **MEDIUM** (2 sources).\r\n7. **ORNAMENT RETURNS: BEADS, SEQUINS, FRINGE, FLOWER BROOCHES/CORSAGES, ART DECO EVENINGWEAR** — explicit end of \"quiet luxury\". Supported by: Vogue Korea Art Deco/beading, Elle craft theme, Bazaar \"Big Blooms\", Vogue.com accessories (secondary, search-level). Confidence: **HIGH** (3 direct sources).\r\n8. **PREPPY RESTYLED A"
+  },
+  {
+   "family": "commerce",
+   "synthesis_tail": "\r\n\r\n## source_registry\r\n\r\n| # | URL attempted | Status | Reason |\r\n|---|---|---|---|\r\n| 1 | https://www.musinsa.com/ranking/best | SOURCE_UNAVAILABLE | HTTP 404 (bot-facing variant of ranking page) |\r\n| 2 | https://m.musinsa.com/ranking/best | SOURCE_UNAVAILABLE | HTTP 404 |\r\n| 3 | https://www.musinsa.com/content/1452877813830509855 | OK | Editorial loaded fully |\r\n| 4 | https://www.musinsa.com/content/1460916785052579323 | OK | Editorial loaded fully |\r\n| 5 | https://www.musinsa.com/content/1541751438425673057 | OK | 26FW editorial loaded fully |\r\n| 6 | https://www.musinsa.com/content/1407554592982536188 | OK | Loaded (2025 autumn edition) |\r\n| 7 | https://m.musinsa.com/content/1426880479377769932 | OK | Loaded (2025 autumn knit content) |\r\n| 8 | https://www.musinsa.com/content/1475353204361786440 | OK | Loaded (Feb 2026 coordination ranking recap) |\r\n| 9 | https://www.wconcept.co.kr/ranking/best | SOURCE_UNAVAILABLE | HTTP 404 |\r\n| 10 | https://www.wconcept.co.kr/ → display.wconcept.co.kr/rn/women | SOURCE_UNAVAILABLE | JS-rendered skeleton; no products in static HTML |\r\n| 11 | https://display.wconcept.co.kr/rn/best | SOURCE_UNAVAILABLE | JS-rendered; client-side product list absent |\r\n| 12 | https://magazine.wconcept.co.kr/ | SOURCE_UNAVAILABLE | DNS resolution failure (ENOTFOUND) |\r\n| 13 | https://www.29cm.co.kr/ | SOURCE_UNAVAILABLE | Fetch timeout (60s) |\r\n| 14 | https://shop.29cm.co.kr/best → www.29cm.co.kr/store/best | SOURCE_UNAVAILABLE | HTTP 404 after redirect |\r\n| 15 | https://magazine.29cm.co.kr/ | SOURCE_UNAVAILABLE | DNS failure (ENOTFOUND) |\r\n| 16 | https://tnnews.co.kr/archives/291079 (29CM data article) | OK | Loaded; current Aug-2026 data |\r\n| 17 | https://m.apparelnews.co.kr/news/news_view/?idx=227471 (Zigzag data) | OK | Loaded; 2026-09-08 article |\r\n| 18 | https://www.ssfshop.com/main | SOURCE_UNAVAILABLE | Fetch timeout (60s) |\r\n| 19 | https://www.lfmall.co.kr/ | SOURCE_UNAVAILABLE | JS-empty (title/slogan only) |\r\n| 20 | https://www.newsis.com/view/NISX20260821_0003757752 | SOURCE_UNAVAILABLE | Fetch timeout; only headline snippets via search |\r\n| 21 | https://tnnews.co.kr/archives/117896 (ABLY) | OK but STALE | 2022 article — excluded from evidence |\r\n| 22 | https://square.a-bly.com/report-28 (ABLY Square) | OK but STALE | 2022 report — excluded from evidence |\r\n| 23 | https://fashionbiz.co.kr/article/222886 (ABLY SPECTRUM) | SOURCE_UNAVAILABLE | Fetch timeout |\r\n| 24 | https://www.vogue.co.kr/2026/08/31/ | SOURCE_UNAVAILABLE | Article body not rendered (nav shell only) |\r\n| 25 | zigzag.kr / kream.co.kr / lotteon.com / aably.com main | NOT ATTEMPTED | App-first/JS-heavy properties; fetch budget exhausted after JS-wall pattern confirmed on W Concept/LF Mall |\r\n\r\n## synthesis\r\n\r\n1. **Suede is the signature F/W 2026 mid-season outer material** — 29CM transaction +124% YoY and search +140% (Aug 7-18, 2026) with an official \"suede is this fall's key trend\" statement; corroborated by Seoul Economic and Money Today headlines and LF's suede-heavy women's outer lineup. Confidence: **HIGH** (records: 29CM data, cross-retailer cluster, LF; plus Musinsa Feb-2026 coordination recap listing suede jacket archetypes).\r\n\r\n2. **Leather jacket is a core 간절기 outer buy now** — 29CM merchandises leather jacket in its 간절기 lineup; Handsome leather outer ~6x and Shinsegae leather jacket ~10x headline figures; Musinsa's 26FW flagship editorial leads with Vanson Leathers capsule. Confidence: **HIGH** (29CM record, cross-retailer record, Musinsa 26FW record).\r\n\r\n3. **Suede/leather jacket silhouettes are diversifying beyond the classic: western, collarless(카라리스), high-neck, layered-collar, tailored** — explicit 29CM merchandising examples (Ruehwere collarless layered suede, Overdue Flare western suede) plus Money Today headline. Confidence: **HIGH** (29CM data record + cross-retailer record + 26FW blouson/trucker merchandising).\r\n\r\n4. **Knitwear is the default 간절기 top, styled as inner layer and as versatile half-zip/quarter-zip** "
+  },
+  {
+   "family": "brand",
+   "synthesis_tail": "\r\n\r\n## source_registry\r\n\r\n| URL | Status |\r\n|---|---|\r\n| https://matinkim.shop/pages/collection | OK (direct) |\r\n| https://matinkim.shop/pages/transition-in-seoul | OK (concept text only; gallery JS-rendered) |\r\n| https://covernat.co.kr/product/collection.html?cate_no=3889 | OK (direct; slow) |\r\n| https://en.covernat.co.kr/category/new-product-category/3749/?page=1 | TIMEOUT — SOURCE_UNAVAILABLE |\r\n| https://mahagrid.net/product/lookbook_list.html | OK (nav only) |\r\n| https://mahagrid.net/product/lookbook_list.html?cate_no=299 | TIMEOUT twice — items unavailable; theme via press |\r\n| https://en.glowny.co.kr/ | OK (direct) |\r\n| https://intl.thisisneverthat.com/features/lookbook/fall-2026-lookbook | Page exists but JS shell — no text; covered via press |\r\n| https://hypebeast.com/2026/8/hisisneverthat-fall-2026-collection-lookbook-release-info | OK (secondary) |\r\n| https://stupiddope.com/2026/08/thisisneverthat-fall-2026... | HTTP 307 redirect — not retrieved |\r\n| https://odalisquemagazine.com/2026/08/18/cos-launches-autumn-winter-2026-campaign/ | OK (secondary, detailed) |\r\n| https://www.cos.com/en-au/campaign/autumn-winter-2026-womenswear | HTTP 403 — not bypassed |\r\n| https://www.uniqlo.com/sg/en/special-feature/lifewear-collection | TIMEOUT |\r\n| https://www.uniqlo.com.kr (LifeWear FW26) | TIMEOUT — covered via L'Officiel Singapore (full article text) |\r\n| https://www.lofficielsingapore.com/fashion/highlights-from-uniqlo-fall-winter-2026... | OK (secondary, detailed) |\r\n| https://adsb.co.kr (Andersson Bell) | OK (direct) — FW26 page not yet published |\r\n| Zara Korea new arrivals (zara.com) | NOT ATTEMPTED beyond policy — Zara blocks automation; SOURCE_UNAVAILABLE |\r\n| Estem Nation / LMC / _WNDERKAMMER / Saltytorch / LMJ / Meelal / Dabagirl / Rolarola | No indexed FW26 lookbook pages found; search API heavily rate-limited — SOURCE_UNAVAILABLE |\r\n\r\nNote: web search infrastructure returned frequent 429 rate limits; brand-site fetches on Korean Cafe24 stores (mahagrid, covernat EN) timed out repeatedly. Evidence density is therefore highest for thisisneverthat, Covernat, Uniqlo, and COS.\r\n\r\n## synthesis (candidate FW26 trend statements)\r\n\r\n1. **Vintage-washed, low-saturation treatments define FW26 tops and outer** — thisisneverthat's washed denim shirts and washed polos (burgundy/dark brown/indigo), Covernat's OG chair coat explicitly \"lowered saturation + washing effects,\" Glowny's damage-wash cinch jeans. Supporting records: 4. **Confidence: HIGH**\r\n\r\n2. **Loose/relaxed silhouettes beat slim for bottoms and layering** — TNT \"relaxed and loose-fit jeans,\" \"effortless layering through relaxed silhouettes\"; Covernat WOMAN \"relaxed silhouettes\"; COS \"tailoring loosened through relaxed fits.\" Records: 3+. **Confidence: HIGH**\r\n\r\n3. **Technical/transitional outerwear is the season's anchor purchase** — TNT PERTEX windbreakers + VIK + SKOGAR down, Uniqlo PUFFTECH/Harrington/Light Down Volume/reversible down, Mahagrid raincoat + military coat. Records: 3 brands. **Confidence: HIGH**\r\n\r\n4. **Autumn-amped palette: warm brown family (brown/burgundy/indigo) with saturation accents** — Uniqlo names warm brown + vibrant red/energetic blue; TNT burgundy/dark brown/indigo/dusty navy; COS black/white + purple. Records: 3 brands. **Confidence: HIGH**\r\n\r\n5. **Knit-first tops programs: funnel necks, V-necks, merino/cashmere fine knits** — COS cashmere funnel-neck jumper + merino crew/cardigan; Glowny Mellow V-Neck Stripe Knit; Uniqlo Souffle Yarn + merino turtleneck/cable. Records: 3 brands. **Confidence: HIGH**\r\n\r\n6. **Military/work coats as the winter statement outer** — Mahagrid winter military coat (\"LAKE CHILD\"), Covernat OG chair coat, Uniqlo Harrington/blouson. Records: 3. **Confidence: HIGH**\r\n\r\n7. **Denim runs on two poles: loose washed (men) vs detailed/wide (women)** — TNT loose-fit washed jeans vs Uniqlo Slim Straight + High-Waist Wide Leg + Glowny cinch-back roll-up damage jeans. Records: 3 brands. **Confidence: MEDIUM** (directions di"
+  },
+  {
+   "family": "community",
+   "synthesis_tail": "\r\n\r\n**source_registry**\r\n\r\n| URL attempted | Method | Status |\r\n|---|---|---|\r\n| reddit.com/r/seoul/comments/1q81oij (youth fashion 2026) | WebFetch + web reader | FETCH_BLOCKED (timeout / \"blocked by network security\") — SOURCE_UNAVAILABLE; snippet-only evidence |\r\n| reddit.com r/KoreanFashion (any fall 2026 thread) | WebSearch x3 | No retrievable fall-2026 threads surfaced in search; subreddit content effectively SOURCE_UNAVAILABLE this session |\r\n| reddit.com r/malefashionadvice fall 2026 WAYWT | WebSearch | Search backend rate-limited (429); no results obtained |\r\n| dongseox.com/entry/2026-가을-남자-코디 (first URL form) | WebFetch | HTTP 404 (wrong slug) |\r\n| dongseox.com correct emoji-encoded slug | WebFetch | OK — full text extracted (2026-08-26) |\r\n| luzien2.tistory.com | WebFetch | OK (2026-08-24) |\r\n| trace0426.tistory.com/40 | WebFetch | OK (2025-10-02, baseline) |\r\n| blog.naver.com/coygray/224059136665 (desktop) | WebFetch + web reader | PARTIAL — title only (Naver iframe); snippet from search |\r\n| m.blog.naver.com/naphg05/224143962799 | WebFetch | OK (2026-01-12) |\r\n| m.blog.naver.com/mongi3415/224401228017 | WebFetch | OK (2026-09-04) |\r\n| m.blog.naver.com/semi169/224391867788 | WebFetch | OK (2026-08-27) |\r\n| gqkorea.co.kr/2026/08/28/ | WebFetch | PARTIAL — archive page nav only; article body not retrieved; snippet-only |\r\n| vogue.co.kr fall knit article | not fetched | snippet-only |\r\n| threads.com/@odhfashion/post/Dclc6cpGETH | WebFetch | OK — post confirmed, image-based body |\r\n| youtube.com (3 videos + 1 lookbook) | via WebSearch snippets | OK (titles/descriptions only; videos not watched) |\r\n| instagram.com/reel/DVVzJCbkSR6 | not fetched directly | SOURCE_UNAVAILABLE (platform blocks); snippet-only |\r\n| tiktok.com/@esosyfashion video | not attempted | snippet-only from search |\r\n| stay.enko.kr 2026 seasonal guide | WebFetch | OK — fall section extracted (2026-06-29) |\r\n| noblemink.tistory.com/542, blog.naver.com/pheysun/224192552987, cogico2026.it, facebook video | not fetched | surfaced in search only; not used as records |\r\n\r\n**synthesis** (candidate trend statements, Korean 20s-early 30s, fall 2026; all phrased strictly as observed prevalence in public posts I examined)\r\n\r\n1. **Leather/suede blouson is the most repeated men's outer item.** Appears in 4 independent public sources I observed: GQ Korea (2026-08-28, reversible suede blouson), luzien2.tistory.com (2026-08-24, 레더 블루종/매트 스웨이드), YouTube Musinsa Standard lookbook no.13 (신세틱 스웨이드 미니멀 블루종), Instagram snippet (블루종 = daily-use outer). Confidence: MEDIUM-HIGH (media+blog+commerce alignment; no Reddit confirmation available).\r\n\r\n2. **Knit + slacks/denim is the default men's formula, with an active wide-vs-straight silhouette dispute.** Knit+wide slacks appears in 3 sources (YouTube no.8 와이드 슬랙스+페니로퍼, luzien2 wide/curved, coygray); straight-denim claim in 1 (dongseox 2026-08-26 \"wide denim ended, straight back\"); women's guide semi169 lists both cigarette and semi-wide. Confidence: MEDIUM — the disagreement itself indicates a silhouette transition moment.\r\n\r\n3. **Women's F/W 2026 shows an explicit slim-silhouette regression narrative.** Appears in 2 independent posts I observed (mongi3415 stylist roundup 2026-09-04: skinny/cigarette pants, 정핏 jackets, pencil skirt; semi169 2026-08-27 lists cigarette pants among trends), with naphg05 (2026-01-12) marking wide/straight as \"settled\" earlier in the year. Confidence: MEDIUM (all blogger/stylist claims, no street-photo verification).\r\n\r\n4. **Brown/camel/charcoal palette with burgundy as the point color is the dominant stated color story.** Appears in 5 independent records: luzien2 (camel/chocolate/charcoal + 딥 버건디), dongseox (camel/khaki/burgundy/charcoal), semi169 (brown blazer, burgundy/cobalt/royal-purple points), stay.enko (olive/maroon/tan/charcoal), trace0426 (2025 baseline, same family). Confidence: HIGH — strongest cross-source convergence observed.\r\n\r\n5. **Specific layering recipes recur: shirt collar/cuff"
+  }
+ ]
+}
