@@ -939,3 +939,45 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
   .gtab-lens { transition: opacity 120ms linear; }
   .gtab-lens.dragging::before { transform: none; }
 }
+
+/* ═══ N°1 — Reference-driven interaction (2026-09-09) ═══
+   Auralee/Amomento/JilSander: hover = worn↔alternate 각도 (zoom 아님, 정보 추가)
+   Apple 01: hero 텍스트가 스크롤에 물러나며 컬렉션으로 핸드오프
+   JilSander 16: 옵션은 칩 그리드 — 즉시 상태 피드백 */
+.piece-media .piece-alt {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: 50% 22%;
+  opacity: 0; transition: opacity 300ms ease;
+}
+@media (hover: hover) {
+  .piece:hover .piece-media .piece-alt { opacity: 1; }
+  .piece:hover .piece-media { background: #eeede8; } /* fog 해제 — 이미지가 또렷 */
+}
+@media (prefers-reduced-motion: reduce) {
+  .piece-media .piece-alt { transition: none; }
+}
+
+/* hero handoff — JS가 opacity/translateY만 구동 (레이아웃 불변) */
+.hero-brand, .hero-drop { will-change: opacity, transform; }
+
+/* 주문 모달 옵션 칩 — quiet commerce precision */
+.option-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 10px; }
+.option-chip {
+  min-height: 40px; padding: 8px 14px; font-size: 12.5px;
+  background: #fff; color: var(--muted, #8a8a86);
+  border: 1px solid var(--line, #e5e5e5); cursor: pointer; border-radius: 0;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+}
+.option-chip:hover { color: var(--ink, #0a0a0a); border-color: #b9b6ac; }
+.option-chip.selected {
+  background: #111; color: #fff; border-color: #111; font-weight: 600;
+}
+.option-chip:focus-visible { outline: 1.5px solid #555e4c; outline-offset: 2px; }
+
+/* story — second editorial moment (조용한 제품 컷) */
+.story-shot {
+  display: block; width: min(300px, 60%); aspect-ratio: 3/4; object-fit: cover;
+  object-position: 50% 18%;
+  margin: 0 auto 34px; opacity: 0.94;
+}
+@media (max-width: 640px) { .story-shot { width: min(220px, 64%); margin-bottom: 26px; } }

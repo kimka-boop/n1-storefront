@@ -535,6 +535,29 @@ export default function Home() {
   const prevSlide = (e?: React.MouseEvent) => { e?.stopPropagation(); setSlide((s) => (s - 1 + slideIds.length) % Math.max(slideIds.length, 1)); };
   const openCs = () => window.dispatchEvent(new Event("n1:open-cs"));
 
+  // ── Apple 01 원칙의 N°1 번역: hero 텍스트가 스크롤에 조용히 물러나며
+  //    컬렉션으로 핸드오프 — transform/opacity만, rAF 스로틀 ──
+  useEffect(() => {
+    const brand = document.querySelector<HTMLElement>(".hero-brand");
+    const drop = document.querySelector<HTMLElement>(".hero-drop");
+    if (!brand) return;
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const t = Math.min(1, Math.max(0, scrollY / 240));
+        const eased = t * t * (3 - 2 * t);
+        brand.style.opacity = String(1 - eased * 0.55);
+        brand.style.transform = `translateY(${-eased * 12}px)`;
+        if (drop) drop.style.opacity = String(1 - eased * 0.7);
+      });
+    };
+    onScroll();
+    addEventListener("scroll", onScroll, { passive: true });
+    return () => { removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); };
+  }, []);
+
   useEffect(() => {
     if (!selected) return;
     const onKey = (e: KeyboardEvent) => {
@@ -624,6 +647,11 @@ export default function Home() {
             {withRoles.map(({ product: p, role }) => {
               const img = failedImg[p.id] ? null : imageOf(p);
               const soldOut = p.stockStatus === "품절";
+              // hover disclosure (Auralee/Amomento/JilSander 공통 원칙): 착용컷 ↔ 다른 각도.
+              // 정보 추가 역할 — zoom 효과가 아님. 샷이 하나뿐이면 스왑 없이 fog 해제만.
+              const altShot = img
+                ? mediaFor(p.id, p.lookbookImage)?.views.find((v) => v.src !== img)?.src ?? null
+                : null;
               return (
                 <Link
                   key={p.id}
@@ -633,15 +661,21 @@ export default function Home() {
                 >
                   <div className={`piece-media ${img ? "" : "empty"}`}>
                     {img ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img
-                        src={img}
-                        alt={`${p.name} 대표 이미지`}
-                        loading={role === "lead" ? "eager" : "lazy"}
-                        onError={() =>
-                          setFailedImg((f) => (f[p.id] ? f : { ...f, [p.id]: true }))
-                        }
-                      />
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={img}
+                          alt={`${p.name} 대표 이미지`}
+                          loading={role === "lead" ? "eager" : "lazy"}
+                          onError={() =>
+                            setFailedImg((f) => (f[p.id] ? f : { ...f, [p.id]: true }))
+                          }
+                        />
+                        {altShot && (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img className="piece-alt" src={altShot} alt="" aria-hidden="true" loading="lazy" />
+                        )}
+                      </>
                     ) : (
                       <span>이미지 준비 중</span>
                     )}
@@ -667,8 +701,11 @@ export default function Home() {
         )}
       </section>
 
-      {/* ── 브랜드 스토리 ── */}
+      {/* ── 브랜드 스토리 — second editorial moment (제품 컷 + 짧은 문장) ── */}
       <section className="story">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="story-shot" src="/editorial-media/PRD-M-51/01_front.jpg" alt="" aria-hidden="true" loading="lazy"
+          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
         <h2 className="story-title">괜찮은 것만 보여드립니다</h2>
         <p className="story-body">
           N°1은 모든 상품을 한자리에 쏟아놓지 않습니다.
@@ -729,18 +766,25 @@ export default function Home() {
                 {/* ── 옵션 선택 (원시 값 기준) ── */}
                 {colorPairs.length > 0 && (
                   <div className="option-row">
-                    <label className="option-label" htmlFor="opt-color">색상</label>
-                    <select id="opt-color" className="option-select"
-                      value={selColor}
-                      onChange={(e) => { setSelColor(e.target.value); setOptTouched(true); }}>
-                      {colorPairs.length > 1 && <option value="">색상을 선택하세요</option>}
-                      {colorPairs.map((c) => (<option key={c.value} value={c.value}>{c.label}</option>))}
-                    </select>
+                    <span className="option-label">색상</span>
+                    <div className="option-chips" role="group" aria-label="색상 선택">
+                      {colorPairs.map((c) => (
+                        <button
+                          key={c.value}
+                          type="button"
+                          className={`option-chip ${selColor === c.value ? "selected" : ""}`}
+                          aria-pressed={selColor === c.value}
+                          onClick={() => { setSelColor(c.value); setOptTouched(true); }}
+                        >
+                          {c.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
                 {selected.sizeOptions && selected.sizeOptions.length > 0 && (
                   <div className="option-row">
-                    <label className="option-label" htmlFor="opt-size">사이즈</label>
+                    <span className="option-label">사이즈</span>
                     {fitProfile && selSize && (
                       <span className="fit-badge">
                         {fitProfile.size} 기준 —{" "}
@@ -750,12 +794,19 @@ export default function Home() {
                         })()}
                       </span>
                     )}
-                    <select id="opt-size" className="option-select"
-                      value={selSize}
-                      onChange={(e) => { setSelSize(e.target.value); setOptTouched(true); }}>
-                      {selected.sizeOptions.length > 1 && <option value="">사이즈를 선택하세요</option>}
-                      {selected.sizeOptions.map((s) => (<option key={s} value={s}>{s}</option>))}
-                    </select>
+                    <div className="option-chips" role="group" aria-label="사이즈 선택">
+                      {selected.sizeOptions.map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          className={`option-chip ${selSize === s ? "selected" : ""}`}
+                          aria-pressed={selSize === s}
+                          onClick={() => { setSelSize(s); setOptTouched(true); }}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
 
