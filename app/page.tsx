@@ -582,7 +582,7 @@ export default function Home() {
         <button className="gtab gtab-fit" onClick={() => setShowFitModal(true)}>
           {fitProfile
             ? `내 핏 — ${fitProfile.size}${fitProfile.fit ? " · " + (FIT_LABEL[fitProfile.fit as "A"|"B"|"C"] ?? "") : ""}`
-            : "나에게 맞게 보기"}
+            : "스마트 핏"}
         </button>
       </nav>
 
@@ -668,7 +668,7 @@ export default function Home() {
         <button className="story-cta" onClick={() => setShowFitModal(true)}>
           {fitProfile
             ? `내 핏 — ${FIT_LABEL[fitProfile.fit as "A"|"B"|"C"] ?? ""} · 수정하기 →`
-            : "어떤 핏을 좋아하세요? →"}
+            : "스마트 핏 →"}
         </button>
       </section>
 

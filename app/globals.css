@@ -300,11 +300,13 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 }
 .gtab {
   position: relative; z-index: 1; /* 렌즈(유리) 위에 텍스트 */
-  padding: 6px 4px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 10px 16px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
   border: none; background: transparent;
   color: var(--muted, #8a8a86); cursor: pointer; border-radius: 0;
   transition: color 0.2s, filter 0.2s;
 }
+/* 텍스트를 통과하는 렌즈 인상 — 활성 텍스트가 유리 아래에서 살짝 또렷 */
+.gtab.active { filter: contrast(1.06) brightness(1.02); }
 .gtab:hover { color: var(--ink, #0a0a0a); }
 .gtab:focus-visible { outline: 1.5px solid #555e4c; outline-offset: 2px; border-radius: 8px; }
 /* 활성 표시는 Liquid Glass 렌즈가 담당 — 언더라인 제거 */
@@ -406,38 +408,35 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 }
 @media (max-width: 640px) { .float-bar { right: 16px; bottom: 14px; } }
 
-/* ── 리퀴드 글래스 플로팅 버튼 (iOS 26 컨트롤 레퍼런스) — 장바구니·문의하기 공통·완전 동일 ──
-   유리는 행동에만: 두 액션 버튼에만 프로스틱 유리를 입히고, 팝업 본체는 불투명 유지.
-   대각 광택 그라디언트+렌즈 림으로 밝은 배경 위에서도 유리 재질이 읽히게.
-   backdrop-filter 미지원 브라우저는 위의 흰색 단색 규칙이 그대로 폴백. */
+/* ── 플로팅 렌즈 — 문의하기·장바구니 (탭 렌즈와 같은 N°1 유리 family) ──
+   페이지 위에 떠 있는 작은 유리 렌즈: 가장자리 밀도 + 맑은 중앙 +
+   specular 하이라이트(::before) + 코스틱 그림자. 탭 렌즈보다 살짝
+   독립적인 부유감. backdrop 미지원 브라우저는 흰 단색 폴백. */
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .float-bar, .cs-fab {
-    background:
-      linear-gradient(135deg,
-        rgba(255,255,255,0.85) 0%,
-        rgba(255,255,255,0.25) 38%,
-        rgba(255,255,255,0.10) 55%,
-        rgba(255,255,255,0.45) 100%);
-    -webkit-backdrop-filter: blur(20px) saturate(1.8);
-    backdrop-filter: blur(20px) saturate(1.8);
-    border-color: rgba(255,255,255,0.9);
-    box-shadow:
-      0 10px 28px rgba(10,10,10,0.16),
-      0 0 0 1px rgba(10,10,10,0.05),
-      inset 0 1.5px 1px rgba(255,255,255,1),
-      inset 0 -2px 3px rgba(255,255,255,0.55),
-      inset 2px 0 4px rgba(255,255,255,0.35),
-      inset -2px 0 4px rgba(255,255,255,0.35);
+    background: var(--n1-glass-fill);
+    -webkit-backdrop-filter: var(--n1-glass-optics);
+    backdrop-filter: var(--n1-glass-optics);
+    border-color: transparent;
+    box-shadow: var(--n1-glass-shadow), var(--n1-glass-edge);
   }
-  .float-bar:hover, .cs-fab:hover {
-    border-color: rgba(10,10,10,0.35); transform: translateY(-2px);
+  @media (hover: hover) {
+    .float-bar:hover, .cs-fab:hover {
+      background: var(--n1-glass-fill-active);
+      -webkit-backdrop-filter: var(--n1-glass-optics-active);
+      backdrop-filter: var(--n1-glass-optics-active);
+      border-color: transparent;
+    }
+    .float-bar:hover::before, .cs-fab:hover::before {
+      opacity: 1; transform: translateX(5%); /* 빛이 받는 방향으로 하이라이트 이동 */
+    }
+  }
+  .float-bar:active, .cs-fab:active {
+    transform: translateY(1px); /* 눌림 = 재질 깊이 살짝 감소 */
     box-shadow:
-      0 14px 34px rgba(10,10,10,0.20),
-      0 0 0 1px rgba(10,10,10,0.05),
-      inset 0 1.5px 1px rgba(255,255,255,1),
-      inset 0 -2px 3px rgba(255,255,255,0.55),
-      inset 2px 0 4px rgba(255,255,255,0.35),
-      inset -2px 0 4px rgba(255,255,255,0.35);
+      0 1px 3px rgba(36, 39, 34, 0.08),
+      0 5px 12px rgba(36, 39, 34, 0.08),
+      var(--n1-glass-edge);
   }
 }
 .float-popup-head button { background: none; border: none; color: #fff; cursor: pointer; }
@@ -473,8 +472,8 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   transition: color 0.2s;
 }
 .auth-link:hover { color: var(--ink, #0a0a0a); }
-.auth-link.primary { border-bottom: 1px solid var(--muted, #8a8a86); padding-bottom: 2px; }
-.auth-link.primary:hover { border-color: var(--ink, #0a0a0a); }
+.auth-link.primary { padding-bottom: 4px; } /* persistent underline 제거 — 로그인/회원가입 동일한 quiet navigation */
+.auth-link:focus-visible { outline: 1.5px solid #555e4c; outline-offset: 2px; }
 .auth-user { color: var(--ink, #0a0a0a); font-weight: 500; }
 /* fit-alt는 .lq-ghost-row/.lq-ghost로 대체됨 */
 
@@ -513,7 +512,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   overflow-x: auto; scrollbar-width: none;
 }
 .collection-nav::-webkit-scrollbar { display: none; }
-@media (max-width: 640px) { .collection-nav { gap: 20px; justify-content: flex-start; } .gtab-brand { display: none; } .gtab-track { gap: 16px; } }
+@media (max-width: 640px) { .collection-nav { gap: 20px; justify-content: flex-start; } .gtab-brand { display: none; } .gtab-track { gap: 12px; } .gtab { padding: 9px 11px; } }
 
 /* ── 컬렉션 섹션 ── */
 .collection { max-width: 1160px; margin: 0 auto; padding: 64px 6vw 24px; }
@@ -865,24 +864,45 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
    탭 셀렉터 렌즈와 CS 전송 버튼이 같은 재질 언어를 공유한다.
    ════════════════════════════════════════════════════════════════ */
 :root {
-  --n1-glass-bg:
-    linear-gradient(165deg,
-      rgba(255, 255, 254, 0.62) 0%,
-      rgba(250, 248, 243, 0.48) 45%,
-      rgba(243, 241, 234, 0.55) 100%);
-  --n1-glass-bg-active:
-    linear-gradient(165deg,
-      rgba(255, 255, 255, 0.72) 0%,
-      rgba(251, 249, 244, 0.58) 45%,
-      rgba(245, 243, 237, 0.64) 100%);
-  --n1-glass-blur: blur(10px) saturate(1.22);
+  /* 렌즈 물성: 가장자리는 밀도가 있고 중앙은 맑다(perfume lens) —
+     배경이 비치고(saturation/brightness) 아래 콘텐츠와 관계를 맺는다 */
+  --n1-glass-fill:
+    linear-gradient(168deg,
+      rgba(255, 255, 253, 0.50) 0%,
+      rgba(255, 255, 252, 0.13) 34%,
+      rgba(248, 246, 240, 0.09) 62%,
+      rgba(243, 241, 233, 0.44) 100%);
+  --n1-glass-fill-active:
+    linear-gradient(168deg,
+      rgba(255, 255, 255, 0.62) 0%,
+      rgba(255, 255, 253, 0.22) 34%,
+      rgba(248, 246, 240, 0.15) 62%,
+      rgba(243, 241, 233, 0.54) 100%);
+  --n1-glass-optics: blur(7px) saturate(1.55) brightness(1.05);
+  --n1-glass-optics-active: blur(8px) saturate(1.7) brightness(1.09);
+  --n1-glass-specular:
+    radial-gradient(130% 80% at 28% 14%,
+      rgba(255, 255, 255, 0.62) 0%,
+      rgba(255, 255, 255, 0.18) 34%,
+      rgba(255, 255, 255, 0) 58%);
   --n1-glass-edge:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.35),
-    inset 1px 0 0 rgba(255, 255, 255, 0.4),
-    inset -1px 0 0 rgba(255, 255, 255, 0.4);
-  --n1-glass-shadow: 0 4px 14px rgba(36, 39, 34, 0.10);
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    inset 0 -1px 1.5px rgba(120, 114, 96, 0.18),
+    inset 1.5px 0 2px rgba(255, 255, 255, 0.30),
+    inset -1.5px 0 2px rgba(255, 255, 255, 0.30);
+  --n1-glass-shadow:
+    0 2px 5px rgba(36, 39, 34, 0.07),
+    0 12px 26px rgba(36, 39, 34, 0.11),
+    0 18px 34px -18px rgba(255, 255, 255, 0.9); /* 유리 아래 은은한 빛 번짐(caustic 인상) */
   --n1-glass-transition: 240ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* 세 유리(탭 렌즈·문의하기·장바구니)가 공유하는 재질 — specular 하이라이트 면 */
+.gtab-lens::before, .cs-fab::before, .float-bar::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: var(--n1-glass-specular);
+  opacity: 0.9; pointer-events: none; z-index: 2;
+  transition: opacity var(--n1-glass-transition), transform var(--n1-glass-transition);
 }
 
 /* ── 카테고리 Liquid Glass 셀렉터 — 선택 상태 자체가 재질 ── */
@@ -892,11 +912,11 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
 }
 .gtab-lens {
   position: absolute; top: 6px; bottom: 6px; left: 0; z-index: 0;
-  width: 60px; /* syncLens가 활성 탭 폭으로 기록 */
-  border-radius: 15px 13px 14px 16px / 17px 14px 15px 16px; /* 살짝 유기적인 드롭릿 곡률 */
-  background: var(--n1-glass-bg);
-  -webkit-backdrop-filter: var(--n1-glass-blur);
-  backdrop-filter: var(--n1-glass-blur);
+  width: 60px; /* syncLens가 활성 탭 히트영역 폭으로 기록 */
+  border-radius: 17px 15px 16px 18px / 19px 16px 17px 18px; /* 유기적인 드롭릿 곡률 */
+  background: var(--n1-glass-fill);
+  -webkit-backdrop-filter: var(--n1-glass-optics);
+  backdrop-filter: var(--n1-glass-optics);
   box-shadow: var(--n1-glass-shadow), var(--n1-glass-edge);
   transition: transform var(--n1-glass-transition), width var(--n1-glass-transition),
     background var(--n1-glass-transition), box-shadow var(--n1-glass-transition);
@@ -905,9 +925,17 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
 }
 .gtab-lens.dragging {
   transition: none; cursor: grabbing;
-  background: var(--n1-glass-bg-active);
-  box-shadow: 0 6px 18px rgba(36, 39, 34, 0.13), var(--n1-glass-edge);
+  background: var(--n1-glass-fill-active);
+  -webkit-backdrop-filter: var(--n1-glass-optics-active);
+  backdrop-filter: var(--n1-glass-optics-active);
+  box-shadow:
+    0 2px 6px rgba(36, 39, 34, 0.09),
+    0 16px 32px rgba(36, 39, 34, 0.14),
+    0 20px 38px -18px rgba(255, 255, 255, 0.95),
+    var(--n1-glass-edge);
 }
+.gtab-lens.dragging::before { opacity: 1; transform: translateX(3%); }
 @media (prefers-reduced-motion: reduce) {
   .gtab-lens { transition: opacity 120ms linear; }
+  .gtab-lens.dragging::before { transform: none; }
 }

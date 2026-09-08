@@ -319,7 +319,7 @@ export default function ProductPage() {
           </div>
         ) : (
           <button className={styles.yourFitEntry} onClick={() => setShowFitFlow(true)}>
-            나에게 맞게 보기 →
+            스마트 핏 →
           </button>
         )}
       </SceneSection>

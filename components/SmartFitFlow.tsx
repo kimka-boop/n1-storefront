@@ -104,7 +104,7 @@ export default function SmartFitFlow({
 
   return (
     <LiquidSurface
-      label="나에게 맞게 보기 — 핏 프로필"
+      label="스마트 핏 — 핏 프로필"
       onClose={onClose}
       autoDissipateMs={phase === "confirm" ? 950 : undefined}
     >
@@ -173,7 +173,7 @@ export default function SmartFitFlow({
                     ? " 겉옷은 취향에 따라 한 치수 이상 여유를 두고 보시면 돼요."
                     : " 평소 사이즈 기준으로 보시면 돼요."}
                 </p>
-                <p className="lq-row-note">상품 페이지에서 이 서페이스를 다시 열면, 그 상품과 함께 해석해 드려요.</p>
+                <p className="lq-row-note">상품 페이지에서 스마트 핏을 다시 열면, 그 상품과 함께 안내해 드려요.</p>
               </>
             )}
             {isLoggedIn ? (
