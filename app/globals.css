@@ -202,7 +202,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 /* ── CS 채팅 위젯 (좌측 끝에 도킹 — 장바구니와 x축 끝 미러) ── */
 .cs-fab {
   position: fixed; left: 4px; bottom: 28px; z-index: 999;
-  width: 52px; height: 52px; border-radius: 50%;
+  width: 36px; height: 36px; border-radius: 50%;
   background: #fff; color: #0a0a0a;
   border: 1px solid var(--line, #e8e8e5); cursor: pointer;
   display: flex; align-items: center; justify-content: center; /* 아이콘 중앙 정렬 */
@@ -368,7 +368,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 /* ═══ 우측 끝 도킹 플로팅 바 (V2: 벡터 쇼핑백 아이콘, 리퀴드 글래스) ═══ */
 .float-bar {
   position: fixed; right: 4px; bottom: 28px; z-index: 900;
-  width: 52px; height: 52px; border-radius: 50%;
+  width: 36px; height: 36px; border-radius: 50%;
   background: #fff; color: #0a0a0a; border: 1px solid var(--line, #e8e8e5);
   box-shadow: 0 4px 18px rgba(10,10,10,0.10);
   display: flex; align-items: center; justify-content: center;
@@ -384,7 +384,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 }
 .float-bar .float-status.done { background: #0b7a3e; }
 .float-popup {
-  position: fixed; right: 16px; bottom: 80px; z-index: 901;
+  position: fixed; right: 16px; bottom: 72px; z-index: 901;
   width: 290px; max-width: calc(100vw - 32px);
   background: #fff; color: #111; border: 1px solid #e5e5e5;
   box-shadow: 0 8px 30px rgba(0,0,0,0.2); border-radius: 10px; overflow: hidden;

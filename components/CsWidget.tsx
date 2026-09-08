@@ -86,7 +86,7 @@ export default function CsWidget() {
           onClick={() => setOpen(true)}
           aria-label="고객센터 채팅"
         >
-          <ChatIcon size={20} />
+          <ChatIcon size={14} />
         </button>
       )}
 

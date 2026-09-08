@@ -38,7 +38,7 @@ export default function FloatingOrderTracker() {
     <>
       <div className="float-bar" onClick={() => order && setOpen(true)}>
         <span className="float-icon">
-          <CartIcon size={20} />
+          <CartIcon size={14} />
         </span>
         {status && (
           <span className={`float-status ${status.includes("완료") ? "done" : ""}`}>
