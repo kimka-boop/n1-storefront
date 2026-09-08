@@ -22,9 +22,12 @@ import TonePanel from "@/components/product/TonePanel";
 import SizeTable from "@/components/product/SizeTable";
 import StickyBuyBar from "@/components/product/StickyBuyBar";
 import MaterialComposition from "@/components/MaterialComposition";
+import SmartFitFlow from "@/components/SmartFitFlow";
+import { useAuth } from "@/components/AuthProvider";
 import { PRODUCT_STORY } from "@/lib/productContent";
 import { mediaFor } from "@/lib/media";
 import { productColors, purchaseState, quickBuyUrl } from "@/lib/experience";
+import { fitGuidance, type FitProfile } from "@/lib/fit";
 import {
   genderKo,
   categoryShort,
@@ -93,6 +96,10 @@ export default function ProductPage() {
   const heroRef = useRef<HTMLDivElement>(null);
   const decisionRef = useRef<HTMLDivElement>(null);
 
+  // ── 나에게 맞게 보기: 핏 개인화 (훅은 early return 이전에 unconditional) ──
+  const { profile: authProfile, token: authToken, login: authLogin, updateProfile: authUpdateProfile } = useAuth();
+  const [showFitFlow, setShowFitFlow] = useState(false);
+
   useEffect(() => {
     let alive = true;
     setState("loading");
@@ -147,6 +154,16 @@ export default function ProductPage() {
   const soldOut = (product.stockStatus || "").trim() === "품절";
   const story = PRODUCT_STORY[product.id];
   const media = mediaFor(product.id, product.lookbookImage);
+
+  // ── 나에게 맞게 보기: 핏 개인화 해석 (FACT → PREFERENCE 순서, lib/fit.ts) ──
+  const guidance = fitGuidance(
+    { name: product.name, fitShape: (product as { fit?: FitInfo }).fit?.shape, sizeChart: product.sizeChart },
+    authProfile as FitProfile | null,
+  );
+  const saveFitProfile = (p: FitProfile) => {
+    localStorage.setItem("n1_fit_profile", JSON.stringify(p));
+    if (authToken) authUpdateProfile(p);
+  };
   const material = clean(product.material);
   const materialKnown = material !== "";
   const fit = product.fit ?? {};
@@ -289,7 +306,32 @@ export default function ProductPage() {
             수치표 미제공 — 착용컷으로 확인하실 수 있습니다.
           </p>
         )}
+        {/* 개인 해석층 — 상품 사실(위) 아래에서 '취향 기준'임을 분리해 전달 */}
+        {guidance ? (
+          <div className={styles.yourFit}>
+            <p className={styles.yourFitKicker}>Your preference</p>
+            <p className={styles.yourFact}>{guidance.fact}</p>
+            <p className={styles.yourFitText}>{guidance.preference}</p>
+            <p className={styles.yourFitNote}>{guidance.note}</p>
+          </div>
+        ) : (
+          <button className={styles.yourFitEntry} onClick={() => setShowFitFlow(true)}>
+            나에게 맞게 보기 →
+          </button>
+        )}
       </SceneSection>
+
+      {showFitFlow && (
+        <SmartFitFlow
+          initial={authProfile as FitProfile | null}
+          isLoggedIn={Boolean(authToken)}
+          onSave={saveFitProfile}
+          onAuthed={(token, email, profile) => {
+            authLogin(token, email, profile);
+          }}
+          onClose={() => setShowFitFlow(false)}
+        />
+      )}
 
       {/* ── Scene 5 INFO — 확인된 정보의 조용한 요약 ── */}
       <SceneSection id="scene5" kicker="Info" title="핵심 정보">

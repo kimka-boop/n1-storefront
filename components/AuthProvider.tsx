@@ -43,6 +43,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("n1_auth_token", tk);
     localStorage.setItem("n1_auth_email", em);
     localStorage.setItem("n1_fit_profile", JSON.stringify(p));
+    // 로그인 시점의 클라이언트 프로필을 서버(Users 시트)에도 반영 —
+    // 게스트가 방금 만든 핏 컨텍스트가 로그인 후에도 유지되도록.
+    fetch("/api/auth", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "profile", token: tk, profile: p }),
+    }).catch(() => {});
   };
 
   const logout = () => {

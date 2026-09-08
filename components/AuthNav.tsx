@@ -2,8 +2,10 @@
 
 /**
  * [헤더 네비] 로그인/회원가입 + 로그인 상태 표시 + 회원가입 모달(2단계)
+ * 회원가입 2단계 — 게스트가 이미 만든 핏 프로필(n1_fit_profile)이 있으면
+ * 다시 묻지 않고 그 프로필로 바로 가입할 수 있다 (질문 무반복 원칙).
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth, FitProfile } from "./AuthProvider";
 
 export default function AuthNav() {
@@ -18,16 +20,27 @@ export default function AuthNav() {
   const [fit, setFit] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
+  // 게스트가 이미 만든 핏 프로필 — 회원가입 2단계에서 재질문하지 않고 재사용
+  const [savedFit, setSavedFit] = useState<FitProfile | null>(null);
+  const [showFitQuestions, setShowFitQuestions] = useState(false);
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("n1_fit_profile");
+      if (raw && modal === "register") setSavedFit(JSON.parse(raw));
+    } catch {}
+  }, [modal]);
+  const FIT_KO: Record<string, string> = { A: "정핏", B: "세미오버", C: "오버핏" };
 
   const TOP = ["95(M)", "100(L)", "105(XL)", "110(2XL)", "FREE"];
   const BOTTOM = ["28~29", "30~31", "32~33", "34~35", "FREE"];
 
-  const doRegister = async () => {
+  const doRegister = async (profileOverride?: { gender: string; size: string; fit: string }) => {
     setBusy(true); setErr("");
+    const p = profileOverride || { gender, size: size.replace(/\(.*\)/, ""), fit };
     try {
       const res = await fetch("/api/auth", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "register", email: regEmail, password: pw, profile: { gender, size: size.replace(/\(.*\)/, ""), fit } }),
+        body: JSON.stringify({ action: "register", email: regEmail, password: pw, profile: p }),
       });
       const data = await res.json();
       if (data.ok) { login(data.token, regEmail, data.profile); setModal(null); }
@@ -90,14 +103,31 @@ export default function AuthNav() {
                 <input className="order-input" placeholder="비밀번호 (6자 이상)" type="password" value={pw} onChange={(e) => setPw(e.target.value)} />
                 <input className="order-input" placeholder="비밀번호 확인" type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} />
                 {err && <p className="stock-alert">{err}</p>}
-                <button className="fit-next" disabled={busy || !email || !pw || pw !== pw2}
+                <button className="fit-next" disabled={busy || !regEmail || !pw || pw !== pw2}
                   onClick={() => { if (pw.length < 6) { setErr("비밀번호는 6자 이상"); return; } setErr(""); setStep(2); }}>
-                  다음 → 스마트핏 설정
+                  다음 → 핏 프로필
                 </button>
               </>
             )}
 
-            {modal === "register" && step === 2 && (
+            {modal === "register" && step === 2 && savedFit && !showFitQuestions ? (
+              <>
+                <h3 className="fit-q">2단계 — 핏 프로필</h3>
+                <p className="fit-acct-note">
+                  이미 만드신 핏 프로필이 있어요 — {savedFit.gender} · {savedFit.size} ·
+                  {FIT_KO[savedFit.fit] || savedFit.fit}. 다시 답하지 않고 이대로 가입할 수 있어요.
+                </p>
+                <button className="fit-next" disabled={busy}
+                  onClick={() => doRegister({ gender: savedFit.gender, size: savedFit.size, fit: savedFit.fit })}>
+                  {busy ? "처리 중..." : "이 핏 프로필로 가입 완료"}
+                </button>
+                <div className="fit-save-sub">
+                  <button className="fit-link" onClick={() => { setGender(savedFit.gender); setSize(savedFit.size); setFit(savedFit.fit); setShowFitQuestions(true); }}>
+                    다시 설정할래요
+                  </button>
+                </div>
+              </>
+            ) : modal === "register" && step === 2 && (
               <>
                 <h3 className="fit-q">2단계 — 스마트 핏 프로필</h3>
                 <p className="fit-progress">Q1. 성별</p>
@@ -125,7 +155,7 @@ export default function AuthNav() {
                   ))}
                 </div>
                 {err && <p className="stock-alert">{err}</p>}
-                <button className="fit-next" disabled={busy || !gender || !size || !fit} onClick={doRegister}>
+                <button className="fit-next" disabled={busy || !gender || !size || !fit} onClick={() => doRegister()}>
                   {busy ? "처리 중..." : "가입 완료 — 자동 사이즈 추천 시작"}
                 </button>
               </>

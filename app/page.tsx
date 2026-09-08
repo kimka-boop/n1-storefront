@@ -16,9 +16,10 @@
  */
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import FitProfileModal from "@/components/FitProfileModal";
+import SmartFitFlow from "@/components/SmartFitFlow";
 import { useAuth } from "@/components/AuthProvider";
 import { mediaFor } from "@/lib/media";
+import { FIT_LABEL, fitPresetSize, preferenceShift, type FitProfile } from "@/lib/fit";
 import {
   productColors,
   purchaseState,
@@ -57,35 +58,7 @@ interface Product {
   optionStock?: Record<string, number>;
 }
 
-// ═══ 스마트 핏 사이즈 프리셋 엔진 (기존 로직 유지) ═══
-const OUTER_KW = /(블루종|자켓|점퍼|가디건|코트|아우터|항공점퍼|패딩|야상)/i;
-const SIZE_ORDER = ["S", "M", "L", "XL", "2XL", "3XL"];
-const NUM_TO_ALPHA: Record<string, string> = { "95": "S", "100": "L", "105": "XL", "110": "2XL" };
-
-function smartFitPreset(product: Product, getProfile: () => any): string {
-  const profile = getProfile();
-  if (!profile || !product.sizeOptions?.length) return "";
-  const { size: rawSize, fit } = profile;
-  if (!rawSize) return "";
-  const opts = product.sizeOptions;
-  const isOuter = OUTER_KW.test(product.name);
-  let baseAlpha = NUM_TO_ALPHA[rawSize] || rawSize;
-  let baseIdx = SIZE_ORDER.indexOf(baseAlpha);
-  if (baseIdx === -1) return "";
-  let targetIdx = baseIdx;
-  if (fit === "B" && isOuter) targetIdx = baseIdx + 1;
-  else if (fit === "C") targetIdx = baseIdx + (isOuter ? 2 : 1);
-  targetIdx = Math.max(0, Math.min(targetIdx, SIZE_ORDER.length - 1));
-  return opts.find((o) => o.toUpperCase() === SIZE_ORDER[targetIdx]) ?? "";
-}
-
-function fitBadge(product: Product, profile: any): string {
-  if (!profile) return "";
-  const isOuter = OUTER_KW.test(product.name);
-  if (profile.fit === "B" && isOuter) return `${profile.size} 기준 — 자켓 여유핏 +1추천`;
-  if (profile.fit === "C") return `${profile.size} 기준 — 오버핏 +${isOuter ? 2 : 1}추천`;
-  return `${profile.size} 기준 추천`;
-}
+// ═══ 스마트 핏 — 엔진은 lib/fit.ts (취향 기준 안내, 근거 없는 정밀 추천 금지) ═══
 
 function orRef(v?: string): string {
   const s = (v || "").trim();
@@ -215,7 +188,7 @@ function editorialWeight(p: Product): number {
 }
 
 export default function Home() {
-  const { profile: authProfile } = useAuth();
+  const { profile: authProfile, token: authToken, login: authLogin, updateProfile: authUpdateProfile } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
@@ -268,8 +241,8 @@ export default function Home() {
     role: (i === 0 ? "lead" : i <= 2 ? "supporting" : "quiet") as "lead" | "supporting" | "quiet",
   }));
 
-  // ── 스마트 핏 ──
-  const [fitProfile, setFitProfile] = useState<{gender: string; size: string; fit: string} | null>(null);
+  // ── 스마트 핏 (게스트: 브라우저 저장 / 로그인: 계정 동기화) ──
+  const [fitProfile, setFitProfile] = useState<FitProfile | null>(null);
   const [showFitModal, setShowFitModal] = useState(false);
   useEffect(() => {
     try {
@@ -277,9 +250,10 @@ export default function Home() {
       if (raw) setFitProfile(JSON.parse(raw));
     } catch {}
   }, []);
-  const saveFitProfile = (p: {gender: string; size: string; fit: string}) => {
+  const saveFitProfile = (p: FitProfile) => {
     setFitProfile(p);
     localStorage.setItem("n1_fit_profile", JSON.stringify(p));
+    if (authToken) authUpdateProfile(p); // AuthProvider.updateProfile이 서버(Users 시트)에도 반영
     setShowFitModal(false);
   };
   useEffect(() => { if (authProfile) setFitProfile(authProfile); }, [authProfile]);
@@ -355,7 +329,7 @@ export default function Home() {
     const colors = productColors(p.colorOptions);
     const apply = () => {
       setSelColor(preset?.color || (colors.length === 1 ? colors[0].value : ""));
-      const presetSize = smartFitPreset(p, () => authProfile);
+      const presetSize = fitPresetSize(p.name, authProfile?.size || fitProfile?.size || "", authProfile?.fit || fitProfile?.fit || "", p.sizeOptions || []);
       setSelSize(preset?.size || presetSize || (p.sizeOptions?.length === 1 ? p.sizeOptions[0] : ""));
       setOptTouched(false);
       setOrderStage("options");
@@ -509,10 +483,10 @@ export default function Home() {
         <button className={`gtab ${genderTab === "genderless" ? "active" : ""}`} onClick={() => changeTab("genderless")}>
           젠더리스 <span className="gcount">({genderCount("genderless")})</span>
         </button>
-        <button className="gtab gtab-fit" onClick={() => setShowFitModal(true)}>
+        <button className={`gtab gtab-fit`} onClick={() => setShowFitModal(true)}>
           {fitProfile
-            ? `Smart Fit — ${fitProfile.size}${fitProfile.fit ? " · " + ({A:"Standard",B:"Semi-Over",C:"Overfit"}[fitProfile.fit as "A"|"B"|"C"] ?? "") : ""}`
-            : "Smart Fit"}
+            ? `내 핏 — ${fitProfile.size}${fitProfile.fit ? " · " + (FIT_LABEL[fitProfile.fit as "A"|"B"|"C"] ?? "") : ""}`
+            : "나에게 맞게 보기"}
         </button>
       </nav>
 
@@ -596,16 +570,23 @@ export default function Home() {
           눈이 편한 쇼핑을 위해서입니다.
         </p>
         <button className="story-cta" onClick={() => setShowFitModal(true)}>
-          내 핏 프로필 만들기 →
+          {fitProfile
+            ? `내 핏 — ${FIT_LABEL[fitProfile.fit as "A"|"B"|"C"] ?? ""} · 수정하기 →`
+            : "어떤 핏을 좋아하세요? →"}
         </button>
       </section>
 
       <footer>© N°1 — 매주 일요일, 새로운 컬렉션</footer>
 
       {showFitModal && (
-        <FitProfileModal
+        <SmartFitFlow
           initial={fitProfile}
+          isLoggedIn={Boolean(authToken)}
           onSave={saveFitProfile}
+          onAuthed={(token, email, profile) => {
+            authLogin(token, email, profile); // 방금 만든 핏 프로필 유지 + 서버 동기화
+            setFitProfile(profile);
+          }}
           onClose={() => setShowFitModal(false)}
         />
       )}
@@ -655,7 +636,13 @@ export default function Home() {
                   <div className="option-row">
                     <label className="option-label" htmlFor="opt-size">사이즈</label>
                     {fitProfile && selSize && (
-                      <span className="fit-badge">✨ {fitBadge(selected, fitProfile)}</span>
+                      <span className="fit-badge">
+                        {fitProfile.size} 기준 —{" "}
+                        {(() => {
+                          const shift = preferenceShift(selected.name, fitProfile.fit || "");
+                          return shift === 0 ? "평소 사이즈 그대로" : shift === 1 ? "한 치수 여유 있게" : "두 치수 여유 있게";
+                        })()}
+                      </span>
                     )}
                     <select id="opt-size" className="option-select"
                       value={selSize}

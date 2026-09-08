@@ -448,3 +448,46 @@
   .viewFade img { animation: none; }
   .viewBtn { transition: none; }
 }
+
+/* ── 나에게 맞게 보기 — 핏 개인 해석층 (FACT 아래, 취향 기준 분리 표기) ── */
+.yourFit {
+  margin-top: 40px;
+  padding-top: 22px;
+  border-top: 1px solid #deddd5;
+}
+.yourFitKicker {
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #99958b;
+  margin: 0 0 10px;
+}
+.yourFact {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: #55534e;
+}
+.yourFitText {
+  margin: 0 0 6px;
+  font-size: 14px;
+  color: #242722;
+  line-height: 1.7;
+}
+.yourFitNote {
+  margin: 0;
+  font-size: 12.5px;
+  color: #66685f;
+}
+.yourFitEntry {
+  margin-top: 32px;
+  background: none;
+  border: none;
+  padding: 6px 2px;
+  font-size: 13px;
+  color: #555e4c;
+  cursor: pointer;
+  border-bottom: 1px solid #b9bfae;
+}
+.yourFitEntry:hover {
+  color: #242722;
+}
