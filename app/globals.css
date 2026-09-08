@@ -394,6 +394,22 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   padding: 12px 14px; background: #111; color: #fff; font-size: 13px;
 }
 @media (max-width: 640px) { .float-bar { left: 12px; bottom: 14px; } }
+
+/* ── 리퀴드 글래스 플로팅 버튼 (iOS 26 컨트롤 레퍼런스) — 장바구니·문의하기 공통·완전 동일 ──
+   유리는 행동에만: 두 액션 버튼에만 프로스틱 유리를 입히고, 팝업 본체는 불투명 유지.
+   backdrop-filter 미지원 브라우저는 위의 흰색 단색 규칙이 그대로 폴백. */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .float-bar, .cs-fab {
+    background: rgba(255, 255, 255, 0.48);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(16px) saturate(180%);
+    border-color: rgba(255, 255, 255, 0.72);
+    box-shadow: 0 8px 24px rgba(10, 10, 10, 0.14),
+      inset 0 1px 1px rgba(255, 255, 255, 0.95),
+      inset 0 -1px 1px rgba(255, 255, 255, 0.4);
+  }
+  .float-bar:hover, .cs-fab:hover { border-color: rgba(10, 10, 10, 0.45); transform: translateY(-2px); }
+}
 .float-popup-head button { background: none; border: none; color: #fff; cursor: pointer; }
 .float-popup-body { padding: 14px 16px; }
 .float-item { font-size: 11.5px; color: #777; margin: 4px 0 0; }
@@ -475,7 +491,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 @media (max-width: 640px) { .collection-nav { gap: 20px; justify-content: flex-start; } .nav-brand { display: none; } }
 
 /* ── 컬렉션 섹션 ── */
-.collection { max-width: 1160px; margin: 0 auto; padding: 48px 6vw 24px; }
+.collection { max-width: 1160px; margin: 0 auto; padding: 64px 6vw 24px; }
 .collection-head { text-align: center; margin-bottom: 64px; }
 .collection-title { font-size: 13px; letter-spacing: 0.3em; color: var(--ink); font-weight: 600;
   text-transform: uppercase; }
@@ -541,7 +557,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 
 /* ── 컬렉션 내 검색 (컬렉션 범위 안에서만) ── */
 .collection-search {
-  margin-top: 48px; display: flex; justify-content: center; align-items: center; gap: 10px;
+  margin-top: 32px; display: flex; justify-content: center; align-items: center; gap: 10px;
 }
 .collection-search input {
   width: min(280px, 70vw); padding: 9px 2px; font-size: 13px;
