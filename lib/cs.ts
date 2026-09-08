@@ -21,6 +21,46 @@ export type ConversationStatus =
 
 export type SenderRole = "customer" | "ai" | "agent" | "system";
 
+// ───────────────────── 메시지 출처 (P0 data integrity) ─────────────────────
+//
+// 모든 CS 메시지는 명시적 provenance를 가진다. HARD INVARIANT:
+//   sender=customer  ⇔ source=WEB_CUSTOMER_INPUT  (실제 웹 고객 입력뿐)
+//   sender=ai        ⇔ source=AI_GENERATION
+//   sender=agent     ⇔ source=TELEGRAM_HUMAN_REPLY (실제 운영자 Telegram 답장뿐)
+//   sender=system    ⇔ source=SYSTEM_EVENT
+// TEST_FIXTURE는 세션이 is_test일 때만 허용된다. 위반 insert는 저장 계층에서
+// 예외로 거부한다 — 고객 발화는 절대 생성·대리 기록될 수 없다 (사고 #B).
+
+export type MessageSource =
+  | "WEB_CUSTOMER_INPUT" // 실제 Customer Center에서 고객이 직접 전송 (유일한 CUSTOMER 출처)
+  | "AI_GENERATION" // AI CS 응답 생성
+  | "TELEGRAM_HUMAN_REPLY" // 운영자의 실제 Telegram reply (원문 verbatim)
+  | "SYSTEM_EVENT" // 시스템 상태 안내
+  | "TEST_FIXTURE"; // 명시된 테스트 전용 (is_test 세션 한정)
+
+/** sender role ↔ 허용 source 대응표 — 저장 계층 강제용 */
+export const PROVENANCE_RULE: Record<SenderRole, MessageSource[]> = {
+  customer: ["WEB_CUSTOMER_INPUT", "TEST_FIXTURE"],
+  ai: ["AI_GENERATION"],
+  agent: ["TELEGRAM_HUMAN_REPLY"],
+  system: ["SYSTEM_EVENT"],
+};
+
+/** provenance 검증 — 위반 시 예외 (server-side guard, 사고 #B 재발 방지) */
+export function validateProvenance(role: SenderRole, source: MessageSource, isTestSession: boolean): void {
+  if (!PROVENANCE_RULE[role].includes(source)) {
+    throw new Error(`[cs] provenance 위반 거부: sender=${role} source=${source}`);
+  }
+  if (source === "TEST_FIXTURE" && !isTestSession) {
+    throw new Error("[cs] provenance 위반 거부: TEST_FIXTURE는 is_test 세션에서만 허용");
+  }
+}
+
+/** 운영 Telegram 피드의 테스트 구분 마킹 — is_test 세션의 발송에만 붙는다 */
+export function testPrefix(isTest: boolean): string {
+  return isTest ? "[TEST] " : "";
+}
+
 export const AI_GREETING = [
   "안녕하세요, N°1 고객센터입니다.",
   "주문·배송, 사이즈·핏, 소재·세탁 등 궁금한 내용을 편하게 남겨주세요.",

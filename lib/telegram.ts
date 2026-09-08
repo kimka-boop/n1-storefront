@@ -112,6 +112,25 @@ export interface TelegramUpdate {
 }
 
 /** getUpdates (long polling) — webhook 미설정 환경 폴백 */
+/** getWebhookInfo (읽기 전용) — inbound 소비자가 webhook 등록 여부를 확인할 때 사용 */
+export async function getWebhookInfo(token: string): Promise<{ ok: boolean; webhookUrl?: string; pendingUpdateCount?: number } | null> {
+  const url = buildApiUrl(token, "getWebhookInfo");
+  if (!url) return null;
+  try {
+    const res = await fetch(url, { method: "GET" });
+    if (!res.ok) return null;
+    const data = await res.json().catch(() => null);
+    if (!data?.ok) return null;
+    return {
+      ok: true,
+      webhookUrl: typeof data.result?.url === "string" && data.result.url ? data.result.url : undefined,
+      pendingUpdateCount: typeof data.result?.pending_update_count === "number" ? data.result.pending_update_count : undefined,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function getTelegramUpdates(token: string, offset: number, timeoutSec = 0): Promise<TelegramUpdate[] | null> {
   const url = buildApiUrl(token, "getUpdates");
   if (!url) return null;
