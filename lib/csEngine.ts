@@ -64,6 +64,80 @@ const PRICE_INTENT = /(가격|얼마|재고|재입고|구매|살\s*수|할인\s*
 const POLICY_EXCHANGE_INTENT = /(교환)/;
 const POLICY_RETURN_INTENT = /(반품|환불|청약철회|취소하고\s*싶|취소\s*어떻게)/;
 
+// ───────────────────── §30 — 소톡 인식 (규칙 기반, LLM 호출 없음) ─────────────────────
+
+const SMALL_TALK: { re: RegExp; replies: string[] }[] = [
+  {
+    re: /(날씨|눈\s*온|비\s*온|덥|춥|좋은\s*날)/,
+    replies: [
+      "그러게요 :) 좋은 날이네요. 편하게 말씀해주세요.",
+      "맞아요, 날씨가 정말 좋네요 :) 도움이 필요하면 언제든 말씀해주세요.",
+    ],
+  },
+  {
+    re: /(고양이|강아지|댕댕이|애옹|멍)/,
+    replies: [
+      "맞아요 :) 갑자기 반려동물 이야기네요. 반려동물도 좋아합니다.",
+      "귀엽죠 :) 무슨 이야기든 편하게 해주세요.",
+    ],
+  },
+  {
+    re: /(감사|고마움|고마워|감사합니다| 땡큐)/,
+    replies: ["네, 저도 감사합니다 :) 더 필요하신 것 있으면 말씀해주세요."],
+  },
+  {
+    re: /(좋아요|좋네|굿|최고|사랑)/,
+    replies: ["감사합니다 :) 도움이 필요하시면 언제든 말씀해주세요."],
+  },
+];
+
+/** 메시지 정규화 지문 — 공백/문장부호 제거 후 소문자 (§32 duplicate 감지용) */
+function normText(t: string): string {
+  return t.toLowerCase().replace(/[\s.,!?~;:'"()\-]+/g, "");
+}
+
+/** §31·32 — spam gate: 60초 window 내 유사 반복을 감지해 deterministic 응답 전환.
+ *  내용이 의미 있게 다르면(§33) 카운트만으로 차단하지 않는다. */
+function spamState(session: CsSession, text: string): { spam: boolean; cooldown: boolean } {
+  const now = Date.now();
+  const norm = normText(text);
+  const spam = session.spam ?? (session.spam = { recent: [], cooldownUntil: 0, lastFallback: "" });
+  spam.recent = spam.recent.filter((r) => now - r.ts < 60_000);
+  const dupCount = spam.recent.filter((r) => r.norm === norm).length;
+  spam.recent.push({ norm, ts: now });
+  if (spam.recent.length > 20) spam.recent = spam.recent.slice(-20);
+  const cooldown = now < spam.cooldownUntil;
+  // 동일 지문 3회 이상(60초 내) → 쿨다운 진입 (§32: 10~20초 시작 범위)
+  if (dupCount >= 2) spam.cooldownUntil = now + 15_000;
+  return { spam: dupCount >= 2 || (cooldown && dupCount >= 1), cooldown };
+}
+
+/** §30 — 알 수 없는 입력: 고정 macro 대신 문맥 인식 짧은 응답 (중복 방지 포함) */
+function contextualFallback(session: CsSession, text: string): string {
+  const spam = session.spam ?? (session.spam = { recent: [], cooldownUntil: 0, lastFallback: "" });
+  for (const { re, replies } of SMALL_TALK) {
+    if (re.test(text)) {
+      const fresh = replies.find((r) => r !== spam.lastFallback) ?? replies[0];
+      spam.lastFallback = fresh;
+      return fresh;
+    }
+  }
+  // 소톡 패턴 미일치 — 이전 문구와 다른 조용한 유도 (동일 macro 반복 금지, §27)
+  const generic = [
+    "네, 이야기 듣고 있어요 :) 주문·상품 관련해서 도와드릴 부분이 있으면 말씀해주세요.",
+    "편하게 말씀해주세요. 주문이나 상품 관련이면 바로 확인해드릴 수 있어요.",
+    "네, 알겠습니다. 도움이 필요해지면 언제든 이어서 말씀해주세요.",
+  ];
+  const fresh = generic.find((r) => r !== spam.lastFallback) ?? generic[0];
+  spam.lastFallback = fresh;
+  return fresh;
+}
+
+/** §32 — cooldown 중 deterministic 응답 (LLM/규칙 재처리 없음) */
+function cooldownReply(): string {
+  return "같은 메시지가 빠르게 반복되고 있어요. 잠시 후 다시 보내주세요.";
+}
+
 // ───────────────────── 엔진 진입점 ─────────────────────
 
 export async function handleCustomerMessage(
@@ -103,6 +177,15 @@ export async function handleCustomerMessage(
     }
   } else {
     session.dissatisfiedStreak = 0;
+  }
+
+  // ── 3.5 spam gate (§31~33): 유사 반복 감지 시 deterministic 쿨다운 —
+  //      주문번호·상담원 요청 등 의미 있는 입력은 게이트 이전에 이미 처리됨.
+  const spamHit = spamState(session, text);
+  if (spamHit.spam || spamHit.cooldown) {
+    const reply = cooldownReply();
+    appendMessage(session, "ai", reply);
+    return { ok: true, sid: session.id, reply, status: session.status, escalated: false };
   }
 
   // ── 4. 인사 (첫 1회만 scripted, 이후 문맥 — 미션 §19·§20)
@@ -226,8 +309,8 @@ async function buildTopicalAnswer(session: CsSession, text: string): Promise<Top
     return { reply: `배송 안내입니다.\n\n${POLICY_SHIPPING}` };
   }
 
-  // 기본 — 짧은 문맥 응답 (번호 메뉴 재생 금지, 미션 §43)
-  return { reply: "네, 말씀해 주세요. 주문번호나 상품명을 함께 알려주시면 더 정확히 도와드릴 수 있어요." };
+  // 기본 — 알 수 없는 입력: 고정 macro 반복 금지(§27), 문맥 인식 짧은 응답(§28·30)
+  return { reply: contextualFallback(session, text) };
 }
 
 // ───────────────────── 상품 Q&A (검증 데이터만) ─────────────────────

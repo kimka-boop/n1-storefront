@@ -31,6 +31,12 @@ export interface CsSession {
   dissatisfiedStreak: number;
   telegramMsgIds: number[]; // escalation 원문 메시지 앵커 (운영자 reply 매핑)
   escalated: boolean;
+  /** §31·32 — spam gate/cooldown 경량 메타 (대화 원문 외 최소) */
+  spam?: {
+    recent: { norm: string; ts: number }[]; // 최근 정규화 메시지 지문
+    cooldownUntil: number; // epoch ms — 이 시각까지 deterministic 단기 응답만
+    lastFallback: string; // 직전 fallback 문구 (동일 문구 연속 방지)
+  };
   createdAt: string;
   updatedAt: string;
 }
