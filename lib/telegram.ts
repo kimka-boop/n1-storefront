@@ -112,16 +112,52 @@ export interface TelegramUpdate {
 }
 
 /** getUpdates (long polling) — webhook 미설정 환경 폴백 */
-export async function getTelegramUpdates(token: string, offset: number, timeoutSec = 0): Promise<TelegramUpdate[] | null> {
+/** getWebhookInfo (읽기 전용) — inbound 소비자가 webhook 등록 여부를 확인할 때 사용 */
+export async function getWebhookInfo(token: string): Promise<{ ok: boolean; webhookUrl?: string; pendingUpdateCount?: number } | null> {
+  const url = buildApiUrl(token, "getWebhookInfo");
+  if (!url) return null;
+  try {
+    const res = await fetch(url, { method: "GET" });
+    if (!res.ok) return null;
+    const data = await res.json().catch(() => null);
+    if (!data?.ok) return null;
+    return {
+      ok: true,
+      webhookUrl: typeof data.result?.url === "string" && data.result.url ? data.result.url : undefined,
+      pendingUpdateCount: typeof data.result?.pending_update_count === "number" ? data.result.pending_update_count : undefined,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export interface TelegramPollResult {
+  updates: TelegramUpdate[] | null;
+  /** true = 제2 getUpdates 소비자 충돌(409) — 호출자는 긴 백오프로 양보해야 한다 */
+  conflict?: boolean;
+}
+
+/**
+ * getUpdates (long polling) — webhook 미설정 환경의 소비자용.
+ * 409(제2 소비자)는 conflict 플래그로 구분해 반환한다 — 네트워크 실패(5s 백오프)와
+ * 소비자 충돌(30s 백오프)은 대응이 다르고, 409를 짧게 재시도하면 상대 long-poll을
+ * 계속 킥하는 요청 폭풍이 된다 (SESSION D 실측 장애). fetch는 타임아웃 신호로 bound된다.
+ */
+export async function getTelegramUpdates(token: string, offset: number, timeoutSec = 0): Promise<TelegramPollResult | null> {
   const url = buildApiUrl(token, "getUpdates");
   if (!url) return null;
   url.searchParams.set("offset", String(offset));
   url.searchParams.set("timeout", String(timeoutSec));
   try {
-    const res = await fetch(url, { method: "GET" });
-    if (!res.ok) return null;
+    const res = await fetch(url, {
+      method: "GET",
+      signal: AbortSignal.timeout((timeoutSec + 15) * 1_000),
+    });
+    if (res.status === 409) return { updates: null, conflict: true };
+    if (!res.ok) return { updates: null };
     const data = await res.json().catch(() => null);
-    return Array.isArray(data?.result) ? (data.result as TelegramUpdate[]) : null;
+    const updates = Array.isArray(data?.result) ? (data.result as TelegramUpdate[]) : null;
+    return updates ? { updates } : { updates: null };
   } catch {
     return null;
   }

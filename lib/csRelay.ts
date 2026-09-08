@@ -13,7 +13,8 @@
  *   - 운영자 원문은 요약·교정·trim 없이 그대로 저장·전달한다 (LLM 호출 0).
  */
 import {
-  appendMessage,
+  appendHumanOperatorMessage,
+  appendSystemMessage,
   getStore,
   markOperatorMessageSeen,
   markUpdateSeen,
@@ -92,6 +93,7 @@ export async function processTelegramUpdate(update: {
   }
   // §15 — authorized operator가 아닌 발신은 조용히 무시 (응답도 보내지 않는다)
   if (!isAuthorized(msg)) {
+    console.warn(`[cs:audit] event=UNAUTHORIZED_SENDER_IGNORED telegram_message=${msg.message_id}`);
     return { handled: false, delivered: false, info: "미인가 발신 — 무시" };
   }
 
@@ -109,7 +111,7 @@ export async function processTelegramUpdate(update: {
       return { handled: false, delivered: false, info: "target 없음" };
     }
     target.session.status = "AI_ACTIVE";
-    appendMessage(target.session, "system", "상담원이 확인을 마치고 AI 상담으로 전환했습니다. 이어서 도움을 드리겠습니다.");
+    appendSystemMessage(target.session, "상담원이 확인을 마치고 AI 상담으로 전환했습니다. 이어서 도움을 드리겠습니다.");
     await replyToOperator(msg, `✓ ${target.session.id} → AI 상담 전환`, msg.message_id);
     return { handled: true, delivered: false, info: `ai 전환: ${target.session.id}` };
   }
@@ -117,11 +119,22 @@ export async function processTelegramUpdate(update: {
   // ── 일반 텍스트: reply-to 매핑만이 고객 전달 경로다 (§9)
   const target = resolveByReply(msg);
   if (!target.session) {
+    // §14 — 미매핑·standalone은 어느 고객에게도 기록하지 않는다.
+    //       이 안내 텍스트는 운영자 응답이지 고객 메시지의 출처가 아니다 (사고 #B).
     await replyToOperator(msg, target.guidance || UNMAPPED_GUIDANCE, msg.message_id);
+    console.warn(
+      `[cs:audit] event=TELEGRAM_REPLY_UNMAPPED conversation=- telegram_message=${msg.message_id} kind=${target.guidance === STANDALONE_GUIDANCE ? "standalone" : "unmapped"}`,
+    );
     return { handled: false, delivered: false, info: target.guidance === STANDALONE_GUIDANCE ? "standalone — 전달 없음" : "미매핑 reply — 전달 없음" };
   }
-  appendMessage(target.session, "agent", raw); // VERBATIM — 요약·교정·완곡화 없음 (§4)
-  target.session.status = "HUMAN_ACTIVE"; // §11 — 첫 성공 전달로 takeover 확정
+  // FIRST: persist (HUMAN_OPERATOR / TELEGRAM_HUMAN_REPLY provenance + 상관 id) → THEN: 고객 전달 (§24)
+  appendHumanOperatorMessage(target.session, raw, {
+    updateId: typeof update.update_id === "number" ? update.update_id : 0,
+    messageId: msg.message_id,
+    replyToMessageId: msg.reply_to_message?.message_id ?? 0,
+  }); // VERBATIM — 요약·교정·완곡화 없음 (§38, LLM 호출 0)
+  target.session.status = "HUMAN_ACTIVE"; // §26 — 첫 성공 전달로 HUMAN_PENDING → HUMAN_ACTIVE
+  console.log(`[cs:audit] event=HUMAN_REPLY_MAPPED conversation=${target.session.id} telegram_message=${msg.message_id}`);
   await replyToOperator(msg, `✓ ${target.session.id} 고객에게 전달했습니다.`, msg.message_id);
   return { handled: true, delivered: true, info: `전달됨: ${target.session.id}` };
 }

@@ -3,7 +3,9 @@
 /**
  * [CS 위젯] N°1 고객센터 채팅 (미션 §17–§46)
  * - 대화 상태 머신은 서버(lib/csEngine)가 담당 — 위젯은 전사 뷰어
- * - 새로고침 후에도 같은 대화 복원 (localStorage sid → GET /api/cs)
+ * - 같은 탭 세션에서는 같은 대화 복원 (sessionStorage sid → GET /api/cs)
+ *   게스트 identity는 "탭/세션 스코프"다 — 새 탭은 새 고객 세션, 새로고침·이동·재오픈은
+ *   같은 대화를 유지한다 (사고 #C: identity는 서버가 발급하고 클라이언트는 기억만 한다)
  * - 역할 구분 표시: AI 답변 / 전문 상담원 답변 / 시스템 안내 (미션 §42)
  * - 상담원 응대 중(HUMAN_*)엔 4초 폴링으로 답변 수신
  */
@@ -13,8 +15,22 @@ import { useAuth } from "./AuthProvider";
 
 interface Msg { role: "customer" | "ai" | "agent" | "system"; text: string; }
 
-const SID_KEY = "n1_cs_sid";
+const SID_KEY = "n1_cs_conversation_id"; // session-scoped — 서버 conversation id 기억용 (opaque)
+const KEY_KEY = "n1_cs_session_key"; // session-scoped — 클라이언트 세션 키 (identity는 서버 발급)
 const HUMAN_STATES = new Set(["HUMAN_PENDING", "HUMAN_ACTIVE"]);
+
+/** 탭 세션당 1회 생성되는 opaque 키 — 모든 메시지에 실려 서버가 get-or-create에 사용한다 (사고 #C) */
+function getOrCreateSessionKey(): string {
+  let k = sessionStorage.getItem(KEY_KEY);
+  if (!k) {
+    k =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `k_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 12)}`;
+    sessionStorage.setItem(KEY_KEY, k);
+  }
+  return k;
+}
 
 export default function CsWidget() {
   const { token, email } = useAuth();
@@ -66,7 +82,7 @@ export default function CsWidget() {
 
   // 대화 복원 — 서버에 세션이 있으면 전사본으로 뷰 동기화 (미션 §38 기억)
   useEffect(() => {
-    const saved = localStorage.getItem(SID_KEY);
+    const saved = sessionStorage.getItem(SID_KEY);
     if (!saved) {
       setRestored(true);
       return;
@@ -80,7 +96,7 @@ export default function CsWidget() {
           setStatus(data.status);
           applyTranscript(data.messages || []);
         } else {
-          localStorage.removeItem(SID_KEY); // 서버 세션 만료(재시작) — 새 대화로
+          sessionStorage.removeItem(SID_KEY); // 서버 세션 만료(재시작) — 새 대화로
         }
       } catch {}
       setRestored(true);
@@ -117,6 +133,7 @@ export default function CsWidget() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           sid,
+          session_key: getOrCreateSessionKey(), // rapid-send race에도 같은 conversation 보장 (사고 #C)
           message: encodeURIComponent(text),
           customer: { name: "web", email: email || undefined, member: Boolean(token) },
         }),
@@ -125,7 +142,7 @@ export default function CsWidget() {
       if (data.ok) {
         setSid(data.sid);
         setStatus(data.status);
-        localStorage.setItem(SID_KEY, data.sid);
+        sessionStorage.setItem(SID_KEY, data.sid);
         if (data.escalated && data.status === "HUMAN_PENDING") {
           // 전사본을 다시 당겨와 system 안내까지 정확히 반영
           const r2 = await fetch(`/api/cs?sid=${encodeURIComponent(data.sid)}`, { cache: "no-store" });

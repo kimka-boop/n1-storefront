@@ -8,11 +8,14 @@
  */
 import { NextResponse } from "next/server";
 import { handleCustomerMessage } from "@/lib/csEngine";
+import { ensureTelegramInbound } from "@/lib/telegramInbound";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
+    // 상담은 언제나 고객 웹 활동에서 시작된다 — 이 시점에 운영자 답장 소비자를 띄운다 (사고 #A)
+    await ensureTelegramInbound();
     const body = await req.json();
     // 클라이언트가 encodeURIComponent로 전송 → 복원 (mojibake 방지, 기존 계약 유지)
     let message: string = body.message || "";
@@ -22,10 +25,11 @@ export async function POST(req: Request) {
     }
 
     const customer = body.customer || {};
+    const sessionKey = typeof body.session_key === "string" ? body.session_key : null;
     const result = await handleCustomerMessage(body.sid, message, {
       email: typeof customer.email === "string" ? customer.email : undefined,
       member: Boolean(customer.member),
-    });
+    }, sessionKey);
     return NextResponse.json(result);
   } catch (e: unknown) {
     return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : String(e) }, { status: 500 });

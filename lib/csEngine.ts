@@ -27,11 +27,14 @@ import {
   type EscalationReason,
 } from "@/lib/cs";
 import {
-  appendMessage,
-  ensureSession,
+  appendAiMessage,
+  appendSystemMessage,
+  appendWebCustomerMessage,
   getStore,
+  resolveOrCreateSession,
   type CsSession,
 } from "@/lib/csStore";
+import { testId, testPrefix } from "@/lib/cs";
 import { fetchCatalog, matchCatalogProduct, type CatalogProduct } from "@/lib/catalog";
 import {
   findOrderById,
@@ -144,12 +147,15 @@ export async function handleCustomerMessage(
   sid: string | null | undefined,
   message: string,
   customer?: ChatCustomerInput,
+  sessionKey?: string | null,
 ): Promise<ChatEngineResult> {
   const store = getStore();
-  const session = ensureSession(store, sid, customer);
+  // session-key get-or-create — rapid send/StrictMode 이중 전송에도 conversation 1개 보장 (사고 #C)
+  const session = resolveOrCreateSession(store, sessionKey, sid, customer);
   const text = (message || "").trim();
 
-  appendMessage(session, "customer", text);
+  // CUSTOMER 메시지의 유일한 저장 경로 — 실제 웹 고객 입력뿐이다 (사고 #B provenance 계약)
+  appendWebCustomerMessage(session, text);
 
   // ── 상담원 응대 중이면 AI는 끼어들지 않는다 (미션 §29) — 전사본 기록 + 운영자 알림만
   if (session.status === "HUMAN_PENDING" || session.status === "HUMAN_ACTIVE") {
@@ -186,7 +192,7 @@ export async function handleCustomerMessage(
   const spamHit = spamState(session, text);
   if (spamHit.spam || spamHit.cooldown) {
     const reply = cooldownReply();
-    appendMessage(session, "ai", reply);
+    appendAiMessage(session, reply);
     return { ok: true, sid: session.id, reply, status: session.status, escalated: false };
   }
 
@@ -195,10 +201,10 @@ export async function handleCustomerMessage(
     if (!session.greetSent) {
       session.greetSent = true;
       session.status = "GREETED";
-      appendMessage(session, "ai", AI_GREETING);
+      appendAiMessage(session, AI_GREETING);
       return { ok: true, sid: session.id, reply: AI_GREETING, status: session.status, escalated: false };
     }
-    appendMessage(session, "ai", SECOND_GREETING);
+    appendAiMessage(session, SECOND_GREETING);
     return { ok: true, sid: session.id, reply: SECOND_GREETING, status: session.status, escalated: false };
   }
 
@@ -214,7 +220,7 @@ async function replyAboutOrder(session: CsSession, orderNo: string): Promise<Cha
     const order = await findOrderById(doc, orderNo);
     if (!order) {
       const reply = `주문번호 ${orderNo} 로는 주문을 확인하지 못했어요. 주문번호를 다시 확인해 주시겠어요? (주문 완료 화면 또는 안내 문자에서 확인하실 수 있어요)`;
-      appendMessage(session, "ai", reply);
+      appendAiMessage(session, reply);
       return { ok: true, sid: session.id, reply, status: session.status, escalated: false };
     }
     // 본인 확인: 로그인 회원 + 주문 고객 레코드 이메일 일치 → 신뢰 조회 (미션 §33)
@@ -222,7 +228,7 @@ async function replyAboutOrder(session: CsSession, orderNo: string): Promise<Cha
     session.orderRefs.push(order.orderId);
     session.status = "ORDER_CONTEXT";
     const reply = view ? formatOrderSummary(view) : "주문은 찾았지만 항목 정보를 읽지 못했어요. 상담원에게 확인을 요청할까요?";
-    appendMessage(session, "ai", reply);
+    appendAiMessage(session, reply);
     return { ok: true, sid: session.id, reply, status: session.status, escalated: false };
   } catch {
     // 조회 실패는 "없다"고 단정하지 않는다 (미션 §46)
@@ -234,7 +240,12 @@ async function replyAboutOrder(session: CsSession, orderNo: string): Promise<Cha
 
 async function replyTopical(session: CsSession, text: string): Promise<ChatEngineResult> {
   const answer = await buildTopicalAnswer(session, text);
-  appendMessage(session, "ai", answer.reply);
+  // §26 — await 사이에 상담원 대기/응대로 전환되었다면(빠른 연속 전송 경합) AI 응답을 폐기한다.
+  // HUMAN_* 상태에서 AI가 고객에게 자동 응답하는 일은 없다. 고객 메시지 자체는 유효하다.
+  if (session.status === "HUMAN_PENDING" || session.status === "HUMAN_ACTIVE") {
+    return { ok: true, sid: session.id, reply: null, status: session.status, escalated: session.escalated };
+  }
+  appendAiMessage(session, answer.reply);
   if (answer.escalate) {
     return escalateSession(session, answer.escalateReason!, answer.reply);
   }
@@ -404,7 +415,7 @@ async function escalateSession(
   session.escalated = true;
   session.status = "HUMAN_PENDING";
   const notice = customNotice || ESCALATION_NOTICE;
-  appendMessage(session, "system", notice);
+  appendSystemMessage(session, notice);
 
   // Telegram 원문 전송 (summary + RAW transcript — 미션 §26)
   const sent = await sendEscalationTranscript(session, reason);
@@ -431,10 +442,13 @@ export function buildTranscriptPayload(session: CsSession, reason: EscalationRea
   };
   const firstCustomer = session.messages.find((m) => m.role === "customer")?.text || "(없음)";
   const lines: string[] = [
-    "[N°1 전문상담 요청]",
+    `${testPrefix(session.isTest)}[N°1 전문상담 요청]`,
     "",
     "고객:",
     session.customer.label,
+    "",
+    "유형:",
+    session.customer.type, // MEMBER | GUEST — 운영자 식별용 안전 컨텍스트 (미션 §5)
     "",
     "Conversation:",
     session.id,
@@ -443,6 +457,9 @@ export function buildTranscriptPayload(session: CsSession, reason: EscalationRea
     session.status,
     "",
   ];
+  if (session.isTest) {
+    lines.push("테스트:", testId(), "");
+  }
   if (session.orderRefs.length) {
     lines.push("관련 주문:", session.orderRefs.join(", "), "");
   }
@@ -503,24 +520,35 @@ async function appendCsMemoToOrder(session: CsSession, reason: string): Promise<
 // ───────────────────── 운영자 지원 ─────────────────────
 
 /**
- * §12·§13 — HUMAN_* 중 고객 후속 메시지를 기존 상담 context로 전달.
+ * §25 — HUMAN_* 중 고객의 실제 웹 입력을 기존 상담 context로 전달.
  * - 새 상담 요청을 만들지 않고, 원래 escalation 스레드에 답장 형태로 연결한다.
  * - 이 알림의 message_id도 같은 conversation에 매핑 → 운영자가 이 알림에 답장하면
  *   동일 고객에게 라우팅된다 (메시지 패밀리 매핑).
+ * - 전달되는 텍스트는 언제나 실제 고객의 웹 입력이며, 그 역순(알림→고객 메시지 생성)은
+ *   존재하지 않는다 (사고 #B — 알림이 customer message의 출처가 되는 일 없음).
  */
 async function notifyOperatorNewCustomerMessage(session: CsSession): Promise<void> {
   const token = process.env.N1_CS_BOT_TOKEN || "";
   const chat = process.env.N1_CS_CHAT_ID || "";
   if (!token || !chat) return;
   const last = session.messages[session.messages.length - 1];
-  const text = `[${session.customer.label} · 새 답변]\n\n고객:\n${last?.text.slice(0, 1000) || ""}`;
-  const anchor = session.telegramMsgIds[0]; // 원래 상담 thread에 연결 (§12) — 앵커가 없으면 일반 발송
+  const text = [
+    `${testPrefix(session.isTest)}[${session.customer.label} · 새 메시지]`,
+    "",
+    `Conversation: ${session.id}`,
+    "",
+    "고객:",
+    last?.text.slice(0, 1000) || "",
+  ].join("\n");
+  const anchor = session.telegramMsgIds[0]; // 원래 상담 thread에 연결 — 앵커가 없으면 일반 발송
   const r = await sendTelegramLong(token, chat, text, anchor);
   if (r.ok && r.messageIds?.length) {
     for (const id of r.messageIds) {
       if (!session.telegramMsgIds.includes(id)) session.telegramMsgIds.push(id);
     }
-    console.log(`[cs] 후속 알림 매핑: conversation=${session.id} telegram_messages=[${r.messageIds.join(",")}]`);
+    console.log(
+      `[cs:audit] event=CUSTOMER_MESSAGE_FORWARDED_TO_TELEGRAM conversation=${session.id} telegram_messages=[${r.messageIds.join(",")}]`,
+    );
   }
 }
 
