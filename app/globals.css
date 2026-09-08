@@ -434,8 +434,8 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   .float-bar:active, .cs-fab:active {
     transform: translateY(1px); /* 눌림 = 재질 깊이 살짝 감소 */
     box-shadow:
-      0 1px 3px rgba(36, 39, 34, 0.08),
-      0 5px 12px rgba(36, 39, 34, 0.08),
+      0 1px 2px rgba(36, 39, 34, 0.06),
+      0 3px 7px -2px rgba(36, 39, 34, 0.08),
       var(--n1-glass-edge);
   }
 }
@@ -864,44 +864,45 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
    탭 셀렉터 렌즈와 CS 전송 버튼이 같은 재질 언어를 공유한다.
    ════════════════════════════════════════════════════════════════ */
 :root {
-  /* 렌즈 물성: 가장자리는 밀도가 있고 중앙은 맑다(perfume lens) —
-     배경이 비치고(saturation/brightness) 아래 콘텐츠와 관계를 맺는다 */
+  /* ═══ N°1 Liquid Glass — 수정 4차(2026-09-09): 렌즈 톤을 확실히 다르게 ═══
+     흰 코스틱(배경보다 밝은 번짐)이 흰 원 인상을 만들었다 → 제거.
+     렌즈 내부는 스모키 아이보리(배경보다 어둡게)로 optical density 차를 분명히.
+     광원 상단 좌측 통일. 그림자는 접촉면 바로 아래 작게. */
   --n1-glass-fill:
     linear-gradient(168deg,
-      rgba(255, 255, 253, 0.50) 0%,
-      rgba(255, 255, 252, 0.13) 34%,
-      rgba(248, 246, 240, 0.09) 62%,
-      rgba(243, 241, 233, 0.44) 100%);
+      rgba(238, 235, 224, 0.66) 0%,
+      rgba(219, 215, 200, 0.5) 36%,
+      rgba(208, 203, 187, 0.5) 62%,
+      rgba(190, 184, 166, 0.72) 100%);
   --n1-glass-fill-active:
     linear-gradient(168deg,
-      rgba(255, 255, 255, 0.62) 0%,
-      rgba(255, 255, 253, 0.22) 34%,
-      rgba(248, 246, 240, 0.15) 62%,
-      rgba(243, 241, 233, 0.54) 100%);
-  --n1-glass-optics: blur(7px) saturate(1.55) brightness(1.05);
-  --n1-glass-optics-active: blur(8px) saturate(1.7) brightness(1.09);
+      rgba(238, 235, 224, 0.76) 0%,
+      rgba(219, 215, 200, 0.6) 36%,
+      rgba(208, 203, 187, 0.58) 62%,
+      rgba(190, 184, 166, 0.8) 100%);
+  --n1-glass-optics: blur(5px) saturate(1.6) brightness(0.965) contrast(1.06);
+  --n1-glass-optics-active: blur(6px) saturate(1.8) brightness(0.94) contrast(1.09);
   --n1-glass-specular:
-    radial-gradient(130% 80% at 28% 14%,
-      rgba(255, 255, 255, 0.62) 0%,
-      rgba(255, 255, 255, 0.18) 34%,
-      rgba(255, 255, 255, 0) 58%);
+    radial-gradient(62% 42% at 28% 10%,
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(255, 255, 255, 0.14) 52%,
+      rgba(255, 255, 255, 0) 78%);
   --n1-glass-edge:
-    inset 0 1px 0 rgba(255, 255, 255, 0.92),
-    inset 0 -1px 1.5px rgba(120, 114, 96, 0.18),
-    inset 1.5px 0 2px rgba(255, 255, 255, 0.30),
-    inset -1.5px 0 2px rgba(255, 255, 255, 0.30);
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.95),
+    inset 0 -2px 2.5px -1px rgba(104, 98, 80, 0.55),
+    inset 1.5px 0 2px -1px rgba(255, 255, 255, 0.3),
+    inset -1.5px 0 2px -1px rgba(255, 255, 255, 0.3);
   --n1-glass-shadow:
-    0 2px 5px rgba(36, 39, 34, 0.07),
-    0 12px 26px rgba(36, 39, 34, 0.11),
-    0 18px 34px -18px rgba(255, 255, 255, 0.9); /* 유리 아래 은은한 빛 번짐(caustic 인상) */
+    0 1px 2px rgba(50, 48, 40, 0.06),
+    0 4px 8px -3px rgba(60, 58, 48, 0.14);
   --n1-glass-transition: 240ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-/* 세 유리(탭 렌즈·문의하기·장바구니)가 공유하는 재질 — specular 하이라이트 면 */
+/* 세 유리(탭 렌즈·문의하기·장바구니)가 공유하는 재질 — specular은 정점 광원만 (전체를 씻지 않음) */
 .gtab-lens::before, .cs-fab::before, .float-bar::before {
   content: ""; position: absolute; inset: 0; border-radius: inherit;
   background: var(--n1-glass-specular);
-  opacity: 0.9; pointer-events: none; z-index: 2;
+  opacity: 0.8; pointer-events: none; z-index: 2;
   transition: opacity var(--n1-glass-transition), transform var(--n1-glass-transition);
 }
 
@@ -911,9 +912,9 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
   display: flex; align-items: stretch; gap: 26px;
 }
 .gtab-lens {
-  position: absolute; top: 6px; bottom: 6px; left: 0; z-index: 0;
-  width: 60px; /* syncLens가 활성 탭 히트영역 폭으로 기록 */
-  border-radius: 17px 15px 16px 18px / 19px 16px 17px 18px; /* 유기적인 드롭릿 곡률 */
+  position: absolute; top: 3px; bottom: 3px; left: 0; z-index: 0;
+  width: 60px; /* syncLens가 활성 탭 히트영역+이웃 간극 절반 폭으로 기록 */
+  border-radius: 20px 17px 18px 21px / 23px 18px 19px 22px; /* 유기적인 광학 렌즈 곡률 */
   background: var(--n1-glass-fill);
   -webkit-backdrop-filter: var(--n1-glass-optics);
   backdrop-filter: var(--n1-glass-optics);
@@ -929,9 +930,8 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
   -webkit-backdrop-filter: var(--n1-glass-optics-active);
   backdrop-filter: var(--n1-glass-optics-active);
   box-shadow:
-    0 2px 6px rgba(36, 39, 34, 0.09),
-    0 16px 32px rgba(36, 39, 34, 0.14),
-    0 20px 38px -18px rgba(255, 255, 255, 0.95),
+    0 1px 2px rgba(50, 48, 40, 0.07),
+    0 6px 13px -4px rgba(60, 58, 48, 0.15),
     var(--n1-glass-edge);
 }
 .gtab-lens.dragging::before { opacity: 1; transform: translateX(3%); }

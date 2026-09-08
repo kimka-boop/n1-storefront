@@ -254,16 +254,26 @@ export default function Home() {
       track?.querySelector<HTMLElement>(`[data-tab="${genderTab}"]`) ??
       track?.querySelector<HTMLElement>('[data-tab="all"]');
     if (!track || !lens || !btn) return;
-    lens.style.width = `${btn.offsetWidth}px`;
-    lens.style.transform = `translate3d(${btn.offsetLeft}px, 0, 0)`;
+    // 텍스트가 아니라 interaction zone 기준 — 좌우 이웃 간극의 절반까지 점유(최소폭 보장)
+    const trackGap = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap) || 0;
+    const prev = btn.previousElementSibling as HTMLElement | null;
+    const next = btn.nextElementSibling as HTMLElement | null;
+    const extra = (side: HTMLElement | null) => (side ? trackGap / 2 : 0);
+    const width = Math.max(64, btn.offsetWidth + extra(prev) + extra(next) - 8);
+    lens.style.width = `${width}px`;
+    lens.style.transform = `translate3d(${btn.offsetLeft - (width - btn.offsetWidth) / 2}px, 0, 0)`;
   }, [genderTab]);
   useEffect(() => { syncLens(); }, [syncLens, products.length]); // 카운트 변화로 탭 폭 변해도 재계산
   useEffect(() => {
-    const track = trackRef.current;
-    if (!track || typeof ResizeObserver === "undefined") return;
+    // 리사이즈 감지: documentElement/track 관찰 + 분기 전환(matchMedia) 보강
+    if (typeof ResizeObserver === "undefined") return;
     const ro = new ResizeObserver(() => syncLens());
-    ro.observe(track);
-    return () => ro.disconnect();
+    ro.observe(document.documentElement);
+    ro.observe(trackRef.current!);
+    const mq = window.matchMedia("(max-width: 640px)");
+    const onChange = () => syncLens();
+    mq.addEventListener?.("change", onChange);
+    return () => { ro.disconnect(); mq.removeEventListener?.("change", onChange); };
   }, [syncLens]);
 
   const onLensPointerDown = (e: React.PointerEvent<HTMLSpanElement>) => {
