@@ -32,6 +32,7 @@ UNMATCHED_CAP_PER_SCOPE = 4          # §6 — 스코프당 미매칭 상한 (2�
 SCOPE_ORDER = ("MALE", "FEMALE", "GENDERLESS")
 TOP_CAT, BOTTOM_CAT = "의류-상의", "의류-하의"
 VERIFIED_AT = "2026-09-09"           # 본 배치 페어 데이터 QA 검증일 (E1–E7 통과 런)
+BATCH_DATE = "2026-09-09"            # 배치 생성일 — 재계산 시 새 버전 날짜 (§10)
 
 NEUTRAL_COLOR_FAMS = ["블랙", "화이트", "아이보리", "크림", "베이지", "그레이", "차콜", "네이비", "브라운", "카멜"]
 DENIM_TOKENS = ["데님", "진청", "흑청", "연청"]
@@ -261,44 +262,60 @@ def brute_match_any(tops, bots, diversity=True):
             best_val, best = val, perm
     return best
 
-def main():
-    data = json.load(sys.stdin)
-    cat = data["catalog"]
-    scopes = {"MALE": "남성", "FEMALE": "여성", "GENDERLESS": "젠더리스"}
+def compute(data):
+    """policy의 순수 함수 — 동일 입력이면 항상 동일 출력 (E7 결정론).
+    I/O·시각 의존이 없다: verified_at·generated_at은 배치 상수(§10 계약)."""
+    scopes = partition_scopes(data["catalog"])
+    labels = {"MALE": "남성", "FEMALE": "여성", "GENDERLESS": "젠더리스"}
     all_pairs = []
-    for g, label in scopes.items():
-        tops = [p for p in cat if p["gender"] == g and p["top_bottom"] == "의류-상의"]
-        bots = [p for p in cat if p["gender"] == g and p["top_bottom"] == "의류-하의"]
-        perm, _val = brute_match(tops, bots, floor=68)
+    notes = []
+    for g in SCOPE_ORDER:
+        tops, bots = scopes[g]
+        perm, _val = brute_match(tops, bots, floor=SECONDARY_FLOOR)
         if perm is None:
-            sys.stderr.write(f"{g}: 매칭 불가\n")
+            notes.append(f"{g}: 매칭 불가")
             continue
         for ti, bi in enumerate(perm):
             a, b = tops[ti], bots[bi]
             s = pair_score(a, b)
-            tier = "BEST_MATCH" if s["total"] >= 78 else ("SECONDARY" if s["total"] >= 68 else "BELOW_THRESHOLD")
+            tier = ("BEST_MATCH" if s["total"] >= BEST_FLOOR
+                    else "SECONDARY" if s["total"] >= SECONDARY_FLOOR
+                    else "BELOW_THRESHOLD")
             all_pairs.append({
                 "pair_id": f"PAIR-{g[:2]}-{len(all_pairs)+1:02d}",
-                "collection_scope": g, "scope_label": label,
+                "collection_scope": g, "scope_label": labels[g],
                 "top_product_id": a["product_id"], "top_name": a["name"],
                 "bottom_product_id": b["product_id"], "bottom_name": b["name"],
                 "pair_score_internal": s["total"], "score_breakdown": s, "tier": tier,
-                "trend_clusters": sorted(set(a["cluster_ids"]) & set(b["cluster_ids"])),
+                "trend_clusters": sorted(
+                    set(a.get("cluster_ids") or []) & set(b.get("cluster_ids") or [])),
                 "pair_reason_short": reason_short(a, b, s),
-                "generated_at": "2026-09-09",
+                "confidence": "HIGH" if s["data"] >= 5 else "MEDIUM",
+                "verified_at": VERIFIED_AT,
+                "generated_at": BATCH_DATE,
             })
-    out = {"policy": "N1_PAIRING_POLICY_V1", "threshold": {"best": 78, "secondary": 68},
-           "pairs": all_pairs}
+    out = {
+        "policy": POLICY_ID,
+        "threshold": {"best": BEST_FLOOR, "secondary": SECONDARY_FLOOR},
+        "verified_at": VERIFIED_AT,
+        "pairs": all_pairs,
+    }
+    return out, notes
+
+def main():
+    out, notes = compute(json.load(sys.stdin))
+    for n_ in notes:
+        sys.stderr.write(n_ + "\n")
+    best = sum(1 for p in out["pairs"] if p["tier"] == "BEST_MATCH")
+    below = sum(1 for p in out["pairs"] if p["tier"] == "BELOW_THRESHOLD")
+    sys.stderr.write(f"pairs {len(out['pairs'])} best {best} below {below}\n")
     json.dump(out, sys.stdout, ensure_ascii=False)
-    best = sum(1 for p in all_pairs if p["tier"] == "BEST_MATCH")
-    below = sum(1 for p in all_pairs if p["tier"] == "BELOW_THRESHOLD")
-    sys.stderr.write(f"pairs {len(all_pairs)} best {best} below {below}\n")
 
 def reason_short(a, b, s):
     sc = silhouette_class(b)
     ts = silhouette_class(a)
     parts = []
-    inter = set(a["cluster_ids"]) & set(b["cluster_ids"])
+    inter = set(a.get("cluster_ids") or []) & set(b.get("cluster_ids") or [])
     if inter:
         parts.append("같은 트렌드 무드")
     if is_denim(b):
