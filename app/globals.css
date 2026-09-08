@@ -199,12 +199,21 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   padding: 8px 10px; margin: 8px 0 0; line-height: 1.6;
 }
 
+:root {
+  /* 플로팅 액션 반응형 토큰 — 고정 px 금지(clamp), 다른 UI와 함께 스케일.
+     36px 고정 → 모바일 44px~와이드 52px (기준 뷰포트 대비 약 +30%). */
+  --n1-fab-size: clamp(44px, 42px + 0.5vw, 52px);
+  --n1-fab-bottom: clamp(14px, 1.6vw + 6px, 30px);
+}
 /* ── CS 채팅 위젯 (좌측 여백 중앙 — 장바구니와 x축 미러) ──
    fixed 요소의 100% = ICB(스크롤바 제외) → 컬럼 중심 기준과 정확히 일치.
-   여백 중앙 = (뷰포트-컬럼)/4 + 6vw의 절반 - 버튼 절반. 좁으면 16px. */
+   여백 중앙 = (뷰포트-컬럼)/4 + 6vw의 절반 - 버튼 절반(가변) - 4px 바깥 럭. */
 .cs-fab {
-  position: fixed; left: max(16px, calc((100% - 1160px) / 4 + 3% - 22px)); bottom: 28px; z-index: 999;
-  width: 36px; height: 36px; border-radius: 50%;
+  position: fixed;
+  left: max(16px, calc((100% - 1160px) / 4 + 3% - (var(--n1-fab-size) / 2) - 4px));
+  bottom: var(--n1-fab-bottom);
+  z-index: 999;
+  width: var(--n1-fab-size); height: var(--n1-fab-size); border-radius: 50%;
   background: #fff; color: #0a0a0a;
   border: 1px solid var(--line, #e8e8e5); cursor: pointer;
   display: flex; align-items: center; justify-content: center; /* 아이콘 중앙 정렬 */
@@ -212,9 +221,11 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   transition: border-color 0.2s, transform 0.25s cubic-bezier(.22,.61,.36,1);
 }
 .cs-fab:hover { border-color: #0a0a0a; transform: translateY(-2px); }
+/* 글리프는 컨테이너의 39% — 종전 14/36 비율 그대로, 크기와 함께 스케일 */
+.cs-fab svg { width: 39%; height: 39%; }
 @media (max-width: 640px) { .cs-fab { left: 16px; bottom: 14px; } } /* .float-bar right:16/bottom:14 미러 */
 .cs-window {
-  position: fixed; left: max(16px, calc((100% - 1160px) / 4 + 3% - 22px)); bottom: 20px; z-index: 1000;
+  position: fixed; left: max(16px, calc((100% - 1160px) / 4 + 3% - (var(--n1-fab-size) / 2) - 4px)); bottom: 20px; z-index: 1000;
   width: 320px; max-width: calc(100vw - 32px); height: 440px;
   background: #fff; color: #111; border: 1px solid #e5e5e5;
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
@@ -327,16 +338,20 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 
 /* ═══ 우측 여백 중앙 플로팅 바 (V2: 벡터 쇼핑백 아이콘, 리퀴드 글래스) ═══ */
 .float-bar {
-  position: fixed; right: max(16px, calc((100% - 1160px) / 4 + 3% - 22px)); bottom: 28px; z-index: 900;
-  width: 36px; height: 36px; border-radius: 50%;
+  position: fixed;
+  right: max(16px, calc((100% - 1160px) / 4 + 3% - (var(--n1-fab-size) / 2) - 4px));
+  bottom: var(--n1-fab-bottom);
+  z-index: 900;
+  width: var(--n1-fab-size); height: var(--n1-fab-size); border-radius: 50%;
   background: #fff; color: #0a0a0a; border: 1px solid var(--line, #e8e8e5);
   box-shadow: 0 4px 18px rgba(10,10,10,0.10);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
   transition: border-color 0.2s, transform 0.25s cubic-bezier(.22,.61,.36,1);
 }
+.float-bar .float-icon svg { width: 39%; height: 39%; } /* 컨테이너와 함께 스케일 */
 .float-bar:hover { border-color: #0a0a0a; transform: translateY(-2px); }
-.float-bar .float-icon { line-height: 1; display: flex; }
+.float-bar .float-icon { line-height: 1; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
 .float-bar .float-status {
   position: absolute; top: -4px; left: -4px;
   font-size: 9.5px; font-weight: 700; padding: 2px 6px;
@@ -344,7 +359,10 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 }
 .float-bar .float-status.done { background: #0b7a3e; }
 .float-popup {
-  position: fixed; right: max(16px, calc((100% - 1160px) / 4 + 3% - 22px)); bottom: 72px; z-index: 901;
+  position: fixed;
+  right: max(16px, calc((100% - 1160px) / 4 + 3% - (var(--n1-fab-size) / 2) - 4px));
+  bottom: calc(var(--n1-fab-bottom) + var(--n1-fab-size) + 8px);
+  z-index: 901;
   width: 290px; max-width: calc(100vw - 32px);
   background: #fff; color: #111; border: 1px solid #e5e5e5;
   box-shadow: 0 8px 30px rgba(0,0,0,0.2); border-radius: 10px; overflow: hidden;
