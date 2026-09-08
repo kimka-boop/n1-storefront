@@ -563,6 +563,82 @@ export default function ProductPage() {
         heroVisible={heroVisible}
         onBuy={scrollToDecision}
       />
+
+      {/* ── 페어 컨텍스트 — 구매 뒤, 조용한 추천 (§52: CTA 앞에서 강요하지 않는다) ── */}
+      <PairSuggestion productId={product.id} />
     </main>
+  );
+}
+
+interface CatalogPairInfo {
+  pairId: string;
+  collectionScope: string;
+  topProductId: string;
+  bottomProductId: string;
+  pairReasonShort: string;
+}
+
+/** 함께 추천된 페어 — 사전 계산된 mapping만 읽는다 (§37·§47). 스코어 노출 금지(§40). */
+function PairSuggestion({ productId }: { productId: string }) {
+  const [suggestion, setSuggestion] = useState<{
+    productId: string;
+    name: string;
+    price: number;
+    gender?: string;
+    image: string | null;
+    reason: string;
+  } | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/products", { cache: "no-store" });
+        const data = await res.json();
+        if (!data.ok || !alive) return;
+        const products: Product[] = data.products || [];
+        const pairs: CatalogPairInfo[] = data.pairs || [];
+        const pair = pairs.find(
+          (p) => p.topProductId === productId || p.bottomProductId === productId
+        );
+        if (!pair) return;
+        const otherId = pair.topProductId === productId ? pair.bottomProductId : pair.topProductId;
+        const other = products.find((p) => p.id === otherId);
+        if (!other) return;
+        const img = mediaFor(other.id, other.lookbookImage)?.front || null;
+        setSuggestion({
+          productId: other.id,
+          name: other.name,
+          price: other.price,
+          gender: other.gender,
+          image: img,
+          reason: pair.pairReasonShort,
+        });
+      } catch {
+        /* 페어 제안은 실패해도 조용히 사라진다 — 구매 흐름을 방해하지 않는다 */
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [productId]);
+
+  if (!suggestion) return null;
+  return (
+    <SceneSection id="pair" kicker="Styled with" title="함께 보기">
+      <Link href={`/product/${suggestion.productId}`} className={styles.pairLink} data-reveal>
+        {suggestion.image ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img src={suggestion.image} alt={`${suggestion.name} 이미지`} loading="lazy" className={styles.pairImage} />
+        ) : (
+          <span className={styles.pairImageEmpty}>이미지 준비 중</span>
+        )}
+        <span className={styles.pairInfo}>
+          <span className={styles.pairName}>{suggestion.name}</span>
+          <span className={styles.pairPrice}>₩{suggestion.price.toLocaleString("ko-KR")}</span>
+          {suggestion.reason ? <span className={styles.pairReason}>{suggestion.reason}</span> : null}
+        </span>
+      </Link>
+    </SceneSection>
   );
 }

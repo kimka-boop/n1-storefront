@@ -24,6 +24,8 @@ import {
   productColors,
   purchaseState,
   selectCollection,
+  buildCollectionPairs,
+  type CollectionPair,
 } from "@/lib/experience";
 import { PRODUCT_STORY } from "@/lib/productContent";
 import {
@@ -176,7 +178,7 @@ function driveImg(fileId: string, w = 1000) {
 }
 
 type GenderKey = "home" | "all" | "male" | "female" | "genderless";
-const GENDER_API: Record<"male" | "female" | "genderless", string> = {
+const GENDER_API: Record<"male" | "female" | "genderless", "MALE" | "FEMALE" | "GENDERLESS"> = {
   male: "MALE", female: "FEMALE", genderless: "GENDERLESS",
 };
 
@@ -186,12 +188,14 @@ function editorialWeight(p: Product): number {
   const colors = productColors(p.colorOptions).length;
   return hasStory * 100 + colors;
 }
+void editorialWeight; // 페어 뷰 전환 후 예비 — 스코어 정렬은 서버(Pairs 시트) 소관
 
 export default function Home() {
   // ── 스마트 핏 — 컨텍스트는 AuthProvider 단일 진실(게스트 즉시 저장, §8) ──
   const { fit } = useAuth();
   const [showFitModal, setShowFitModal] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
+  const [pairs, setPairs] = useState<CollectionPair[]>([]);
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<Product | null>(null);
@@ -231,11 +235,13 @@ export default function Home() {
     if (t === "home") window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const collection = selectCollection(
-    products,
-    genderTab === "all" || genderTab === "home" ? "all" : GENDER_API[genderTab],
-    query
-  ).sort((a, b) => editorialWeight(b) - editorialWeight(a));
+  // ── 페어 컬렉션: 한 row = 추천 코디 1벌 (LEFT=TOP, RIGHT=BOTTOM) ──
+  // N1_PAIRING_POLICY_V1 — HERMES가 사전 계산한 mapping만 소비, 프론트에서 조합 생성 금지.
+  const scope = genderTab === "all" || genderTab === "home" ? "all" : GENDER_API[genderTab];
+  const { rows: pairRows, singles } = buildCollectionPairs(products, pairs, scope, query);
+  const collection = pairRows.length
+    ? [...pairRows.flatMap((r) => [r.top, r.bottom]), ...singles]
+    : selectCollection(products, scope, query);
   const genderCount = (g: "male" | "female" | "genderless") =>
     selectCollection(products, GENDER_API[g]).length;
 
@@ -353,12 +359,6 @@ export default function Home() {
     else syncLens(); // 제자리 안정화 스냅
   };
 
-  // 에디토리얼 역할 배분: 첫 편성 = LEAD, 다음 2 = SUPPORTING, 나머지 = QUIET
-  const withRoles = collection.map((p, i) => ({
-    product: p,
-    role: (i === 0 ? "lead" : i <= 2 ? "supporting" : "quiet") as "lead" | "supporting" | "quiet",
-  }));
-
   // ── 빠른 주문 상태 (원시 색상/사이즈 값) ──
   const [selColor, setSelColor] = useState("");
   const [selSize, setSelSize] = useState("");
@@ -373,8 +373,10 @@ export default function Home() {
     try {
       const res = await fetch("/api/products", { cache: "no-store" });
       const data = await res.json();
-      if (data.ok) setProducts(data.products);
-      else setError(data.error || "시트 조회 실패");
+      if (data.ok) {
+        setProducts(data.products);
+        setPairs(data.pairs || []);
+      } else setError(data.error || "시트 조회 실패");
     } catch {
       setError("서버 연결 실패");
     }
@@ -585,7 +587,7 @@ export default function Home() {
       <header className="hero">
         <div className="hero-brand">
           <h1>N°1</h1>
-          <p className="hero-tag">60 Pieces · Selected by AI</p>
+          <p className="hero-tag">44 Pieces · 20 Outfits</p>
           <p className="hero-tagline">매주 일요일, 마음에 드는 몇 벌만 골라 보여드립니다</p>
         </div>
         <p className="hero-drop">
@@ -640,8 +642,8 @@ export default function Home() {
           <h2 className="collection-title">이번 컬렉션</h2>
           <p className="collection-sub">
             {genderTab === "all" || genderTab === "home"
-              ? `남성 ${genderCount("male")} · 여성 ${genderCount("female")} · 젠더리스 ${genderCount("genderless")} — 총 ${products.length}벌`
-              : `${({ male: "남성", female: "여성", genderless: "젠더리스" } as Record<string, string>)[genderTab]} 컬렉션 — ${collection.length}벌`}
+              ? `남성 ${genderCount("male")} · 여성 ${genderCount("female")} · 젠더리스 ${genderCount("genderless")} — 코디 ${pairRows.length}벌 · 단품 ${singles.length}개`
+              : `${({ male: "남성", female: "여성", genderless: "젠더리스" } as Record<string, string>)[genderTab]} 컬렉션 — 코디 ${pairRows.length}벌 · 단품 ${singles.length}개`}
           </p>
           <div className="collection-search">
             <input
@@ -657,63 +659,130 @@ export default function Home() {
           </div>
         </div>
 
-        {withRoles.length ? (
-          <div className="pieces">
-            {withRoles.map(({ product: p, role }) => {
-              const img = failedImg[p.id] ? null : imageOf(p);
-              const soldOut = p.stockStatus === "품절";
-              // hover disclosure (Auralee/Amomento/JilSander 공통 원칙): 착용컷 ↔ 다른 각도.
-              // 정보 추가 역할 — zoom 효과가 아님. 샷이 하나뿐이면 스왑 없이 fog 해제만.
-              const altShot = img
-                ? mediaFor(p.id, p.lookbookImage)?.views.find((v) => v.src !== img)?.src ?? null
-                : null;
-              return (
-                <Link
-                  key={p.id}
-                  href={`/product/${p.id}`}
-                  className={`piece piece-${role}`}
-                  data-reveal
-                >
-                  <div className={`piece-media ${img ? "" : "empty"}`}>
-                    {img ? (
-                      <>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={img}
-                          alt={`${p.name} 대표 이미지`}
-                          loading={role === "lead" ? "eager" : "lazy"}
-                          onError={() =>
-                            setFailedImg((f) => (f[p.id] ? f : { ...f, [p.id]: true }))
-                          }
-                        />
-                        {altShot && (
-                          /* eslint-disable-next-line @next/next/no-img-element */
-                          <img className="piece-alt" src={altShot} alt="" aria-hidden="true" loading="lazy" />
-                        )}
-                      </>
-                    ) : (
-                      <span>이미지 준비 중</span>
-                    )}
-                    {soldOut && <span className="piece-soldout">품절</span>}
-                  </div>
-                  <div className="piece-caption">
-                    <p className="piece-eyebrow">
-                      {[genderKo(p.gender), categoryShort(p.category)].filter(Boolean).join(" · ")}
-                    </p>
-                    <h3 className="piece-name">{p.name}</h3>
-                    <p className="piece-price">₩{p.price.toLocaleString("ko-KR")}</p>
-                  </div>
-                </Link>
-              );
-            })}
+        {pairRows.length ? (
+          <div className="pair-collection">
+            {/* §34: 상의/하의는 column header — pair view를 깨는 interactive 탭이 아니다 */}
+            <div className="pair-head" aria-hidden="true">
+              <span>상의</span>
+              <span>하의</span>
+            </div>
+            {pairRows.map(({ pair, top, bottom }, rowIndex) => (
+              <div className="pair-row" key={pair.pairId} data-reveal>
+                <div className="pair-cards">
+                  {[{ p: top, eager: rowIndex === 0 }, { p: bottom, eager: false }].map(({ p, eager }) => {
+                    const img = failedImg[p.id] ? null : imageOf(p);
+                    const soldOut = p.stockStatus === "품절";
+                    const altShot = img
+                      ? mediaFor(p.id, p.lookbookImage)?.views.find((v) => v.src !== img)?.src ?? null
+                      : null;
+                    return (
+                      <Link
+                        key={p.id}
+                        href={`/product/${p.id}`}
+                        className="piece pair-piece"
+                        data-reveal
+                      >
+                        <div className={`piece-media ${img ? "" : "empty"}`}>
+                          {img ? (
+                            <>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={img}
+                                alt={`${p.name} 대표 이미지`}
+                                loading={eager ? "eager" : "lazy"}
+                                onError={() =>
+                                  setFailedImg((f) => (f[p.id] ? f : { ...f, [p.id]: true }))
+                                }
+                              />
+                              {altShot && (
+                                /* eslint-disable-next-line @next/next/no-img-element */
+                                <img className="piece-alt" src={altShot} alt="" aria-hidden="true" loading="lazy" />
+                              )}
+                            </>
+                          ) : (
+                            <span>이미지 준비 중</span>
+                          )}
+                          {soldOut && <span className="piece-soldout">품절</span>}
+                        </div>
+                        <div className="piece-caption">
+                          <p className="piece-eyebrow">
+                            {[genderKo(p.gender), categoryShort(p.category)].filter(Boolean).join(" · ")}
+                          </p>
+                          <h3 className="piece-name">{p.name}</h3>
+                          <p className="piece-price">₩{p.price.toLocaleString("ko-KR")}</p>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+                {pair.pairReasonShort && (
+                  <p className="pair-reason">{pair.pairReasonShort}</p>
+                )}
+              </div>
+            ))}
           </div>
-        ) : (
+        ) : null}
+
+        {singles.length ? (
+          <div className="pair-singles">
+            <p className="pair-singles-label">단품으로 보기</p>
+            <div className="pieces">
+              {singles.map((p) => {
+                const img = failedImg[p.id] ? null : imageOf(p);
+                const soldOut = p.stockStatus === "품절";
+                const altShot = img
+                  ? mediaFor(p.id, p.lookbookImage)?.views.find((v) => v.src !== img)?.src ?? null
+                  : null;
+                return (
+                  <Link
+                    key={p.id}
+                    href={`/product/${p.id}`}
+                    className="piece piece-quiet"
+                    data-reveal
+                  >
+                    <div className={`piece-media ${img ? "" : "empty"}`}>
+                      {img ? (
+                        <>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={img}
+                            alt={`${p.name} 대표 이미지`}
+                            loading="lazy"
+                            onError={() =>
+                              setFailedImg((f) => (f[p.id] ? f : { ...f, [p.id]: true }))
+                            }
+                          />
+                          {altShot && (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img className="piece-alt" src={altShot} alt="" aria-hidden="true" loading="lazy" />
+                          )}
+                        </>
+                      ) : (
+                        <span>이미지 준비 중</span>
+                      )}
+                      {soldOut && <span className="piece-soldout">품절</span>}
+                    </div>
+                    <div className="piece-caption">
+                      <p className="piece-eyebrow">
+                        {[genderKo(p.gender), categoryShort(p.category)].filter(Boolean).join(" · ")}
+                      </p>
+                      <h3 className="piece-name">{p.name}</h3>
+                      <p className="piece-price">₩{p.price.toLocaleString("ko-KR")}</p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+
+        {!pairRows.length && !singles.length && !collection.length ? (
           <p className="collection-empty">
             {query
               ? "검색 결과가 없습니다 — 다른 이름으로 찾아보세요."
               : "이번 컬렉션에는 해당하는 상품이 없습니다 — 다음 컬렉션에서 만나요."}
           </p>
-        )}
+        ) : null}
       </section>
 
       {/* ── 브랜드 스토리 — second editorial moment (제품 컷 + 짧은 문장) ── */}

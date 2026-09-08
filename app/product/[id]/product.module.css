@@ -537,3 +537,51 @@
   border: 1px solid #111;
 }
 .ctaBuyNow:hover { background: #111; color: #faf9f7; }
+
+/* ── 페어 제안 — 조용한 단일 추천 (§49–§52: 박스·배지 없이) ── */
+.pairLink {
+  display: grid;
+  grid-template-columns: 132px 1fr;
+  gap: 22px;
+  align-items: center;
+  max-width: 420px;
+  text-decoration: none;
+  color: inherit;
+}
+.pairLink:hover .pairName { box-shadow: inset 0 -1px 0 0 #242722; }
+.pairImage {
+  width: 132px;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: 50% 22%;
+  background: #f2f1ed;
+  display: block;
+}
+.pairImageEmpty {
+  width: 132px;
+  aspect-ratio: 3 / 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f2f1ed;
+  color: #a8a49c;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.pairInfo { display: flex; flex-direction: column; gap: 6px; }
+.pairName {
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #242722;
+  box-shadow: inset 0 -1px 0 0 transparent;
+  transition: box-shadow 0.2s ease-out;
+  align-self: flex-start;
+}
+.pairPrice { font-size: 12.5px; color: #55534e; letter-spacing: 0.03em; }
+.pairReason { font-size: 11.5px; color: #8b877e; letter-spacing: 0.06em; }
+@media (max-width: 640px) {
+  .pairLink { grid-template-columns: 108px 1fr; gap: 16px; }
+}

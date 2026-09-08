@@ -1,0 +1,368 @@
+[
+ {
+  "source_name": "Aj 패션로그 (Tistory)",
+  "source_type": "community",
+  "source_url": "https://luzien2.tistory.com/entry/2026-가을-남성-패션-트렌드-총정리",
+  "publication_date": "2026-08-24",
+  "observation_type": "direct",
+  "gender_relevance": "MEN",
+  "category": "styling",
+  "observed_item": "5 key F/W trends: 소프트 테일러링 (unstructured blazer + drape pants + round knit), retro heritage (아가일 니트, 체크 오버셔츠, 레더 블루종, 매트 스웨이드), 쿼터 집업/스웨터 베스트 layered over white tee or Oxford shirt",
+  "color": "camel, chocolate brown, charcoal + deep burgundy point (scarf/socks/single knit)",
+  "silhouette": "drop shoulder, wide/curved fit, 1-2 tuck pleated wide pants, tapered slacks",
+  "material": "brushed wool, tweed, tartan check, corduroy, textured leather, matte suede; advises wool 70%+ over acrylic",
+  "keywords": [
+   "소프트 테일러링",
+   "레더 블루종",
+   "쿼터 집업",
+   "스웨터 베스트",
+   "드레이프 팬츠",
+   "브러쉬드 울",
+   "아가일",
+   "딥 버건디"
+  ],
+  "notes": "CLAIM (blogger trend round-up, not street observation). Full text fetched directly."
+ },
+ {
+  "source_name": "패션&뷰티 인사이드 (dongseox.com)",
+  "source_type": "community",
+  "source_url": "https://dongseox.com/entry/%F0%9F%8D%82-2026-%EA%B0%80%EC%9D%84-%EB%82%A8%EC%9E%90-%EC%BD%94%EB%94%94-%EC%9D%B4-%EA%B3%B5%EC%8B%9D-%ED%95%98%EB%82%98%EB%A9%B4-%EB%81%9D%EB%82%98%EC%9A%94",
+  "publication_date": "2026-08-26",
+  "observation_type": "direct",
+  "gender_relevance": "MEN",
+  "category": "styling",
+  "observed_item": "Outfit formulas: 출근 cotton blazer+slacks+loafers; 데이트 knit cardigan+straight denim+sneakers; 캐주얼 hoodie+balmacaan coat+cargo pants. Keywords 그래놀라 코어 (functional outer + knit) and 패러독스 드레싱 (sporty + classic coat)",
+  "color": "camel, khaki, burgundy, charcoal; 'Transformative Teal' as accent/accessory only; max 2-3 colors per outfit",
+  "silhouette": "CLAIMS wide-fit denim trend is over and '클래식 스트레이트 데님이 다시 떠올랐어요' (straight denim back); warns against double oversized",
+  "material": "not emphasized",
+  "keywords": [
+   "그래놀라 코어",
+   "패러독스 드레싱",
+   "발마칸 코트",
+   "코튼 블레이저",
+   "니트 카디건",
+   "스트레이트 데님"
+  ],
+  "notes": "CLAIM. Full text fetched directly. Directly contradicts luzien2 (same fortnight) which still recommends wide/curved pants — blogger disagreement over wide vs straight is itself a signal of transition."
+ },
+ {
+  "source_name": "슈슈의 스타일로그 (Naver blog, citing stylist YouTube 옆집언니 최실장)",
+  "source_type": "community",
+  "source_url": "https://m.blog.naver.com/mongi3415/224401228017",
+  "publication_date": "2026-09-04",
+  "observation_type": "direct",
+  "gender_relevance": "WOMEN",
+  "category": "styling",
+  "observed_item": "10 F/W 2026 trends: skinny/cigarette pants return, 정핏 (exact-fit) jackets, shirt collar+cuffs layered out over knits/jackets (unbalanced one-collar styling), peplum, pencil skirt, check mix-match, 3D flower decorations, sporty mix (windbreaker over slacks/skirt), sheer layering, shoulder-drape muffler",
+  "color": "not specified",
+  "silhouette": "explicit slim-regression: '전체 실루엣이 다시 슬림해지는 흐름'; narrow shoulders, shorter sleeves",
+  "material": "leather, mouton, nylon, tulle, PVC, bead decoration",
+  "keywords": [
+   "스키니 회귀",
+   "시가렛 팬츠",
+   "정핏",
+   "펜슬 스커트",
+   "페플럼",
+   "셔츠 레이어링",
+   "체크 믹스매치",
+   "시스루 레이어드"
+  ],
+  "notes": "CLAIM (stylist YouTube content re-blogged). Full text fetched directly. Dated inside target window."
+ },
+ {
+  "source_name": "Naver blog semi169 (2026 가을 옷 뭐 사지?)",
+  "source_type": "community",
+  "source_url": "https://m.blog.naver.com/semi169/224391867788",
+  "publication_date": "2026-08-27",
+  "observation_type": "direct",
+  "gender_relevance": "WOMEN",
+  "category": "styling",
+  "observed_item": "'Buy only 6' list: brown or check blazer, quality basic knit, semi-wide slacks, one point-color item, dark brown loafers, structured bag/scarf. Layer combos named: shirt+knit, knit+jacket, thin turtleneck+cardigan, knit+skirt. Also: brown leather bomber + Oxford shirt + denim called a revived classic; lace camisole under jackets as key F/W item",
+  "color": "basics in gray/cream/brown/charcoal/navy; point colors burgundy, cobalt blue, royal purple, butter yellow, peach, turquoise; rule '기본색 80% + 유행색 20%'",
+  "silhouette": "semi-wide slacks (fitted waist falling straight from hip); oversized top + streamlined bottom (and vice versa)",
+  "material": "soft low-pilling knit fabric prioritized over design; suede pants named among trends",
+  "keywords": [
+   "브라운 블레이저",
+   "체크 블레이저",
+   "세미 와이드 슬랙스",
+   "다크브라운 로퍼",
+   "버건디",
+   "코발트 블루",
+   "레이스 카미솔",
+   "레더 봄버"
+  ],
+  "notes": "CLAIM (shopping-guide blog). Full text fetched directly. Dated inside target window."
+ },
+ {
+  "source_name": "미래스타일리스트 한결 (Naver blog)",
+  "source_type": "community",
+  "source_url": "https://m.blog.naver.com/naphg05/224143962799",
+  "publication_date": "2026-01-12",
+  "observation_type": "direct",
+  "gender_relevance": "WOMEN",
+  "category": "general",
+  "observed_item": "2026 forecast: wide/straight pants as settled default ('편함의 정착'), lace skirts, balloon skirts, drop-waist 'refined retro'; buy list includes mid-width wide denim, straight wool slacks, straight cotton, corduroy; skip list: chunky ugly sneakers, micro bags, loud Y2K points ('already finished consuming')",
+  "color": "monochrome coexisting with lime/vivid; basics black/white/navy/brown/gray for bags-outer-shoes",
+  "silhouette": "medium wide, low-rise relaxed; slinky drop-waist dresses",
+  "material": "wool mary janes, leather bags, lace as texture not decoration",
+  "keywords": [
+   "리파인드 레트로",
+   "벌룬 스커트",
+   "말차 코어",
+   "모노크롬",
+   "와이드 스트레이트 팬츠"
+  ],
+  "notes": "CLAIM. Full text fetched directly. NOTE: published Jan 2026 (forecast for the year, not fall-specific) — used as baseline only."
+ },
+ {
+  "source_name": "trace0426의 티스토리 (20대 남자 가을 코디 완전정복)",
+  "source_type": "community",
+  "source_url": "https://trace0426.tistory.com/40",
+  "publication_date": "2025-10-02",
+  "observation_type": "direct",
+  "gender_relevance": "MEN",
+  "category": "styling",
+  "observed_item": "6 outfit formulas for men in 20s: cream turtleneck knit + corduroy pants + loafers/Chelsea boots; half-zip knit + straight denim + down vest; white Oxford shirt + beige chino + navy knit + trench + white sneakers; flannel check shirt over raglan sweatshirt + denim",
+  "color": "brown, camel, burgundy, olive + neutrals",
+  "silhouette": "relaxed top / straight or slim bottom",
+  "material": "cotton, wool blend, tweed, corduroy",
+  "keywords": [
+   "터틀넥 니트",
+   "코듀로이 팬츠",
+   "하프집업",
+   "셔츠 레이어링",
+   "첼시 부츠",
+   "트렌치코트"
+  ],
+  "notes": "CLAIM. Full text fetched directly. NOTE: dated fall 2025 — one season older than window; included as prior-season baseline, not as 2026 evidence."
+ },
+ {
+  "source_name": "YouTube '패션 참고하기 좋은 2026년 남자 가을 코디 no.13' (search-result title+description)",
+  "source_type": "community",
+  "source_url": "https://www.youtube.com/watch?v=YYfVpPchG7I",
+  "publication_date": "unknown",
+  "observation_type": "secondary",
+  "gender_relevance": "MEN",
+  "category": "outer",
+  "observed_item": "Musinsa Standard '신세틱 스웨이드 미니멀 블루종 재킷' (synthetic suede minimal blouson jacket, 123,390 KRW) featured in a 2026 fall menswear lookbook episode",
+  "color": "unknown",
+  "silhouette": "minimal blouson",
+  "material": "synthetic suede",
+  "keywords": [
+   "블루종",
+   "스웨이드",
+   "무신사스탠다드",
+   "가을 코디"
+  ],
+  "notes": "Evidence from search-result title/description only (video not watched, per method). Title asserts 2026 fall; upload date not confirmed."
+ },
+ {
+  "source_name": "YouTube '패션 참고하기 좋은 2026년 남자 가을 코디 no.8' (search-result title+description)",
+  "source_type": "community",
+  "source_url": "https://www.youtube.com/watch?v=xZdSEJiOWQM",
+  "publication_date": "unknown",
+  "observation_type": "secondary",
+  "gender_relevance": "MEN",
+  "category": "bottoms",
+  "observed_item": "Musinsa Standard '와이드 히든 밴딩 슬랙스' (wide hidden-banding slacks, 39,900 KRW) paired with Haruta penny loafers",
+  "color": "unknown",
+  "silhouette": "wide slacks",
+  "material": "unknown",
+  "keywords": [
+   "와이드 슬랙스",
+   "페니로퍼",
+   "무신사스탠다드"
+  ],
+  "notes": "Evidence from search-result title/description only. Shows wide slacks + penny loafers still being merchandised for fall 2026 menswear."
+ },
+ {
+  "source_name": "YouTube '남자 9월 느좋 가을 코디 10가지 추천' (search-result title+description)",
+  "source_type": "community",
+  "source_url": "https://www.youtube.com/watch?v=CMKflTTvsEs",
+  "publication_date": "unknown",
+  "observation_type": "secondary",
+  "gender_relevance": "MEN",
+  "category": "styling",
+  "observed_item": "10 September '느좋' (vibe-good) fall outfits for men, timestamped looks with height/weight info",
+  "color": "unknown",
+  "silhouette": "unknown",
+  "material": "unknown",
+  "keywords": [
+   "9월 가을 코디",
+   "남자 데일리룩"
+  ],
+  "notes": "Title/description only. Confirms September-dated menswear outfit content volume."
+ },
+ {
+  "source_name": "YouTube Musinsa-collab lookbook '느슨해진 룩북씬에 긴장감을 주는 가성비 가을 코디' (search-result title+description)",
+  "source_type": "community",
+  "source_url": "https://www.youtube.com/watch?v=z6bk6Hkrn1Y",
+  "publication_date": "unknown",
+  "observation_type": "secondary",
+  "gender_relevance": "MIXED",
+  "category": "general",
+  "observed_item": "Musinsa-branded fall lookbook series (#무신사 #가을룩북 #가을코디 #가성비), one-week daily-look format; title frames the lookbook scene as 'loosening up' (느슨해진)",
+  "color": "unknown",
+  "silhouette": "title suggests relaxed/loose fits dominant in lookbook scene",
+  "material": "unknown",
+  "keywords": [
+   "무신사",
+   "가을룩북",
+   "가성비 코디"
+  ],
+  "notes": "Title/description only. Commercial platform (Musinsa) actively publishing fall-2026 lookbook content."
+ },
+ {
+  "source_name": "GQ Korea '옷 잘 입는 남자들의 옷장에서 찾은, 2026년 가을의 포인트 아이템 20'",
+  "source_type": "media",
+  "source_url": "https://www.gqkorea.co.kr/2026/08/28/",
+  "publication_date": "2026-08-28",
+  "observation_type": "secondary",
+  "gender_relevance": "MEN",
+  "category": "outer",
+  "observed_item": "Point items for fall 2026 drawn from well-dressed men's actual wardrobes; search snippet highlights suede jacket incl. reversible suede blouson, and styling advice: oversized knit worn like a T-shirt with straight denim or black slacks",
+  "color": "unknown",
+  "silhouette": "roomy knit treated as a top layer over straight-leg bottoms",
+  "material": "suede",
+  "keywords": [
+   "스웨이드 재킷",
+   "블루종",
+   "니트 스트레이트 진",
+   "포인트 아이템"
+  ],
+  "notes": "Evidence via search-result snippets; direct fetch of the archive URL returned only site navigation, article body not retrieved. Publication date confirmed by URL path (2026/08/28)."
+ },
+ {
+  "source_name": "Vogue Korea '평범하거나 화려하거나! 올가을 입고 싶은 모든 니트'",
+  "source_type": "media",
+  "source_url": "https://www.vogue.co.kr/ (article surfaced via search; exact slug not captured)",
+  "publication_date": "2026-09-03",
+  "observation_type": "secondary",
+  "gender_relevance": "GENDERLESS",
+  "category": "tops",
+  "observed_item": "Fall 2026 knit guide; V-neck knit framed as the fall must-have versatile item",
+  "color": "unknown",
+  "silhouette": "unknown",
+  "material": "knitwear (incl. wool 100% classic knits per related GQ piece)",
+  "keywords": [
+   "브이넥 니트",
+   "가을 니트"
+  ],
+  "notes": "Evidence via search-result snippet only (dated 2026.9.3 in search result). Not fetched directly."
+ },
+ {
+  "source_name": "Threads @odhfashion '2026년 남자 가을 코디 Part.4'",
+  "source_type": "community",
+  "source_url": "https://www.threads.com/@odhfashion/post/Dclc6cpGETH/",
+  "publication_date": "2026-08-28",
+  "observation_type": "direct",
+  "gender_relevance": "MEN",
+  "category": "styling",
+  "observed_item": "Pinterest-sourced men's fall outfit compilation post (Part.4 of a series); search snippet lists 울 블렌드 니트 (wool-blend knit) and 오버핏 스웨트셔츠 (oversized sweatshirt)",
+  "color": "unknown",
+  "silhouette": "oversized (per sweatshirt item)",
+  "material": "wool blend",
+  "keywords": [
+   "남자가을코디",
+   "울 블렌드 니트",
+   "오버핏 스웨트셔츠"
+  ],
+  "notes": "Post existence and date confirmed by direct fetch; body is image-based (no text items on page) — item names come from the search-result snippet. Engagement low (2 likes) — single small account, weak popularity signal."
+ },
+ {
+  "source_name": "Reddit r/seoul 'What defines Korean Youth Fashion in 2026?'",
+  "source_type": "community",
+  "source_url": "https://www.reddit.com/r/seoul/comments/1q81oij/what_defines_korean_youth_fashion_in_2026_share/",
+  "publication_date": "unknown",
+  "observation_type": "secondary",
+  "gender_relevance": "MIXED",
+  "category": "general",
+  "observed_item": "Community discussion of 2026 Korean youth fashion; search snippet indicates commenters noting a shift toward comfort-focused styles",
+  "color": "unknown",
+  "silhouette": "comfort-focused",
+  "material": "unknown",
+  "keywords": [
+   "Korean youth fashion 2026",
+   "comfort"
+  ],
+  "notes": "DIRECT FETCH BLOCKED (timeout / network security block) — SOURCE_UNAVAILABLE for full thread. Snippet only. Reddit r/KoreanFashion produced no retrievable fall-2026 threads in any search; Reddit coverage in this report is therefore thin."
+ },
+ {
+  "source_name": "Stay Enko 'What to Wear in South Korea in 2026'",
+  "source_type": "media",
+  "source_url": "https://stay.enko.kr/blog/en/what-to-wear-in-south-korea-in-2026-seasonal-fashion-tips-for-visitors/",
+  "publication_date": "2026-06-29",
+  "observation_type": "secondary",
+  "gender_relevance": "MIXED",
+  "category": "general",
+  "observed_item": "Fall (Sep-Nov) in Korea: blazers, sweater vests, long cardigans, muted-tone knits, tapered slacks or jeans, midi skirts, loafers, ankle boots; earthing palette olive/maroon/tan/charcoal with scarves; avoid chunky dad sneakers",
+  "color": "olive, maroon, tan, charcoal (muted/earthy)",
+  "silhouette": "tapered trousers, midi skirts",
+  "material": "unknown",
+  "keywords": [
+   "sweater vest",
+   "tapered slacks",
+   "loafers",
+   "ankle boots",
+   "earthy palette"
+  ],
+  "notes": "Full fall section fetched directly. CLAIM by a visitor-oriented living guide (English, expat/tourist lens) — corroborating, not primary street evidence."
+ },
+ {
+  "source_name": "Instagram reel (QUEEN CLOSET / 블루종 코디 account) via search snippet",
+  "source_type": "community",
+  "source_url": "https://www.instagram.com/reel/DVVzJCbkSR6/",
+  "publication_date": "unknown",
+  "observation_type": "secondary",
+  "gender_relevance": "WOMEN",
+  "category": "outer",
+  "observed_item": "Blouson styling reel: '레더 재킷 → 강한 존재감 / 블루종 → 데일리 활용도'; 2026 key silhouette described as 넓은 어깨 + 잘록한 허리 (broad shoulders, cinched waist via belt/seaming)",
+  "color": "unknown",
+  "silhouette": "broad shoulder + cinched waist",
+  "material": "leather, soft PU",
+  "keywords": [
+   "블루종",
+   "레더 재킷",
+   "파워숄더",
+   "허리라인"
+  ],
+  "notes": "Instagram direct fetch not attempted (platform blocks non-logged access) — SOURCE_UNAVAILABLE; evidence is search-result snippet text only. Weak date attribution."
+ },
+ {
+  "source_name": "Naver blog coygray '40대 남자 가을 코디'",
+  "source_type": "community",
+  "source_url": "https://blog.naver.com/coygray/224059136665",
+  "publication_date": "unknown",
+  "observation_type": "secondary",
+  "gender_relevance": "MEN",
+  "category": "styling",
+  "observed_item": "Cozy wool knit matched with warm wide slacks; snippet notes '최근에는 이런 와이드 하면서 밑으로…' (recently wide, falling…)",
+  "color": "unknown",
+  "silhouette": "wide slacks",
+  "material": "wool",
+  "keywords": [
+   "울 니트",
+   "와이드 슬랙스"
+  ],
+  "notes": "Desktop Naver blog body iframe-blocked (title only retrievable); snippet from search. AGE CAVEAT: subject is 40s, outside the 20s-30s target — corroboration only."
+ },
+ {
+  "source_name": "Naver blog yoojin-gz '2026 가을 슬래커코어' (search snippet)",
+  "source_type": "community",
+  "source_url": "https://blog.naver.com/yoojin-gz/224390017534",
+  "publication_date": "unknown",
+  "observation_type": "secondary",
+  "gender_relevance": "MIXED",
+  "category": "general",
+  "observed_item": "Fall 2026 'slackercore' trend guide (post ID sequence suggests late-Aug/Sep 2026 publication)",
+  "color": "unknown",
+  "silhouette": "unknown",
+  "material": "unknown",
+  "keywords": [
+   "슬래커코어",
+   "slackercore",
+   "2026 가을"
+  ],
+  "notes": "Snippet only — body not fetched (desktop Naver iframe). Name echoes the '그래놀라 코어'/comfort trend naming cluster."
+ }
+]

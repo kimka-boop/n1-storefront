@@ -36,3 +36,47 @@ export function selectCollection<T extends { name: string; gender?: string; look
     (gender === 'all' || p.gender?.toUpperCase() === gender) &&
     (!term || p.name.toLocaleLowerCase().includes(term)));
 }
+
+// ── Top × Bottom 페어 merchandising (N1_PAIRING_POLICY_V1 — 사전 계산 mapping만 소비) ──
+
+export interface CollectionPair {
+  pairId: string;
+  collectionScope: string;
+  scopeLabel: string;
+  topProductId: string;
+  bottomProductId: string;
+  trendClusters: string[];
+  pairReasonShort: string;
+}
+
+export interface PairRow<T> {
+  pair: CollectionPair;
+  top: T;
+  bottom: T;
+}
+
+export function buildCollectionPairs<T extends RetailProduct>(
+  products: T[],
+  pairs: CollectionPair[],
+  gender: 'all' | 'MALE' | 'FEMALE' | 'GENDERLESS',
+  query = '',
+): { rows: PairRow<T>[]; singles: T[] } {
+  const byId = new Map(products.map(p => [p.id, p] as const));
+  const term = query.trim().toLocaleLowerCase();
+  const rows: PairRow<T>[] = [];
+  const used = new Set<string>();
+  for (const pair of pairs) {
+    if (gender !== 'all' && pair.collectionScope !== gender) continue;
+    const top = byId.get(pair.topProductId);
+    const bottom = byId.get(pair.bottomProductId);
+    if (!top || !bottom) continue; // unavailable 상품이 페어를 깨면 조용히 제외 (§38)
+    if (term && !(top.name.toLocaleLowerCase().includes(term) || bottom.name.toLocaleLowerCase().includes(term))) continue;
+    rows.push({ pair, top, bottom });
+    used.add(top.id);
+    used.add(bottom.id);
+  }
+  // 미매칭·미달 페어 상품 — quiet 단품 영역 (§46: 나쁜 조합 강제 금지)
+  const singles = selectCollection(products, gender === 'all' ? 'all' : gender, query)
+    .filter(p => !used.has(p.id));
+  return { rows, singles };
+}

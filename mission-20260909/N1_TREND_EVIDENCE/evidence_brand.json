@@ -1,0 +1,525 @@
+[
+ {
+  "source_name": "thisisneverthat",
+  "source_type": "brand",
+  "source_url": "https://intl.thisisneverthat.com/features/lookbook/fall-2026-lookbook",
+  "publication_date": "2026-08",
+  "observation_type": "direct",
+  "gender_relevance": "MIXED",
+  "category": "general",
+  "observed_item": "Official Fall 2026 Lookbook page published on brand site; Fall 2026 first drop sold via Seoul Hongdae/Seongsu flagships and online (per brand IG); lookbook imagery is JS-rendered, item text not machine-readable",
+  "color": null,
+  "silhouette": null,
+  "material": null,
+  "keywords": [
+   "Fall 2026 Lookbook",
+   "first drop August 2026",
+   "Seoul flagship"
+  ],
+  "notes": "Page exists and is indexed (title 'Fall 2026 Lookbook'); content must be read via press coverage below. Season framed around '90s subculture, retro athletic + modern street utility."
+ },
+ {
+  "source_name": "thisisneverthat (via Hypebeast)",
+  "source_type": "brand",
+  "source_url": "https://hypebeast.com/2026/8/hisisneverthat-fall-2026-collection-lookbook-release-info",
+  "publication_date": "2026-08",
+  "observation_type": "secondary",
+  "gender_relevance": "MEN",
+  "category": "outer",
+  "observed_item": "PERTEX SP-Logo windbreakers (reversible and tonal variations), VIK Pertex jackets, SKOGAR down pieces",
+  "color": "tonal variations",
+  "silhouette": "relaxed, transitional layering outerwear",
+  "material": "Pertex technical nylon, down insulation",
+  "keywords": [
+   "Pertex windbreaker",
+   "VIK jacket",
+   "SKOGAR down",
+   "reversible",
+   "technical weather gear"
+  ],
+  "notes": "Article published 2026-08-14; first drop available at publication. Transitional outerwear + technical weather gear named as season pillars."
+ },
+ {
+  "source_name": "thisisneverthat (via Hypebeast)",
+  "source_type": "brand",
+  "source_url": "https://hypebeast.com/2026/8/hisisneverthat-fall-2026-collection-lookbook-release-info",
+  "publication_date": "2026-08",
+  "observation_type": "secondary",
+  "gender_relevance": "MEN",
+  "category": "tops",
+  "observed_item": "Washed denim shirts in autumn hues; washed polo shirts; signature graphic tees; casual graphic fleece layers",
+  "color": "burgundy, dark brown, indigo",
+  "silhouette": "relaxed",
+  "material": "vintage-washed fabrications, fleece",
+  "keywords": [
+   "washed denim shirt",
+   "washed polo",
+   "graphic fleece",
+   "vintage wash"
+  ],
+  "notes": "Washed treatment applied across both polos and denim shirts — a key top-item direction for FW26."
+ },
+ {
+  "source_name": "thisisneverthat (via Hypebeast)",
+  "source_type": "brand",
+  "source_url": "https://hypebeast.com/2026/8/hisisneverthat-fall-2026-collection-lookbook-release-info",
+  "publication_date": "2026-08",
+  "observation_type": "secondary",
+  "gender_relevance": "MEN",
+  "category": "bottoms",
+  "observed_item": "Relaxed and loose-fit jeans in dusty navy, brown, and washed blue",
+  "color": "dusty navy, brown, washed blue",
+  "silhouette": "relaxed / loose fit",
+  "material": "vintage-washed denim",
+  "keywords": [
+   "loose-fit jeans",
+   "relaxed jeans",
+   "washed blue",
+   "dusty navy"
+  ],
+  "notes": "Styling message: 'effortless layering through relaxed silhouettes and vintage-washed fabrications'."
+ },
+ {
+  "source_name": "thisisneverthat (via Stupiddope)",
+  "source_type": "brand",
+  "source_url": "https://stupiddope.com/2026/08/thisisneverthat-fall-2026-builds-a-layered-wardrobe-around-street-utility/",
+  "publication_date": "2026-08",
+  "observation_type": "secondary",
+  "gender_relevance": "MEN",
+  "category": "styling",
+  "observed_item": "Fall 2026 styled as a layered street-utility wardrobe: PERTEX outerwear over knitwear/fleece, paired with washed denim",
+  "color": null,
+  "silhouette": "layered, relaxed streetwear",
+  "material": "Pertex, down, fleece, washed denim, knitwear",
+  "keywords": [
+   "layered wardrobe",
+   "street utility",
+   "transitional dressing"
+  ],
+  "notes": "Confirms layering logic of lookbook: technical shell or down over fleece/knit tops, loose washed denim below."
+ },
+ {
+  "source_name": "Covernat",
+  "source_type": "brand",
+  "source_url": "https://covernat.co.kr/product/collection.html?cate_no=3889",
+  "publication_date": "2026-08",
+  "observation_type": "direct",
+  "gender_relevance": "MIXED",
+  "category": "general",
+  "observed_item": "2026 F/W lookbook set live on brand site: '2026 FALL UNI', '2026 FALL WOMAN', '2026 FALL with SANA', '2026 FALL with SOOBIN'; '26 FALL' shop menu split into TOPS / OUTER / BOTTOM / ACC per ambassador line",
+  "color": null,
+  "silhouette": null,
+  "material": null,
+  "keywords": [
+   "26 FALL UNI",
+   "26 FALL WOMAN",
+   "After Aware",
+   "SANA",
+   "SOOBIN",
+   "1st drop August 19"
+  ],
+  "notes": "FW26 theme 'After Aware' announced on brand IG with 1st drop 2026-08-19; site confirms dedicated UNI (unisex) and WOMAN fall lines."
+ },
+ {
+  "source_name": "Covernat",
+  "source_type": "brand",
+  "source_url": "https://covernat.co.kr/product/collection.html?cate_no=3889",
+  "publication_date": "2026-08",
+  "observation_type": "direct",
+  "gender_relevance": "MEN",
+  "category": "bottoms",
+  "observed_item": "Parachute cargo pants in Charcoal (우먼 파라슈트 카고 팬츠) carried in current lineup; pigment-dye tees, oatmeal colorway tees",
+  "color": "Charcoal, Oatmeal, Gray (pigment)",
+  "silhouette": "parachute cargo (voluminous)",
+  "material": "pigment-dye cotton, cool cotton",
+  "keywords": [
+   "parachute cargo pants",
+   "pigment dye",
+   "oatmeal",
+   "charcoal"
+  ],
+  "notes": "Items shown on collection page (summer carryover); naming shows brand's fit/color vocabulary: regular fit, pigment dye, parachute cargo."
+ },
+ {
+  "source_name": "Covernat (via Instagram/YouTube summaries)",
+  "source_type": "brand",
+  "source_url": "https://www.instagram.com/p/DcH6nG4jo8_/",
+  "publication_date": "2026-08",
+  "observation_type": "secondary",
+  "gender_relevance": "MEN",
+  "category": "outer",
+  "observed_item": "26 FALL LOOKBOOK features OG series 'chair coat' (체어 코트) — outfit-design details with lowered-saturation color and washing effects vs previous Hamilton Brown",
+  "color": "lowered saturation tones (muted/washed)",
+  "silhouette": "outfit-designed coat",
+  "material": "washed cotton (washed effect stated)",
+  "keywords": [
+   "chair coat",
+   "OG series",
+   "low saturation",
+   "washing effect",
+   "After Aware"
+  ],
+  "notes": "Explicit brand statement that FW26 outer color direction is desaturated + washed vs prior seasons."
+ },
+ {
+  "source_name": "Covernat WOMAN (via YouTube lookbook)",
+  "source_type": "brand",
+  "source_url": "https://www.youtube.com/watch?v=bjbUID_Bcdg",
+  "publication_date": "2026-08",
+  "observation_type": "secondary",
+  "gender_relevance": "WOMEN",
+  "category": "styling",
+  "observed_item": "COVERNAT WOMAN 26 FALL LOOKBOOK 'GENTLE MOMENTS — AUTUMN': relaxed silhouettes and natural layering shot on a fall ranch",
+  "color": null,
+  "silhouette": "relaxed, natural layering",
+  "material": null,
+  "keywords": [
+   "GENTLE MOMENTS",
+   "AUTUMN",
+   "relaxed silhouette",
+   "natural layering",
+   "ranch"
+  ],
+  "notes": "Women's FW26 styling direction: soft relaxed volume, understated layered looks in rural autumn setting."
+ },
+ {
+  "source_name": "Mahagrid",
+  "source_type": "brand",
+  "source_url": "https://mahagrid.net/product/lookbook_list.html?cate_no=299",
+  "publication_date": "2026-08",
+  "observation_type": "secondary",
+  "gender_relevance": "MEN",
+  "category": "general",
+  "observed_item": "FW26 collection titled 'LAKE CHILD' (2026 F/W LOOKBOOK live on brand site; page shows lookbook thumbnail dated 2026-08)",
+  "color": null,
+  "silhouette": null,
+  "material": null,
+  "keywords": [
+   "LAKE CHILD",
+   "2026 F/W lookbook",
+   "MAHAGRID DESIGN STUDIO"
+  ],
+  "notes": "Lookbook list page confirms 2026 F/W section (cate_no=299); item-level text did not render in fetches (page timed out twice)."
+ },
+ {
+  "source_name": "Mahagrid (via Instagram collection posts)",
+  "source_type": "brand",
+  "source_url": "https://www.instagram.com/p/DbsHKGuygtn/",
+  "publication_date": "2026-08",
+  "observation_type": "secondary",
+  "gender_relevance": "MEN",
+  "category": "outer",
+  "observed_item": "FW26 'LAKE CHILD' includes winter military coat; sibling 2026 A/W collection posts cite raincoat and Aurora Borealis-inspired prints; everyday essentials meet season-specific items",
+  "color": "Aurora Borealis print (multicolor)",
+  "silhouette": "military coat (heavy winter)",
+  "material": null,
+  "keywords": [
+   "winter military coat",
+   "raincoat",
+   "Aurora print",
+   "LAKE CHILD"
+  ],
+  "notes": "Post dated 2026-08-25 directing to mahagrid.com; military outer + allover nature print are the FW26 statements."
+ },
+ {
+  "source_name": "Glowny",
+  "source_type": "brand",
+  "source_url": "https://en.glowny.co.kr/",
+  "publication_date": "2026-09",
+  "observation_type": "direct",
+  "gender_relevance": "WOMEN",
+  "category": "general",
+  "observed_item": "Homepage banner: 'FALL WINTER 26 / COMING SOON / PREVIEW NOW'; 26FW 'UNFILTERED; PRETTY' pre-release sold early in offline stores from Sept 4 (10% off)",
+  "color": null,
+  "silhouette": null,
+  "material": null,
+  "keywords": [
+   "FW26 UNFILTERED; PRETTY",
+   "preview now",
+   "pre-release September 4"
+  ],
+  "notes": "26FW theme is 'UNFILTERED; PRETTY' per brand store IG; global site still in preview/coming-soon state on 2026-09-09."
+ },
+ {
+  "source_name": "Glowny",
+  "source_type": "brand",
+  "source_url": "https://en.glowny.co.kr/",
+  "publication_date": "2026-09",
+  "observation_type": "direct",
+  "gender_relevance": "WOMEN",
+  "category": "tops",
+  "observed_item": "Current bestseller tops entering FW: Mellow V-Neck Stripe Knit, Roan Layered Long Sleeve, Powder Corset Top, V-neck 3/4 sleeve tops ('Angel Puppy', 'Lost Girl', 'Off Duty Girl')",
+  "color": null,
+  "silhouette": "corset fit, layered long sleeve, 3/4 sleeve slim",
+  "material": "knit (V-neck stripe)",
+  "keywords": [
+   "V-neck stripe knit",
+   "corset top",
+   "layered long sleeve",
+   "3/4 sleeve"
+  ],
+  "notes": "Signal of FW top direction: fitted/romantic knits and V-necks rather than oversized tees."
+ },
+ {
+  "source_name": "Glowny",
+  "source_type": "brand",
+  "source_url": "https://en.glowny.co.kr/",
+  "publication_date": "2026-09",
+  "observation_type": "direct",
+  "gender_relevance": "WOMEN",
+  "category": "bottoms",
+  "observed_item": "Damage Cinch Back Roll-Up Jeans; Polly Wrap Skort",
+  "color": null,
+  "silhouette": "cinch-back, roll-up hem, wrap skort",
+  "material": "denim (damaged wash)",
+  "keywords": [
+   "damage jeans",
+   "cinch back",
+   "roll-up",
+   "wrap skort"
+  ],
+  "notes": "Detail-led denim styling (cinch, roll-up, distress) is the women's denim statement."
+ },
+ {
+  "source_name": "Matin Kim",
+  "source_type": "brand",
+  "source_url": "https://matinkim.shop/pages/transition-in-seoul",
+  "publication_date": "2026-08",
+  "observation_type": "direct",
+  "gender_relevance": "WOMEN",
+  "category": "general",
+  "observed_item": "MATIN KIM 2026 FALL COLLECTION 'TRANSITION IN SEOUL' — captures people welcoming seasonal transition against downtown Seoul; visualizes change through wind and motion, swaying garments and moving figures",
+  "color": null,
+  "silhouette": "movement/sway emphasized (flowing)",
+  "material": null,
+  "keywords": [
+   "Transition in Seoul",
+   "26 Autumn",
+   "wind and motion",
+   "swaying garments"
+  ],
+  "notes": "Collection page live; gallery is JS-rendered so item-level data unavailable. Companion drop: MATIN KIM x MOMO 2026 FALL 1ST 'IN MY COLOR'."
+ },
+ {
+  "source_name": "COS (via Odalisque Magazine)",
+  "source_type": "brand",
+  "source_url": "https://odalisquemagazine.com/2026/08/18/cos-launches-autumn-winter-2026-campaign/",
+  "publication_date": "2026-08",
+  "observation_type": "secondary",
+  "gender_relevance": "MIXED",
+  "category": "colors",
+  "observed_item": "AW26 campaign palette: primarily monochromatic black and white, punctuated with surprising purple accents",
+  "color": "black, white, purple",
+  "silhouette": null,
+  "material": null,
+  "keywords": [
+   "monochrome",
+   "black and white",
+   "purple accents"
+  ],
+  "notes": "Campaign launched 2026-08-18; features Korean actor Park Gyuyoung as global ambassador — high Korea-visibility. Collection shows at NYFW on CFDA schedule."
+ },
+ {
+  "source_name": "COS (via Odalisque Magazine)",
+  "source_type": "brand",
+  "source_url": "https://odalisquemagazine.com/2026/08/18/cos-launches-autumn-winter-2026-campaign/",
+  "publication_date": "2026-08",
+  "observation_type": "secondary",
+  "gender_relevance": "MIXED",
+  "category": "materials",
+  "observed_item": "Fabrics: cashmere, wool, leather, suede, waxed cotton, merino, crisp cotton",
+  "color": null,
+  "silhouette": "tailoring loosened through relaxed fits and fluid shapes",
+  "material": "cashmere, wool, leather, suede, waxed cotton, merino",
+  "keywords": [
+   "cashmere",
+   "waxed cotton",
+   "merino",
+   "suede",
+   "relaxed tailoring"
+  ],
+  "notes": "Tactile natural fibers are the FW26 material story."
+ },
+ {
+  "source_name": "COS (via Odalisque + search catalog)",
+  "source_type": "brand",
+  "source_url": "https://www.cos.com/en-au/campaign/autumn-winter-2026-womenswear",
+  "publication_date": "2026-08",
+  "observation_type": "secondary",
+  "gender_relevance": "WOMEN",
+  "category": "tops",
+  "observed_item": "Cashmere funnel-neck jumper; crew-neck merino wool top; merino wool cardigan; fine merino knits; tuxedo-inspired wing-collar shirt with French cuffs",
+  "color": "black, white, purple",
+  "silhouette": "funnel neck, crew neck, fine gauge",
+  "material": "cashmere, merino wool",
+  "keywords": [
+   "funnel-neck jumper",
+   "merino top",
+   "merino cardigan",
+   "wing collar shirt"
+  ],
+  "notes": "Knit-first tops program; menswear side adds waxed-cotton trench and grained flight jacket."
+ },
+ {
+  "source_name": "COS (via Odalisque + WhoWhatWear)",
+  "source_type": "brand",
+  "source_url": "https://www.whowhatwear.com/fashion/affordable/cos-early-autumn-buys-2026",
+  "publication_date": "2026-08",
+  "observation_type": "secondary",
+  "gender_relevance": "WOMEN",
+  "category": "bottoms",
+  "observed_item": "Wool-blend wide-leg pants; balloon tailored trousers; leather blouson styled over stirrup leggings and fine merino knits",
+  "color": null,
+  "silhouette": "wide-leg, balloon, stirrup legging",
+  "material": "wool blend, leather",
+  "keywords": [
+   "wide-leg pants",
+   "balloon trousers",
+   "stirrup leggings"
+  ],
+  "notes": "Two-pole bottom silhouette: volumetric (wide/balloon) or second-skin (stirrup); wide-leg named as expected sell-out."
+ },
+ {
+  "source_name": "Uniqlo LifeWear (via L'Officiel Singapore)",
+  "source_type": "brand",
+  "source_url": "https://www.lofficielsingapore.com/fashion/highlights-from-uniqlo-fall-winter-2026-collection-knitwear-outerwear-fashion-style",
+  "publication_date": "2026-08",
+  "observation_type": "secondary",
+  "gender_relevance": "MIXED",
+  "category": "colors",
+  "observed_item": "FW26 LifeWear palette: vibrant red and energetic blue accenting classic warm brown base",
+  "color": "warm brown, vibrant red, energetic blue",
+  "silhouette": null,
+  "material": null,
+  "keywords": [
+   "warm brown",
+   "vibrant red",
+   "energetic blue",
+   "LifeWear FW26"
+  ],
+  "notes": "Catalog coverage published 2026-08-14. Same color family as thisisneverthat's burgundy/brown/indigo autumn tones."
+ },
+ {
+  "source_name": "Uniqlo LifeWear (via L'Officiel Singapore)",
+  "source_type": "brand",
+  "source_url": "https://www.lofficielsingapore.com/fashion/highlights-from-uniqlo-fall-winter-2026-collection-knitwear-outerwear-fashion-style",
+  "publication_date": "2026-08",
+  "observation_type": "secondary",
+  "gender_relevance": "MEN",
+  "category": "outer",
+  "observed_item": "PUFFTECH jackets, down jackets, faux sheepskin coats, fleece; Harrington Jacket, Blouson Jacket, Light Down Volume Jacket, Seamless Down Jacket, Reversible Down Short Jacket",
+  "color": "warm brown base, red/blue accents",
+  "silhouette": "volume down (Light Down Volume), blouson, Harrington, reversible",
+  "material": "PUFFTECH synthetic padding, down, faux sheepskin, fleece",
+  "keywords": [
+   "PUFFTECH",
+   "Harrington",
+   "blouson",
+   "light down volume",
+   "faux sheepskin",
+   "reversible down"
+  ],
+  "notes": "Outerwear is the headline category; multiple padding technologies at opening price points."
+ },
+ {
+  "source_name": "Uniqlo LifeWear (via L'Officiel Singapore)",
+  "source_type": "brand",
+  "source_url": "https://www.lofficielsingapore.com/fashion/highlights-from-uniqlo-fall-winter-2026-collection-knitwear-outerwear-fashion-style",
+  "publication_date": "2026-08",
+  "observation_type": "secondary",
+  "gender_relevance": "MIXED",
+  "category": "tops",
+  "observed_item": "Souffle Yarn and Merino wool knitwear (turtlenecks, cable crew neck); flannel shirts; corduroy pieces; HEATTECH inner layers",
+  "color": "warm brown, red, blue",
+  "silhouette": null,
+  "material": "Souffle yarn, merino wool, flannel, corduroy, HEATTECH",
+  "keywords": [
+   "Souffle yarn knit",
+   "merino turtleneck",
+   "cable crew neck",
+   "flannel shirt",
+   "corduroy",
+   "HEATTECH layering"
+  ],
+  "notes": "Brand layering formula: HEATTECH top + fleece/tee + lightweight jacket = FW26 styling education."
+ },
+ {
+  "source_name": "Uniqlo LifeWear (via L'Officiel Singapore)",
+  "source_type": "brand",
+  "source_url": "https://www.lofficielsingapore.com/fashion/highlights-from-uniqlo-fall-winter-2026-collection-knitwear-outerwear-fashion-style",
+  "publication_date": "2026-08",
+  "observation_type": "secondary",
+  "gender_relevance": "MIXED",
+  "category": "bottoms",
+  "observed_item": "Men's cargo pants, wide tuck pants; denim in Slim Fit Straight Leg and High-Waist Wide Leg",
+  "color": null,
+  "silhouette": "cargo, wide tuck, slim straight, high-waist wide leg",
+  "material": "denim",
+  "keywords": [
+   "cargo pants",
+   "wide tuck pants",
+   "slim fit straight leg denim",
+   "high-waist wide leg denim"
+  ],
+  "notes": "Two-track denim strategy (slim straight + high-waist wide) signals both poles are being merchandised for FW26."
+ },
+ {
+  "source_name": "Uniqlo (Clare Waight Keller line, via L'Officiel)",
+  "source_type": "brand",
+  "source_url": "https://www.lofficielsingapore.com/fashion/highlights-from-uniqlo-fall-winter-2026-collection-knitwear-outerwear-fashion-style",
+  "publication_date": "2026-08",
+  "observation_type": "secondary",
+  "gender_relevance": "WOMEN",
+  "category": "general",
+  "observed_item": "Women's Lounge & Innerwear by Clare Waight Keller FW26: 'Effortless Charm' and 'Minimalist Classic' themes",
+  "color": null,
+  "silhouette": "lounge/relaxed innerwear",
+  "material": null,
+  "keywords": [
+   "Clare Waight Keller",
+   "Effortless Charm",
+   "Minimalist Classic",
+   "lounge"
+  ],
+  "notes": "Designer capsule framing FW26 women's relaxed minimalism."
+ },
+ {
+  "source_name": "Andersson Bell",
+  "source_type": "brand",
+  "source_url": "https://adsb.co.kr",
+  "publication_date": "2026-09",
+  "observation_type": "direct",
+  "gender_relevance": "MIXED",
+  "category": "general",
+  "observed_item": "Brand site live (Shopify) but FW26 collection page not yet published — 2026 archive shows only S/S 26; FW26 lookbook pending",
+  "color": null,
+  "silhouette": null,
+  "material": null,
+  "keywords": [
+   "FW26 not yet live",
+   "S/S 26 latest"
+  ],
+  "notes": "Brand announced FW26 unveiling across Paris (Mar 5-10), Tokyo (Mar 16-20), Shanghai (Mar 25-30) via official IG."
+ },
+ {
+  "source_name": "Andersson Bell (via search/press)",
+  "source_type": "brand",
+  "source_url": "https://www.instagram.com/p/DVanI4YCVJm/",
+  "publication_date": "2026-03",
+  "observation_type": "secondary",
+  "gender_relevance": "MIXED",
+  "category": "general",
+  "observed_item": "FW26 celebrated 10th anniversary with Milan Fashion Week debut around 'LAB + LIFE' concept; a tagged FW26 item: 'Trompe L'oeil Denim Layered Tattoo Top'",
+  "color": null,
+  "silhouette": "trompe l'oeil layered look (built-in layering)",
+  "material": "denim + knit hybrid",
+  "keywords": [
+   "LAB + LIFE",
+   "Milan debut",
+   "trompe l'oeil",
+   "tattoo top",
+   "layered"
+  ],
+  "notes": "Item-level FW26 detail is sparse; hybrid/trompe-l'oeil novelty tops consistent with brand's hybrid construction DNA (S/S26 had wrongly-buttoned tops, endless layering)."
+ }
+]
