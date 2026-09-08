@@ -1,0 +1,219 @@
+/* ════════════════════════════════════════════════════════════════
+   N°1 GLASS MATERIAL LAB — dev-only (2026-09-09)
+   프로덕션 storefront와 완전히 격리된 재질 실험실.
+   재질 3종: A Clear Optical · B Soft Water · C Perfume Glass
+   공통 5레이어: Transmission / Backdrop / Specular / Rim / Contact
+   ════════════════════════════════════════════════════════════════ */
+
+.lab {
+  min-height: 100vh; background: #faf9f7; color: #242722;
+  padding: 34px 5vw 90px; font-family: inherit;
+}
+.labHeader { margin-bottom: 26px; }
+.labTitle { font-size: 14px; letter-spacing: 0.3em; font-weight: 600; margin: 0; }
+.labNote { font-size: 11.5px; color: #77756b; margin: 6px 0 0; line-height: 1.6; }
+.labSection { margin: 34px 0 10px; }
+.labSectionTitle {
+  font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase;
+  color: #8f8b80; margin: 0 0 12px;
+}
+
+/* ── 테스트 배경 존: 한 화면에서 단색/선/글자/이미지 위 재질 동시 비교 ── */
+.zones {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px;
+}
+@media (max-width: 900px) { .zones { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .zones { grid-template-columns: 1fr; } }
+.zone {
+  position: relative; height: 150px; border-radius: 8px; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  background: #faf9f7;
+}
+.zone.blank { background: #fbfaf7; }
+.zone.line::after {
+  content: ""; position: absolute; left: 10%; right: 10%; top: 50%;
+  border-top: 1px solid rgba(36, 39, 34, 0.45);
+}
+.zone.type {
+  background: #fbfaf7;
+  font-size: 12px; line-height: 1.9; color: #55534e; text-align: center;
+  padding: 14px; overflow: hidden;
+}
+.zone.img img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: 50% 20%;
+}
+.zoneTag {
+  position: absolute; top: 8px; left: 10px; font-size: 9px;
+  letter-spacing: 0.2em; text-transform: uppercase; color: #a19d92; z-index: 0;
+}
+
+/* ── 공용 렌즈 베이스: 5레이어 ──
+   Layer1 Transmission = fill의 낮은 알파 (배경이 그대로 보임)
+   Layer2 Backdrop    = backdrop-filter (blur 낮게 + saturate/contrast)
+   Layer3 Specular    = ::before (좌상단 정점 광)
+   Layer4 Rim         = ::after (각도별 밀도가 다른 광학 엣지 — uniform border 아님)
+   Layer5 Contact     = box-shadow (작고 가까운 접촉 깊이) */
+.lens {
+  position: absolute; z-index: 3;
+  left: 0; top: 0; /* translate3d(0,0)이 트랙 좌상단 기준이 되도록 고정 */
+  border-radius: 18px;
+  pointer-events: none;
+}
+.lens::before, .lens::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+
+/* ═══ A — CLEAR OPTICAL LENS: 가장 얇고 투명 ═══ */
+.clear {
+  /* 목표 내부 밀도: 배경 대비 약 -2% (가장 얇은 후보) */
+  background: linear-gradient(172deg,
+    rgba(193, 188, 172, 0.16) 0%,
+    rgba(193, 188, 172, 0.06) 45%,
+    rgba(185, 179, 161, 0.22) 100%);
+  -webkit-backdrop-filter: blur(5px) saturate(1.45) brightness(0.975) contrast(1.07);
+  backdrop-filter: blur(5px) saturate(1.45) brightness(0.975) contrast(1.07);
+  box-shadow:
+    0 1px 2px rgba(50, 48, 40, 0.05),
+    0 3px 7px -2px rgba(60, 58, 48, 0.07);
+}
+.clear::before { /* specular — 상단 좌측 정점 */
+  background:
+    radial-gradient(70% 48% at 26% 8%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.08) 55%, rgba(255,255,255,0) 80%);
+}
+.clear::after { /* rim — 광원 방향 밀도 차 (uniform border 금지) */
+  box-shadow:
+    inset 0 1px 0.5px rgba(255,255,255,0.9),
+    inset 0 -1.5px 2px -0.5px rgba(110,104,86,0.6),
+    inset 1px 0 1px -0.5px rgba(255,255,255,0.35),
+    inset -1px 0 1px -0.5px rgba(255,255,255,0.35);
+}
+
+/* ═══ B — SOFT WATER LENS: 내부 곡률감 + 두께 ═══ */
+.water {
+  /* 목표 내부 밀도: 배경 대비 약 -5% (물방울 두께감) */
+  background:
+    radial-gradient(120% 95% at 32% 22%,
+      rgba(184, 178, 158, 0.24) 0%,
+      rgba(184, 178, 158, 0.12) 42%,
+      rgba(178, 172, 152, 0.22) 78%,
+      rgba(170, 163, 144, 0.36) 100%);
+  -webkit-backdrop-filter: blur(7px) saturate(1.6) brightness(0.955) contrast(1.09);
+  backdrop-filter: blur(7px) saturate(1.6) brightness(0.955) contrast(1.09);
+  box-shadow:
+    0 2px 4px rgba(50, 48, 40, 0.06),
+    0 6px 12px -4px rgba(60, 58, 48, 0.10);
+}
+.water::before {
+  background:
+    radial-gradient(85% 55% at 30% 14%, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.06) 60%, rgba(255,255,255,0) 82%),
+    radial-gradient(60% 34% at 70% 96%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 70%); /* 하단 반사광 */
+}
+.water::after {
+  box-shadow:
+    inset 0 1.5px 1px rgba(255,255,255,0.85),
+    inset 0 -2.5px 3.5px -1px rgba(104,98,80,0.68),
+    inset 2px 0 2px -1px rgba(255,255,255,0.3),
+    inset -2px 0 2px -1px rgba(255,255,255,0.3);
+}
+
+/* ═══ C — PERFUME GLASS LENS: 약간 denser · refined · least playful ═══ */
+.perfume {
+  /* 목표 내부 밀도: 배경 대비 약 -7% (가장 denser · premium) */
+  background: linear-gradient(172deg,
+    rgba(178, 172, 154, 0.28) 0%,
+    rgba(178, 172, 154, 0.16) 40%,
+    rgba(172, 166, 148, 0.22) 70%,
+    rgba(164, 158, 140, 0.42) 100%);
+  -webkit-backdrop-filter: blur(6px) saturate(1.5) brightness(0.965) contrast(1.1);
+  backdrop-filter: blur(6px) saturate(1.5) brightness(0.965) contrast(1.1);
+  box-shadow:
+    0 1px 2px rgba(50, 48, 40, 0.05),
+    0 5px 10px -3px rgba(60, 58, 48, 0.09);
+}
+.perfume::before {
+  background:
+    radial-gradient(95% 60% at 24% 10%, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0) 75%),
+    linear-gradient(102deg, rgba(255,255,255,0) 58%, rgba(255,255,255,0.14) 74%, rgba(255,255,255,0) 88%); /* 우측 세로 스트릭 */
+}
+.perfume::after {
+  box-shadow:
+    inset 0 1px 0.5px rgba(255,255,255,0.88),
+    inset 0 -2px 2.5px -0.5px rgba(110,104,86,0.62),
+    inset 1.5px 0 1.5px -1px rgba(255,255,255,0.32),
+    inset -1.5px 0 1.5px -1px rgba(255,255,255,0.32);
+}
+
+/* ── 탭 zone 데모: 레이블은 내비 레이어, 렌즈는 별도 optical object ── */
+.tabDemo {
+  position: relative; display: flex; justify-content: center; align-items: center;
+  gap: 30px; padding: 18px 6px; background: #faf9f7;
+  border: 1px dashed rgba(36,39,34,0.12); border-radius: 6px;
+  overflow: hidden; min-height: 66px;
+}
+.tabDemo + .tabDemo { margin-top: 10px; }
+.tabLabel {
+  position: relative; z-index: 1;
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: #8a8a86; white-space: nowrap;
+}
+.tabLabel.on { color: #242722; font-weight: 500; }
+.demoLens { top: 8px; bottom: 8px; } /* JS가 zone 폭/위치 기록 */
+
+.orbRow { display: flex; gap: 26px; align-items: center; }
+.orb {
+  position: relative; width: 52px; height: 52px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #242722;
+}
+.orb svg { width: 40%; height: 40%; display: block; }
+
+/* ── 스마트핏 단일 표면 데모 (재질별) — 카드 분할 없이 한 재질 ── */
+.sfRow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 900px) { .sfRow { grid-template-columns: 1fr; } }
+.sfBg {
+  position: relative; border-radius: 8px; overflow: hidden; padding: 26px 18px;
+  background: #fbfaf7; min-height: 300px;
+}
+.sfBg::before { /* 뒤 컨텍스트: 선 + 글자 */
+  content: "BACKGROUND CONTEXT — 텍스트와 선이 표면 뒤로 보여야 합니다";
+  position: absolute; left: 14px; right: 14px; top: 44%;
+  font-size: 10px; letter-spacing: 0.12em; color: #a19d92;
+  border-bottom: 1px solid rgba(36,39,34,0.3); padding-bottom: 8px;
+}
+.sfBg img {
+  position: absolute; right: -8px; bottom: -8px; width: 62%; height: 58%;
+  object-fit: cover; object-position: 50% 18%; opacity: 0.92;
+}
+.sfSurface {
+  position: relative; border-radius: 16px; padding: 20px 18px 16px;
+  min-height: 250px;
+}
+.sfSurface::before, .sfSurface::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.sfKicker { position: relative; font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: #8f8b80; margin: 0 0 8px; }
+.sfQ { position: relative; font-size: 13.5px; font-weight: 600; margin: 0 0 14px; color: #242722; }
+.sfOpts { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 3px; border-radius: 12px; background: rgba(36,39,34,0.045); }
+.sfOpt {
+  position: relative; text-align: left; border: none; background: none; cursor: pointer;
+  padding: 9px 12px; font-size: 12px; color: #55534e; border-radius: 9px;
+  transition: color 200ms ease;
+}
+.sfOpt span { display: block; font-size: 10px; color: #8f8b80; margin-top: 1px; }
+.sfOpt.on { color: #242722; font-weight: 600; }
+.sfOpt.on .sfOptDensity { /* 선택 = 재질 밀도 이동 */
+  position: absolute; inset: 0; border-radius: 9px; pointer-events: none;
+  background: linear-gradient(172deg, rgba(255,255,255,0.5), rgba(255,255,255,0.12));
+  box-shadow: inset 0 1px 0.5px rgba(255,255,255,0.9), 0 1px 4px rgba(50,48,40,0.08);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+.sfOpt { overflow: hidden; }
+.sfNext {
+  position: relative; margin-top: 12px; width: 100%; padding: 10px;
+  border: none; border-radius: 11px; cursor: pointer; font-size: 12px; font-weight: 600;
+  color: #242722; /* action density — solid black 금지, 재질 family 내 고밀도 상태 */
+  background: linear-gradient(172deg, rgba(255,255,255,0.4), rgba(228,225,212,0.28));
+  box-shadow: inset 0 1px 0.5px rgba(255,255,255,0.85), inset 0 -1.5px 2px -1px rgba(110,104,86,0.4), 0 1px 3px rgba(50,48,40,0.07);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.guide { font-size: 11px; color: #77756b; line-height: 1.7; margin: 8px 0 0; }
