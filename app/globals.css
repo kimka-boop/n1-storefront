@@ -585,6 +585,49 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 .piece:hover .piece-name { box-shadow: inset 0 -1px 0 0 var(--ink); }
 .piece-price { margin-top: 6px; font-size: 13px; color: #55534e; letter-spacing: 0.03em; }
 
+/* ── 페어 컬렉션 — 한 row = 추천 코디 1벌 (LEFT=TOP, RIGHT=BOTTOM) ──
+   박스·배지로 묶지 않는다. whitespace·alignment·조용한 근거 한 줄만. (§49–§51) */
+.pair-collection { display: flex; flex-direction: column; gap: clamp(56px, 7vw, 96px); }
+.pair-head {
+  display: grid; grid-template-columns: 1fr 1fr; column-gap: clamp(28px, 4.5vw, 64px);
+  max-width: 880px; width: 100%; margin: 0 auto; padding: 0 0 4px;
+  border-bottom: 1px solid rgba(36, 39, 34, 0.12);
+}
+.pair-head span {
+  font-size: 10px; letter-spacing: 0.3em; color: #a8a49c; text-transform: uppercase;
+}
+.pair-head span:first-child { text-align: left; }
+.pair-head span:last-child { text-align: right; }
+.pair-row { display: flex; flex-direction: column; gap: 14px; }
+.pair-cards {
+  display: grid; grid-template-columns: 1fr 1fr;
+  column-gap: clamp(28px, 4.5vw, 64px);
+  max-width: 880px; width: 100%; margin: 0 auto;
+  align-items: start;
+}
+/* 첫 페어 — 컬렉션의 첫 인상: 살짝 크게 (에디토리얼 강약 유지) */
+.pair-row:first-of-type .pair-cards { max-width: 980px; }
+.pair-row:first-of-type .piece-name { font-size: 15.5px; }
+.pair-reason {
+  max-width: 880px; width: 100%; margin: 0 auto;
+  text-align: center; font-size: 11.5px; letter-spacing: 0.08em; color: #8b877e;
+}
+/* 모바일: 상의 → 하의 스택. 페어 관계는 인접 간격 + 근거 문구로 유지 (§79) */
+@media (max-width: 640px) {
+  .pair-head { display: none; }
+  .pair-cards { grid-template-columns: 1fr; row-gap: 10px; }
+  .pair-cards .piece-media { aspect-ratio: 4/5; }
+  .pair-reason { margin-top: 2px; }
+  .pair-collection { gap: 52px; }
+}
+/* 단품 영역 — 페어에 오르지 못한 상품을 조용히 */
+.pair-singles { margin-top: clamp(72px, 9vw, 120px); }
+.pair-singles-label {
+  text-align: center; font-size: 10px; letter-spacing: 0.3em; color: #a8a49c;
+  text-transform: uppercase; margin-bottom: 40px;
+}
+.pair-singles .pieces { max-width: 880px; margin: 0 auto; }
+
 /* ── 컬렉션 내 검색 (컬렉션 범위 안에서만) ── */
 .collection-search {
   margin-top: 32px; display: flex; justify-content: center; align-items: center; gap: 10px;
