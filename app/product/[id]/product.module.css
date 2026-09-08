@@ -491,3 +491,49 @@
 .yourFitEntry:hover {
   color: #242722;
 }
+
+/* ── 구매 (SESSION C): 수량 선택 + 장바구니 담기 / 바로 구매 ──
+   기존 .cta 계열과 같은 무게감 유지, 새 클래스만 추가 */
+.qtyRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 360px;
+  margin: 0 0 12px;
+}
+.qtyBtn {
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: 1px solid rgba(17, 17, 17, 0.24);
+  color: #111;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.qtyBtn:hover:not(:disabled) { border-color: #111; }
+.qtyBtn:disabled { color: rgba(17, 17, 17, 0.24); cursor: default; }
+.qtyVal {
+  min-width: 28px;
+  text-align: center;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.qtyTotal {
+  margin-left: auto;
+  font-size: 12.5px;
+  color: rgba(17, 17, 17, 0.62);
+}
+.buyRow {
+  display: flex;
+  gap: 8px;
+  max-width: 360px;
+}
+.buyRow .cta { flex: 1; }
+.ctaBuyNow {
+  background: transparent;
+  color: #111;
+  border: 1px solid #111;
+}
+.ctaBuyNow:hover { background: #111; color: #faf9f7; }

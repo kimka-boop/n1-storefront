@@ -1,49 +1,91 @@
 "use client";
 
 /**
- * [CS 위젯] n1pieces.com 우측 하단 채팅창
- * - 고객 메시지 → /api/cs POST (에스컬레이션 판별)
- * - 상담원 답변 → /api/cs GET 폴링 (3초 간격)
+ * [CS 위젯] N°1 고객센터 채팅 (미션 §17–§46)
+ * - 대화 상태 머신은 서버(lib/csEngine)가 담당 — 위젯은 전사 뷰어
+ * - 새로고침 후에도 같은 대화 복원 (localStorage sid → GET /api/cs)
+ * - 역할 구분 표시: AI 답변 / 전문 상담원 답변 / 시스템 안내 (미션 §42)
+ * - 상담원 응대 중(HUMAN_*)엔 4초 폴링으로 답변 수신
  */
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { ChatIcon } from "./Icons";
+import { useAuth } from "./AuthProvider";
 
-interface Msg { role: "customer" | "agent" | "bot"; text: string; }
+interface Msg { role: "customer" | "ai" | "agent" | "system"; text: string; }
+
+const SID_KEY = "n1_cs_sid";
+const HUMAN_STATES = new Set(["HUMAN_PENDING", "HUMAN_ACTIVE"]);
 
 export default function CsWidget() {
+  const { token, email } = useAuth();
   const [open, setOpen] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [sentGlow, setSentGlow] = useState(false);
   const [sid, setSid] = useState<string | null>(null);
+  const [status, setStatus] = useState<string>("NEW");
   const [typing, setTyping] = useState(false);
+  const [restored, setRestored] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [msgs]);
+  }, [msgs, typing]);
 
   // 재고 미확정 등에서 "고객센터 문의" 버튼이 이 위젯을 여는 경로 (자동 메시지 없음)
   useEffect(() => {
-    const open = () => setOpen(true);
-    window.addEventListener("n1:open-cs", open);
-    return () => window.removeEventListener("n1:open-cs", open);
+    const openEv = () => setOpen(true);
+    window.addEventListener("n1:open-cs", openEv);
+    return () => window.removeEventListener("n1:open-cs", openEv);
   }, []);
 
-  // 상담원 답변 폴링 (세션 있을 때만, 3초)
+  const applyTranscript = useCallback((serverMsgs: { role: string; text: string }[]) => {
+    setMsgs(
+      serverMsgs
+        .filter((m): m is { role: Msg["role"]; text: string } =>
+          m.role === "customer" || m.role === "ai" || m.role === "agent" || m.role === "system")
+        .map((m) => ({ role: m.role, text: m.text })),
+    );
+  }, []);
+
+  // 대화 복원 — 서버에 세션이 있으면 전사본으로 뷰 동기화 (미션 §38 기억)
   useEffect(() => {
-    if (!sid) return;
+    const saved = localStorage.getItem(SID_KEY);
+    if (!saved) {
+      setRestored(true);
+      return;
+    }
+    (async () => {
+      try {
+        const res = await fetch(`/api/cs?sid=${encodeURIComponent(saved)}`, { cache: "no-store" });
+        const data = await res.json();
+        if (data.ok) {
+          setSid(saved);
+          setStatus(data.status);
+          applyTranscript(data.messages || []);
+        } else {
+          localStorage.removeItem(SID_KEY); // 서버 세션 만료(재시작) — 새 대화로
+        }
+      } catch {}
+      setRestored(true);
+    })();
+  }, [applyTranscript]);
+
+  // 상담원 답변 폴링 — 상담원 관련 상태에서만 (AI 응답은 동기 응답)
+  useEffect(() => {
+    if (!sid || !HUMAN_STATES.has(status)) return;
     const t = setInterval(async () => {
       try {
         const res = await fetch(`/api/cs?sid=${encodeURIComponent(sid)}`, { cache: "no-store" });
         const data = await res.json();
-        if (data.ok && data.agent_messages?.length) {
-          setMsgs((prev) => [...prev, ...data.agent_messages.map((t: string) => ({ role: "agent" as const, text: t }))]);
+        if (data.ok) {
+          setStatus(data.status);
+          applyTranscript(data.messages || []);
         }
       } catch {}
-    }, 3000);
+    }, 4000);
     return () => clearInterval(t);
-  }, [sid]);
+  }, [sid, status, applyTranscript]);
 
   const send = async () => {
     const text = input.trim();
@@ -51,30 +93,37 @@ export default function CsWidget() {
     setInput("");
     setMsgs((prev) => [...prev, { role: "customer", text }]);
     setTyping(true);
-    setSentGlow(true); // 전송 액션의 짧은 유리 afterglow (마이크로 인터랙션 전용)
+    setSentGlow(true);
     setTimeout(() => setSentGlow(false), 500);
     try {
-      // 실시간 챗봇 응답 (/api/chat)
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sid, message: encodeURIComponent(text), customer: { name: "web" } }),
+        body: JSON.stringify({
+          sid,
+          message: encodeURIComponent(text),
+          customer: { name: "web", email: email || undefined, member: Boolean(token) },
+        }),
       });
       const data = await res.json();
       if (data.ok) {
         setSid(data.sid);
-        setMsgs((prev) => [...prev, { role: data.escalated ? "bot" : "bot", text: data.reply }]);
-        if (data.escalated) {
-          // 에스컬레이션 → 기존 세션 스토어에도 기록 (상담원 답장 대기)
-          fetch("/api/cs", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ sid: data.sid, message: encodeURIComponent(text), customer: { name: "web" } }),
-          }).catch(() => {});
+        setStatus(data.status);
+        localStorage.setItem(SID_KEY, data.sid);
+        if (data.escalated && data.status === "HUMAN_PENDING") {
+          // 전사본을 다시 당겨와 system 안내까지 정확히 반영
+          const r2 = await fetch(`/api/cs?sid=${encodeURIComponent(data.sid)}`, { cache: "no-store" });
+          const d2 = await r2.json();
+          if (d2.ok) applyTranscript(d2.messages || []);
+        } else if (data.reply) {
+          setMsgs((prev) => [...prev, { role: "ai", text: data.reply }]);
         }
+        // reply === null → 상담원 응대 중: AI가 끼어들지 않는다 (미션 §29)
+      } else {
+        setMsgs((prev) => [...prev, { role: "system", text: "지금 자동 상담 연결이 원활하지 않습니다. 잠시 후 다시 시도해주세요." }]);
       }
     } catch {
-      setMsgs((prev) => [...prev, { role: "bot", text: "연결이 불안정합니다. 잠시 후 다시 시도해주세요." }]);
+      setMsgs((prev) => [...prev, { role: "system", text: "연결이 불안정합니다. 잠시 후 다시 시도해주세요." }]);
     } finally {
       setTyping(false);
     }
@@ -84,11 +133,7 @@ export default function CsWidget() {
     <>
       {/* 채팅 버튼 */}
       {!open && (
-        <button
-          className="cs-fab"
-          onClick={() => setOpen(true)}
-          aria-label="고객센터 채팅"
-        >
+        <button className="cs-fab" onClick={() => setOpen(true)} aria-label="고객센터 채팅">
           <ChatIcon size={14} />
         </button>
       )}
@@ -98,22 +143,26 @@ export default function CsWidget() {
         <div className="cs-window">
           <div className="cs-header">
             <span>N°1 고객센터</span>
+            {status === "HUMAN_ACTIVE" && <em className="cs-state">상담원 응대 중</em>}
+            {status === "HUMAN_PENDING" && <em className="cs-state">상담원 연결 중</em>}
             <button className="cs-close" onClick={() => setOpen(false)}>✕</button>
           </div>
           <div className="cs-messages">
-            {msgs.length === 0 && (
+            {restored && msgs.length === 0 && (
               <p className="cs-welcome">
                 안녕하세요, N°1 고객센터입니다.<br />
-                주문·배송·사이즈·소재 문의를 남겨주세요.
+                주문·배송, 사이즈·핏, 소재·세탁 등<br />
+                궁금한 내용을 편하게 남겨주세요.
               </p>
             )}
+            {!restored && <p className="cs-typing">불러오는 중...</p>}
             {msgs.map((m, i) => (
               <div key={i} className={`cs-msg ${m.role}`}>
-                {m.role === "agent" && <span className="cs-agent-badge">상담원</span>}
+                {m.role === "agent" && <span className="cs-agent-badge">전문 상담원</span>}
                 <p>{m.text}</p>
               </div>
             ))}
-            {typing && <p className="cs-typing">상담사 입력중...</p>}
+            {typing && <p className="cs-typing">입력 중...</p>}
             <div ref={bottomRef} />
           </div>
           <div className="cs-input-row">
