@@ -22,10 +22,10 @@ body {
 /* ── 히어로 (V2: 저밀도 세리프 + 아이브로우 — COS) ── */
 .hero { min-height: auto; display: flex; flex-direction: column; align-items: center; justify-content: center;
   text-align: center; padding: 88px 16px 60px; }
-@media (max-width: 640px) { .hero { padding: 48px 12px 36px; } .hero-brand h1 { font-size: 26px; letter-spacing: 6px; } .hero-tag { font-size: 10px; margin-top: 4px; } }
+@media (max-width: 640px) { .hero { padding: 48px 12px 36px; } .hero-brand h1 { font-size: 26px; letter-spacing: 6px; } .hero-tag { font-size: 10px; margin-top: 8px; } }
 .hero-brand { opacity: 0; transform: translateY(20px); animation: heroIn .8s ease .1s forwards; }
 .hero-brand h1 { font-size: 20px; letter-spacing: 0.32em; font-weight: 500; text-transform: uppercase; }
-.hero-tag { margin-top: 4px; color: var(--muted); letter-spacing: 0.24em; font-size: 10px; text-transform: uppercase; }
+.hero-tag { margin-top: 8px; color: var(--muted); letter-spacing: 0.24em; font-size: 10px; text-transform: uppercase; }
 @keyframes heroIn { to { opacity: 1; transform: none; } }
 
 /* ── 그리드 ── */
@@ -202,6 +202,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
   width: 52px; height: 52px; border-radius: 50%;
   background: #0a0a0a; color: #fff;
   border: 1px solid #0a0a0a; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; /* 아이콘 중앙 정렬 */
   box-shadow: 0 6px 24px rgba(10,10,10,0.18);
   transition: transform 0.25s cubic-bezier(.22,.61,.36,1), box-shadow 0.25s;
 }
@@ -438,7 +439,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 .hero { min-height: auto; display: flex; flex-direction: column; align-items: center; justify-content: center;
   text-align: center; padding: 64px 20px 56px; }
 .hero-tagline {
-  margin-top: 18px; font-size: 15px; color: #55534e; letter-spacing: 0.02em; line-height: 1.7;
+  margin-top: 8px; font-size: 15px; color: #55534e; letter-spacing: 0.02em; line-height: 1.7;
 }
 .hero-drop {
   margin-top: 34px; font-size: 11px; color: var(--muted); letter-spacing: 0.14em;
@@ -446,7 +447,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: 11px
 }
 @media (max-width: 640px) {
   .hero { padding: 56px 16px 40px; }
-  .hero-tagline { font-size: 13.5px; margin-top: 14px; }
+  .hero-tagline { font-size: 13.5px; margin-top: 8px; }
   .hero-drop { margin-top: 24px; font-size: 10px; }
 }
 
