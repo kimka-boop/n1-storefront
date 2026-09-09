@@ -48,3 +48,36 @@ export function findPaymentMethod(id: string): PaymentMethod | undefined {
 
 /** 서버가 신뢰하는 유일한 V1 결제수단 — 클라이언트가 다른 값을 보내도 이 값으로 기록 */
 export const DEFAULT_PAYMENT_METHOD: PaymentMethodId = "bank_transfer";
+
+// ── 서버 결제수단 결정 (Commerce Architecture Mission §13E·§17) ──
+// 클라이언트의 결제수단 선택은 "요청"일 뿐이다. 서버가 어댑터 상태를 보고 결정한다.
+
+export const PAYMENT_METHOD_UNSUPPORTED = "PAYMENT_METHOD_UNSUPPORTED";
+export const CUSTOMER_MSG_PG_PREPARING = "결제 시스템 준비 중입니다.";
+
+export type ServerPaymentDecision =
+  | { ok: true; method: PaymentMethodId }
+  | { ok: false; code: string; customer_message: string };
+
+/**
+ * 요청된 결제수단 → 서버가 실제로 수행할 결제수단.
+ * - 미지정 → 무통장입금 (V1 기본, 하위호환)
+ * - pg_card → live PG 어댑터가 있을 때만 수용. 없으면 PAYMENT_PROVIDER_NOT_CONFIGURED 로
+ *   정직 거절 — 거짓 결제수단으로 주문을 만들지 않는다 (미션 §17).
+ */
+export function resolveServerPaymentMethod(
+  requested: string | undefined,
+  livePgAvailable: boolean,
+): ServerPaymentDecision {
+  const req = String(requested || "").trim() || DEFAULT_PAYMENT_METHOD;
+  if (req === "bank_transfer") return { ok: true, method: "bank_transfer" };
+  if (req === "pg_card") {
+    return livePgAvailable
+      ? { ok: true, method: "pg_card" }
+      : { ok: false, code: PAYMENT_PROVIDER_NOT_CONFIGURED_CODE, customer_message: CUSTOMER_MSG_PG_PREPARING };
+  }
+  return { ok: false, code: PAYMENT_METHOD_UNSUPPORTED, customer_message: "지원하지 않는 결제 수단입니다." };
+}
+
+/** paymentProvider 모듈을 클라이언트 번들이 가져가지 않도록 코드 상수만 로컬 정의 */
+export const PAYMENT_PROVIDER_NOT_CONFIGURED_CODE = "PAYMENT_PROVIDER_NOT_CONFIGURED";

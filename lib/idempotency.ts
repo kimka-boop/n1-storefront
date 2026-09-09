@@ -90,3 +90,26 @@ export function resetIdempotency(domain?: string): void {
   const prefix = `${domain}::`;
   for (const k of Array.from(s.keys())) if (k.startsWith(prefix)) s.delete(k);
 }
+
+/**
+ * 동시 도착 병합 전용 — 결과를 캐시하지 않는다 (webhook용).
+ * withIdempotency 는 성공 결과를 TTL 내 replay 하므로, 상태가 진행하는 거래(PENDING→CONFIRMED)
+ * 의 두 번째 webhook 이 첫 결과로 덮이는 문제가 있다. 결제 webhook의 영구 방어는 결제 레코드의
+ * 상태 자체(CONFIRMED 이후 duplicate)이고, 여기서는 실행 중인 같은 키만 하나로 합친다.
+ * 완료(성공/실패 무관) 즉시 엔트리를 치운다 — 다음 도착은 새 검증이다.
+ */
+export async function withInFlightMerge<T>(domain: string, key: string, run: () => Promise<T>): Promise<T> {
+  const cleanKey = String(key || "").trim();
+  if (!cleanKey) return await run();
+  const scoped = makeIdempotencyScope(`${domain}.inflight`, cleanKey);
+  const s = store();
+  const existing = s.get(scoped);
+  if (existing) return (await existing.promise) as unknown as T;
+  const entry: Entry = { key: scoped, promise: run(), createdAt: Date.now() };
+  s.set(scoped, entry);
+  try {
+    return (await entry.promise) as unknown as T;
+  } finally {
+    s.delete(scoped); // 성공도 캐시하지 않는다 — 다음 webhook은 새 검증
+  }
+}

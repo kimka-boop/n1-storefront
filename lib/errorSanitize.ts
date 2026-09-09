@@ -29,3 +29,22 @@ export function clientSafeFailure(e: unknown): { status: number; message: string
   }
   return { status: 502, message: GENERIC_UPSTREAM_MESSAGE };
 }
+
+/**
+ * code가 붙은 계약 거절용 위생 확장 (Commerce Architecture Mission §17).
+ * 라우트가 { status, code, message(고객용) } 를 명시해 던진 의도적 거절 —
+ * 예: PAYMENT_PROVIDER_NOT_CONFIGURED ("결제 시스템 준비 중입니다.") — 는 원래 상태와
+ * 문구를 유지해 내려간다. code+status 쌍이 없는 예외는 예상 못한 실패로 간주하고
+ * clientSafeFailure 계약(4xx 통과, 5xx 고정 문구 치환)을 그대로 따른다.
+ *
+ * 라우트는 이 함수의 결과만 응답 본문에 실는다 — raw 예외 텍스트가 고객 응답으로
+ * 가는 경로를 구조적으로 닫는다 (L4 소스 잠금 계약 유지).
+ */
+export function clientSafeRejection(e: unknown): { status: number; message: string; code?: string } {
+  const code = (e as { code?: string } | null)?.code;
+  const status = (e as { status?: number } | null)?.status;
+  if (typeof code === "string" && code && typeof status === "number" && status >= 400 && status < 600) {
+    return { status, message: e instanceof Error ? e.message : String(e), code };
+  }
+  return clientSafeFailure(e);
+}

@@ -61,9 +61,24 @@ function consumeIdempotencyKey(): void {
 
 type Source = "cart" | "buynow";
 
+interface CheckoutForm {
+  name: string;
+  phone: string;
+  postal_code: string;
+  address1: string;
+  address2: string;
+  delivery_memo: string;
+  depositor: string;
+  email?: string;
+}
+
+const EMPTY_FORM: CheckoutForm = {
+  name: "", phone: "", postal_code: "", address1: "", address2: "", delivery_memo: "", depositor: "", email: "",
+};
+
 interface PendingOrder {
   items: CheckoutLine[];
-  form: { name: string; phone: string; address: string; depositor: string; email?: string };
+  form: CheckoutForm;
   order_id: string;
   total: number;
   source: Source;
@@ -81,7 +96,14 @@ function loadPending(): PendingOrder | null {
     if (!raw) return null;
     const d = JSON.parse(raw);
     if (!d?.order_id || !Array.isArray(d.items)) return null;
-    return d as PendingOrder;
+    // 구 저장본(form.address 문자열) 하위호환 — 구조화 필드로 이동, 배송지 문자열은 주소1로 승격
+    const f = d.form || {};
+    const form: CheckoutForm = {
+      ...EMPTY_FORM,
+      ...f,
+      address1: f.address1 || f.address || "",
+    };
+    return { ...d, form } as PendingOrder;
   } catch {
     return null;
   }
@@ -95,7 +117,7 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
   const [lines, setLines] = useState<CheckoutLine[]>([]);
   const [source, setSource] = useState<Source>("cart");
   const [loaded, setLoaded] = useState(false);
-  const [form, setForm] = useState<{ name: string; phone: string; address: string; depositor: string; email?: string }>({ name: "", phone: "", address: "", depositor: "", email: "" });
+  const [form, setForm] = useState<CheckoutForm>(EMPTY_FORM);
   const [payMethod, setPayMethod] = useState("bank_transfer");
   const [reviewed, setReviewed] = useState(false); // ④ 최종 주문 검토 확인
   const [submitting, setSubmitting] = useState(false);
@@ -159,13 +181,17 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
           customer: {
             name: form.name,
             phone: form.phone,
-            address: form.address,
+            postal_code: form.postal_code,
+            address1: form.address1,
+            address2: form.address2,
+            delivery_memo: form.delivery_memo,
             depositor: form.depositor || form.name,
             email: isMember ? form.email : undefined,
             member: isMember,
           },
           items: lines.map((i) => ({ sku: i.sku, color: i.color, size: i.size, qty: i.qty })),
           source,
+          payment_method: payMethod, // 서버가 어댑터 상태로 최종 결정 (클라이언트는 요청일 뿐)
           idempotency_key: currentIdempotencyKey(), // 동일 시도 재제출 = 동일 키 → 서버가 1회만 생성
         }),
       });
@@ -173,6 +199,7 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
       if (!data.ok) {
         // [Session H · TASK 13] 409 = 결제 개시 직전 재고 게이트가 확정 품절/수량부족으로 중단.
         // 서버 메시지를 그대로(truthful) 보여주고, 카트는 성공 경로에서만 비워지므로 유지된다.
+        // [Commerce Mission §17] PG 미연결 거절은 고객용 문구 그대로 — 위장된 성공 없음.
         setError(
           res.status === 409
             ? `${data.error} — 장바구니는 그대로 유지됩니다.`
@@ -181,19 +208,30 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
         return;
       }
       consumeIdempotencyKey(); // 성공 — 다음 주문은 새 멱등키로
-      // 주문 생성 성공 — 소스 비움 (재고는 서버가 이미 차감)
+      // 주문 생성 성공 — 소스 비움 (재고는 서버가 이미 차감; PG 주문은 검증 후 차감 예약)
       if (source === "cart") clearCart();
       clearBuyNow();
       const pending: PendingOrder = {
         items: lines,
         form: { ...form, depositor: form.depositor || form.name },
         order_id: data.order_id,
-        // 서버가 재계산한 상품 총액 + 동일 규칙의 배송비 (서버 total은 상품금만)
-        total: data.total_amount + getShippingFee(data.total_amount),
+        // 최종 결제대금은 서버 계약 — payable_amount 가 단일 기준 (구 응답 하위호환 폴백)
+        total: typeof data.payable_amount === "number"
+          ? data.payable_amount
+          : data.total_amount + getShippingFee(data.total_amount),
         source,
         status: "입금 대기",
         splitNotice: data.shipping?.notice,
       };
+
+      // PG 결제 요청이 함께 성공한 경우 — 결제창 URL을 받아 이동한다 (PG 연결 후 활성 경로).
+      // 현재(pre-PG)는 pg_card 선택이 UI에서 차단되어 이 분기는 자연적으로 닫혀 있다.
+      if (data.payment?.ok && data.payment.checkout_url) {
+        localStorage.setItem(PENDING_ORDER_KEY, JSON.stringify(pending));
+        window.location.href = data.payment.checkout_url as string;
+        return;
+      }
+
       localStorage.setItem(PENDING_ORDER_KEY, JSON.stringify(pending));
       window.dispatchEvent(new Event("n1_order_update"));
       router.push("/checkout/payment");
@@ -282,16 +320,29 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
                 )}
               </section>
 
-              {/* ② 주문자 / 배송 정보 */}
+              {/* ② 주문자 / 배송 정보 — 구조화 주소 (미션 §6·§13·§14) */}
               <section className="checkout-section">
                 <h2 className="checkout-step">2 · 주문자 · 배송 정보</h2>
                 <div className="checkout-fields">
-                  <input placeholder="주문자명" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-                  <input placeholder="연락처 (010-0000-0000)" type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-                  <input placeholder="배송지 주소" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+                  <input placeholder="주문자명" autoComplete="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                  <input placeholder="연락처 (010-0000-0000)" type="tel" inputMode="tel" autoComplete="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+                  <input
+                    className="addr-postal"
+                    placeholder="우편번호 (5자리)"
+                    inputMode="numeric"
+                    autoComplete="postal-code"
+                    maxLength={5}
+                    value={form.postal_code}
+                    onChange={(e) => setForm({ ...form, postal_code: e.target.value.replace(/[^\d]/g, "").slice(0, 5) })}
+                  />
+                  <input placeholder="기본 주소 (도로명/지번)" autoComplete="address-line1" value={form.address1} onChange={(e) => setForm({ ...form, address1: e.target.value })} />
+                  <input placeholder="상세 주소 (동·호수 등 — 선택)" autoComplete="address-line2" value={form.address2} onChange={(e) => setForm({ ...form, address2: e.target.value })} />
+                  <input placeholder="배송 메모 (선택 — 문 앞 배송 등)" value={form.delivery_memo} onChange={(e) => setForm({ ...form, delivery_memo: e.target.value })} />
                   <input
                     placeholder={authToken ? "이메일 (회원 계정)" : "이메일 (선택 — 주문 조회용)"}
                     type="email"
+                    inputMode="email"
+                    autoComplete="email"
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                   />
@@ -335,7 +386,8 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
                 <div className="checkout-total">
                   <span>상품금액 ({lines.reduce((s, i) => s + i.qty, 0)}개)</span><b>{won(subtotal)}</b>
                   <span>배송비</span><b>{fee ? won(fee) : "무료"}</b>
-                  <span className="total-label">총 결제금액</span><b className="total-val">{won(finalTotal)}</b>
+                  <span>할인</span><b>₩0</b>
+                  <span className="total-label">최종 결제금액</span><b className="total-val">{won(finalTotal)}</b>
                 </div>
                 <label className="checkout-confirm">
                   <input type="checkbox" checked={reviewed} onChange={(e) => setReviewed(e.target.checked)} />
@@ -344,7 +396,11 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
                 {error && <p className="stock-alert">{error}</p>}
                 <button
                   className="checkout-btn"
-                  disabled={submitting || !reviewed || !form.name || !form.phone || !form.address || payMethod !== "bank_transfer"}
+                  disabled={
+                    submitting || !reviewed || !form.name || !form.phone ||
+                    !/^\d{5}$/.test(form.postal_code) || !form.address1 ||
+                    !methods.find((m) => m.id === payMethod)?.available
+                  }
                   onClick={submitOrder}
                 >
                   {submitting ? "처리 중..." : `주문 생성 → ${won(finalTotal)}`}

@@ -161,6 +161,28 @@ export async function ensureOrdersIdempotencyColumn(doc: GoogleSpreadsheet): Pro
   }
 }
 
+/**
+ * 주문 Draft 확장 컬럼 보장 (Commerce Architecture Mission §6·§13) — 전부 additive.
+ * - 우편번호/주소1/주소2/배송메모: 구조화 배송지. 기존 `배송지` 문자열도 병기(운영자 흐름 보존).
+ * - 상품금액/배송비/할인: 최종 결제대금(총결제금액)의 근거 분해 — Price Authority 가계 산출.
+ * 없는 컬럼만 뒤에 붙인다. 실패해도 주문을 막지 않는다(기존 컬럼만으로 인입).
+ */
+export const ORDER_EXTRA_COLUMNS = ["우편번호", "주소1", "주소2", "배송메모", "상품금액", "배송비", "할인"] as const;
+
+export async function ensureOrdersExtraColumns(doc: GoogleSpreadsheet): Promise<boolean> {
+  try {
+    const sheet = await getOrdersSheet(doc);
+    if (!sheet) return false;
+    const headers = sheet.headerValues || [];
+    const missing = ORDER_EXTRA_COLUMNS.filter((c) => !headers.includes(c));
+    if (missing.length === 0) return true;
+    await sheet.setHeaderRow([...headers, ...missing]);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /** 멱등키로 기존 주문 조회 — 있으면 중복 생성 없이 원본 응답 replay 의 근거가 된다 */
 export async function findOrderByIdempotencyKey(
   doc: GoogleSpreadsheet,

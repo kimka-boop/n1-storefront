@@ -352,23 +352,21 @@ test('I6 교환·반품 문구: 승인 문장 3개가 그대로 순서 보존되
   assert.ok(display.noticeQualityText().includes('\n\n'));
 });
 
-test('I6 문의 위치: 안내 문구가 "하단 좌측" — 실제 고객센터 위젯(.cs-fab) 좌측 고정과 일치', () => {
+test('I6 문의 위치: 안내 문구가 "상단 문의 아이콘" — 상단 유틸리티 독(.util-dock)과 일치', () => {
+  // Storefront Repair §12(2026-09-10): 하단 cs-fab·float-bar 제거 → 상단 util-dock 통합.
+  // 승인 문구는 "화면 상단의 문의 아이콘" — 구 "페이지 하단 좌측" 문구는 더 이상 사실이 아니다.
   const asText = display.noticeAsText();
-  assert.ok(asText.includes('페이지 하단 좌측'), `좌측 문구 없음: ${asText}`);
-  assert.ok(!asText.includes('우측'), '우측 문구 잔존 — 실제 위치와 불일치');
+  assert.ok(asText.includes('화면 상단'), `상단 문구 없음: ${asText}`);
+  assert.ok(!asText.includes('하단 좌측'), '구 하단 문구 잔존 — 실제 위치와 불일치');
   // 구 카탈로그 fallback 문구도 신규 표기로 정규화
   const mapped = display.noticeAsText('N°1 고객센터 (상품 문의는 페이지 하단 문의하기 이용)');
-  assert.ok(mapped.includes('페이지 하단 좌측'));
+  assert.ok(mapped.includes('화면 상단'));
 
-  // 실제 위치 실측(정적 계약): cs-fab은 left 고정, 장바구니(.float-bar)와 x축 미러
+  // 실제 위치 실측(정적 계약): util-dock 문의 버튼 존재 — cs-fab·float-bar는 제거됨
   const css = fs.readFileSync(path.join(ROOT, 'app', 'globals.css'), 'utf8');
-  const fab = css.match(/\.cs-fab\s*\{[^}]*\}/)?.[0] || '';
-  assert.ok(fab.includes('position: fixed'), 'cs-fab fixed 아님');
-  assert.ok(fab.includes('left:'), 'cs-fab left anchor 아님 (좌측 위젯이어야 함)');
-  const mobileFab = css.match(/@media \(max-width: 640px\)\s*\{\s*\.cs-fab\s*\{[^}]*\}/)?.[0] || '';
-  assert.ok(mobileFab.includes('left: 16px'), '모바일 cs-fab 좌측 고정 아님');
-  const floatBar = css.match(/\.float-bar\s*\{[^}]*\}/)?.[0] || '';
-  assert.ok(floatBar.includes('right:'), 'float-bar(장바구니)는 우측이어야 미러 구조');
+  assert.ok(css.includes('.util-dock'), '상단 유틸리티 돕(.util-dock) 없음');
+  const dock = fs.readFileSync(path.join(ROOT, 'components', 'UtilityDock.tsx'), 'utf8');
+  assert.ok(dock.includes('고객센터 문의 열기'), 'util-dock 문의 버튼 없음');
 
   // PDP가 문단 렌더링을 사용하는지 (소스 실측)
   const pdp = fs.readFileSync(path.join(ROOT, 'app', 'product', '[id]', 'page.tsx'), 'utf8');

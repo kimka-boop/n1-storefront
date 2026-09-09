@@ -2,32 +2,28 @@
  * [모듈 2-2] 주문 웹훅 리시버
  * POST /api/orders — 표준 주문 JSON 수령 → 검증 → 분리배송 판별 → Customers/Orders 시트 인입 → 재고 차감
  *
- * 스키마 v2 (PG 전환 대응): payment 블록만 교체하면 토스페이먼츠 연동 가능
- * body: { customer: {name, phone, address, depositor, email?, member?},
+ * 스키마 v3 (Commerce Architecture Mission):
+ * body: { customer: {name, phone, address | postal_code+address1+address2, delivery_memo?,
+ *                    depositor, email?, member?},
  *         items: [{sku, color, size, qty}], source?: "cart"|"buynow",
+ *         payment_method?: "bank_transfer"|"pg_card",      // 서버가 어댑터 상태로 최종 결정
  *         idempotency_key?: string }
- * 응답: { ok, order_id, customer_id, total_amount, payment_method, status, status_label,
- *         shipping: {type, notice}, deposit_info, duplicate? }
+ * 응답: { ok, order_id, customer_id, total_amount, payable_amount, payment_method, status,
+ *         status_label, shipping: {type, notice}, deposit_info, payment?, duplicate? }
  *
- * V1 결제수단은 무통장입금 고정(lib/payments DEFAULT_PAYMENT_METHOD) —
- * 클라이언트가 어떤 결제수단을 보내도 서버가 확정한다 (client 신뢰 금지).
+ * 결제 계약 (미션 §2·§4·§7·§17):
+ *  - 주문 ≠ 결제. 이 라우트는 주문 draft를 만든다. PAID로 가는 유일한 길은 서버측 결제 검증
+ *    (무통장 = 운영자 대장 확인, PG = /api/payments/webhook 검증).
+ *  - 클라이언트 결제수단·금액은 요청일 뿐. resolveServerPaymentMethod가 수용 여부를 결정하고
+ *    금액은 시트 재판돈 최종 결제대금(상품금+배송비)으로 기록한다 (Price Authority).
+ *  - pg_card + PG 미연결 → 시트 쓰기 이전에 PAYMENT_PROVIDER_NOT_CONFIGURED 로 정직 거절
+ *    ("결제 시스템 준비 중입니다.") — 운영 Orders에 죽은 주문을 남기지 않는다.
+ *  - PG 주문의 재고 차감은 결제 검증 후로 이연된다. 무통장 V1은 기존대로 주문 생성 시 차감.
  *
- * [Session C — 멱등성 §7]
- *  - 같은 idempotency_key 로 재요청(더블 클릭/새로고침 재제출/재시도)하면
- *    재고 재차감·시트 중복 인입·중복 알림 없이 원본 주문 응답을 replay 한다 (duplicate: true).
- *  - 1층: lib/idempotency in-flight 병합 (동시 요청 race 차단)
- *  - 2층: Orders 시트 `멱등키` 컬럼 조회 (인스턴스 무관 영구 방어 — 단일 진실)
- *
- * [Session C — 회원 주문내역 §9]
- *  - GET /api/orders?token=… — 세션 토큰의 계정 이메일과 일치하는(고객이메일) 주문만 조회.
- *    본인 주문이 아닌 것은 절대 내려가지 않는다. 토큰 없음/무효 → 401.
- *
- * [Session H — 최종 재고 확인 (TASK 13)]
- *  - 결제 개시(고객 upsert·Orders 인입·차감·알림) 직전에 finalStockCheck로 선택 옵션을
- *    재검증한다: B 파이프라인 확정 품절/수량부족 → 409로 결제 중단(카트 유지·truthful 메시지),
- *    미확정 → C 원본(Products 옵션별재고) 폴백 — 정확히 일치하는 키만, 없으면 "재고 미확인".
- *  - 재고 차감은 Stock_Staging 기준(검증 숫자만·검증일시 불변). Products AB열(unisex_score)
- *    기록은 제거했다 — 데이터 오염 방지.
+ * [Session C — 멱등성 §7] 2층 멱등(in-flight merge + Orders.멱등키 영구 replay) 유지.
+ * [Session H — 최종 재고 확인 TASK 13] 결제 개시 직전 finalStockCheck 게이트 유지.
+ * [Commerce Mission — §10] 검사→인입→차감 임계구역을 withOrderLock으로 직렬화 (경합 방어).
+ * [Commerce Mission — §8] 주문 draft의 운영 이벤트를 HERMES_Events에 발행 (best-effort).
  */
 import { NextResponse } from "next/server";
 import {
@@ -35,17 +31,24 @@ import {
   getOrdersSheet,
   upsertCustomer,
   ensureOrdersIdempotencyColumn,
+  ensureOrdersExtraColumns,
   findOrderByIdempotencyKey,
   findOrdersByMemberEmail,
 } from "@/lib/sheets";
-import { DEFAULT_PAYMENT_METHOD } from "@/lib/payments";
+import { DEFAULT_PAYMENT_METHOD, resolveServerPaymentMethod } from "@/lib/payments";
+import { resolvePaymentProvider } from "@/lib/paymentProvider";
+import { createPaymentRequestForOrder } from "@/lib/paymentFlow";
+import { buildPaymentFlowDeps } from "@/lib/paymentFlowWiring";
 import { withIdempotency } from "@/lib/idempotency";
+import { withOrderLock } from "@/lib/orderLock";
 import { projectOrderForOwner } from "@/lib/orderView";
 import { displayLabel } from "@/lib/orderState";
+import { getShippingFee } from "@/lib/checkout";
+import { emitHermesEvent } from "@/lib/hermesEvents";
 import { sendTelegramMessage } from "@/lib/telegram";
 import { checkoutFinalStockCheck, decrementStagingStock, sheetOptionQty } from "@/lib/stockCheckout";
 import { gateFromStockCheck, gateFromSheetStock, GateLine } from "@/lib/stockGate";
-import { clientSafeFailure, logInternal } from "@/lib/errorSanitize";
+import { clientSafeRejection, clientSafeFailure, logInternal } from "@/lib/errorSanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -69,11 +72,36 @@ async function notifyNewOrder(orderId: string, name: string, amount: number, shi
 interface OrderBody {
   customer?: {
     name?: string; phone?: string; address?: string;
+    postal_code?: string; address1?: string; address2?: string; delivery_memo?: string;
     depositor?: string; email?: string; member?: boolean;
   };
   items?: { sku?: string; color?: string; size?: string; qty?: number; colorIndex?: number }[];
   source?: string;
+  payment_method?: string;
   idempotency_key?: string;
+}
+
+interface ResolvedAddress {
+  /** Orders.배송지 — 운영자가 읽는 단일 문자열 (구조화 입력 시 정규 조립) */
+  full: string;
+  postalCode: string;
+  address1: string;
+  address2: string;
+  deliveryMemo: string;
+}
+
+function resolveAddress(customer: NonNullable<OrderBody["customer"]>): ResolvedAddress | null {
+  const postal = String(customer.postal_code || "").trim();
+  const a1 = String(customer.address1 || "").trim();
+  const a2 = String(customer.address2 || "").trim();
+  const memo = String(customer.delivery_memo || "").trim();
+  if (a1) {
+    const postalPart = postal ? `(${postal}) ` : "";
+    return { full: `${postalPart}${a1}${a2 ? ` ${a2}` : ""}`, postalCode: postal, address1: a1, address2: a2, deliveryMemo: memo };
+  }
+  const legacy = String(customer.address || "").trim();
+  if (legacy) return { full: legacy, postalCode: "", address1: "", address2: "", deliveryMemo: memo };
+  return null;
 }
 
 interface CreateResult {
@@ -85,8 +113,23 @@ interface CreateResult {
 async function createOrderRecord(body: OrderBody): Promise<CreateResult> {
   const { customer, items, source } = body || {};
   const idempotencyKey = String(body?.idempotency_key || "").trim();
-  // ── 1. 입력 검증 ──
-  if (!customer?.name || !customer?.phone || !customer?.address || !Array.isArray(items) || items.length === 0) {
+
+  // ── 1. 결제수단 결정 (서버 권위 — 시트 접근 이전에 끝낸다) ──
+  const { provider, livePgAvailable, configSummary } = resolvePaymentProvider();
+  const methodDecision = resolveServerPaymentMethod(body?.payment_method, livePgAvailable);
+  // ⚠️ tsconfig strict:false — truthiness(!ok)로 유니언이 좁혀지지 않는다. 판별자 비교로 좁힌다.
+  if (methodDecision.ok === false) {
+    // pg_card + PG 미연결 — 주문도 만들지 않는 정직 거절 (미션 §17). 503: 재시도 가능 상태 아님.
+    throw Object.assign(new Error(methodDecision.customer_message), {
+      status: 503,
+      code: methodDecision.code,
+    });
+  }
+  const paymentMethod = methodDecision.method;
+
+  // ── 1.5 입력 검증 ──
+  const addr = customer ? resolveAddress(customer) : null;
+  if (!customer?.name || !customer?.phone || !addr || !Array.isArray(items) || items.length === 0) {
     throw Object.assign(new Error("필수 항목 누락 (고객명/연락처/배송지/상품)"), { status: 400 });
   }
 
@@ -94,19 +137,23 @@ async function createOrderRecord(body: OrderBody): Promise<CreateResult> {
   const productsSheet = doc.sheetsByIndex[0]; // Products
   const pRows = await productsSheet.getRows();
 
-  // ── 2. 서버 측 가격 재계산 (클라이언트 금액 신뢰 금지 — Price Authority §8) ──
-  // [SESSION H] 옵션별재고 확인은 이 루프에서 제거되고 3.7의 finalStockCheck 게이트로
-  // 이동했다 — 결제 개시 직전 단일 시점에 B 파이프라인(확정) + C 원본(폴백) 순으로 판정한다.
-  let total = 0;
+  // ── 2. 서버 측 가격 재계산 (클라이언트 금액 신뢰 금지 — Price Authority §7) ──
+  // 최종 결제대금 = 상품금(시트 판매가) + 배송비(규칙 동일) − 할인(미도입 0).
+  // 이전까지 시트 total은 상품금만이었으나, 결제 대금은 서버가 끝까지 계산하는 것이 계약이다
+  // (근거 분해는 상품금액/배송비/할인 컬럼으로 함께 기록).
+  let subtotal = 0;
   const resolved: { sku: string; color: string; size: string; qty: number; unit_price: number; supplier: string; colorIndex: number; name: string }[] = [];
   for (const it of items) {
     const p = pRows.find((r) => r.get("상품ID") === it.sku);
     if (!p) throw Object.assign(new Error(`존재하지 않는 상품: ${it.sku}`), { status: 400 });
     const price = Number(String(p.get("판매가") || "0").replace(/[^\d]/g, "")) || 0;
     const qty = Math.max(1, Math.min(10, Number(it.qty) || 1));
-    total += price * qty;
+    subtotal += price * qty;
     resolved.push({ sku: it.sku, color: it.color || "", size: it.size || "", qty, unit_price: price, supplier: String(p.get("공급사명") || ""), colorIndex: (typeof it.colorIndex === "number" ? it.colorIndex : -1), name: String(p.get("상품명") || it.sku) });
   }
+  const shippingFee = getShippingFee(subtotal);
+  const discount = 0;
+  const payable = subtotal + shippingFee - discount;
 
   // ── 3. 분리배송 판별 (공급사명 기준 그룹핑) ──
   const supplierSet = new Set(resolved.map((r) => r.supplier));
@@ -117,7 +164,9 @@ async function createOrderRecord(body: OrderBody): Promise<CreateResult> {
   if (idempotencyKey) {
     const existing = await findOrderByIdempotencyKey(doc, idempotencyKey);
     if (existing) {
-      const existingTotal = existing.total;
+      // 신규 행은 총결제금액=최종 결제대금. 구행(상품금만)은 배송비를 더해 같은 계약으로 응는다.
+      const storedIsPayable = Boolean(existing.raw?.["상품금액"]);
+      const replayPayable = storedIsPayable ? existing.total : existing.total + getShippingFee(existing.total);
       return {
         duplicate: true,
         payload: {
@@ -127,7 +176,8 @@ async function createOrderRecord(body: OrderBody): Promise<CreateResult> {
           payment_method: existing.paymentMethod || DEFAULT_PAYMENT_METHOD,
           status: "PAYMENT_PENDING",
           status_label: displayLabel("PAYMENT_PENDING"),
-          total_amount: existingTotal,
+          total_amount: existing.total,
+          payable_amount: replayPayable,
           shipping: {
             type: existing.shipType,
             notice: existing.shipType === "분리배송"
@@ -136,7 +186,7 @@ async function createOrderRecord(body: OrderBody): Promise<CreateResult> {
           },
           deposit_info: {
             ...DEPOSIT_ACCOUNT,
-            amount: existingTotal,
+            amount: replayPayable,
             depositor: existing.depositor || existing.customerName,
           },
         },
@@ -144,113 +194,153 @@ async function createOrderRecord(body: OrderBody): Promise<CreateResult> {
     }
   }
 
-  // ── 3.7 [SESSION H · TASK 13] 결제 개시 직전 최종 재고 확인 (finalStockCheck) ──
-  // 멱등키 replay 판정 *뒤*에 실행한다 — 이미 생성된 주문의 재제출은 재고 변동과 무관하게
-  // 원본 응답을 replay한다. 게이트는 고객 upsert·Orders 인입·차감·알림(=결제 개시) 직전의
-  // 마지막 경계다. 선택한 정확한 옵션(color×size) 단위로 재검증한다.
-  const gateLines: GateLine[] = resolved.map((r) => ({ sku: r.sku, color: r.color, size: r.size, qty: r.qty, name: r.name }));
-  const stockCheck = await checkoutFinalStockCheck(gateLines);
-  const pipelineGate = gateFromStockCheck(stockCheck, gateLines);
-  if (pipelineGate && !pipelineGate.ok) {
-    // 확정 품절/수량 부족 — 결제 중단. 카트 비움은 성공 경로에서만 일어나므로 유지된다.
-    throw Object.assign(new Error(pipelineGate.message), { status: 409 });
-  }
-  if (!pipelineGate) {
-    // 어댑터 미확정(미스테이징·STALE·TYPE B 수량미확인·조회 실패) → C 원본(Products
-    // 옵션별재고) 폴백. 정확히 일치하는 옵션 키만 읽는다 — 값이 없으면 "재고 미확인"으로
-    // truthful 차단한다(품절로 창작 금지).
-    const rowBySku = new Map(pRows.map((r) => [String(r.get("상품ID")), r] as const));
-    const sheetGate = gateFromSheetStock(gateLines, (line) => {
-      const row = rowBySku.get(line.sku);
-      return row ? sheetOptionQty(row, line) : undefined;
-    });
-    if (!sheetGate.ok) {
-      throw Object.assign(new Error(sheetGate.message), { status: 409 });
+  // ── 4~6. 임계구역: 재고 게이트 → 주문 인입 → 재고 차감 (경합 직렬화 — 미션 §10) ──
+  const createOutcome = await withOrderLock(async () => {
+    // ── 4. [SESSION H · TASK 13] 결제 개시 직전 최종 재고 확인 ──
+    const gateLines: GateLine[] = resolved.map((r) => ({ sku: r.sku, color: r.color, size: r.size, qty: r.qty, name: r.name }));
+    const stockCheck = await checkoutFinalStockCheck(gateLines);
+    const pipelineGate = gateFromStockCheck(stockCheck, gateLines);
+    if (pipelineGate && !pipelineGate.ok) {
+      throw Object.assign(new Error(pipelineGate.message), { status: 409 });
     }
-  }
+    if (!pipelineGate) {
+      const rowBySku = new Map(pRows.map((r) => [String(r.get("상품ID")), r] as const));
+      const sheetGate = gateFromSheetStock(gateLines, (line) => {
+        const row = rowBySku.get(line.sku);
+        return row ? sheetOptionQty(row, line) : undefined;
+      });
+      if (!sheetGate.ok) {
+        throw Object.assign(new Error(sheetGate.message), { status: 409 });
+      }
+    }
 
-  // ── 4. 고객 레코드 upsert (Customers 시트 — 회원/게스트 구분, 실패 시 빈 참조로 계속) ──
-  const isMember = Boolean(customer.member && customer.email);
-  const { customerId } = await upsertCustomer(doc, {
-    name: customer.name,
-    phone: customer.phone,
-    email: isMember ? customer.email : "",
-    type: isMember ? "MEMBER" : "GUEST",
+    // ── 5. 고객 레코드 upsert (Customers 시트 — 회원/게스트 구분, 실패 시 빈 참조로 계속) ──
+    const isMember = Boolean(customer.member && customer.email);
+    const { customerId } = await upsertCustomer(doc, {
+      name: customer.name!,
+      phone: customer.phone!,
+      email: isMember ? customer.email : "",
+      type: isMember ? "MEMBER" : "GUEST",
+    });
+
+    // ── 6. 주문번호 생성 + 시트 인입 ──
+    // N1_PG_TEST_ONLY=true 인 테스트 인스턴스는 TEST- 네임스페이스로 격리한다 —
+    // 합성 PG(test_only)가 TEST- 주문만 수용하므로 운영 주문과 구조적으로 만날 수 없다.
+    const testInstance = (process.env.N1_PG_TEST_ONLY || "").trim().toLowerCase() === "true";
+    const idPrefix = testInstance ? "TEST" : "ORD";
+    const now = new Date();
+    const orderId = `${idPrefix}-${now.toISOString().slice(0, 10).replace(/-/g, "")}-${String(now.getMilliseconds()).padStart(3, "0")}${String(Math.floor(Math.random() * 90) + 10)}`;
+    const ordersSheet = await getOrdersSheet(doc);
+    if (!ordersSheet) {
+      console.error("[orders] Orders 시트 탭을 찾지 못했습니다");
+      throw Object.assign(new Error("주문 접수 중 문제가 발생했습니다"), { status: 500 });
+    }
+    if (idempotencyKey) await ensureOrdersIdempotencyColumn(doc);
+    await ensureOrdersExtraColumns(doc);
+    await ordersSheet.addRow({
+      "주문번호": orderId,
+      "주문일시": now.toISOString(),
+      "결제수단": paymentMethod,
+      "결제상태": paymentMethod === "pg_card" ? "결제대기" : "입금대기",
+      "입금자명": customer.depositor || customer.name,
+      "PG거래ID": "",
+      "고객ID": customerId,
+      "고객명": customer.name,
+      "연락처": customer.phone,
+      "배송지": addr.full,
+      "우편번호": addr.postalCode,
+      "주소1": addr.address1,
+      "주소2": addr.address2,
+      "배송메모": addr.deliveryMemo,
+      "고객이메일": isMember ? String(customer.email) : "",
+      "주문출처": source === "buynow" ? "buynow" : "cart",
+      "주문항목": JSON.stringify(resolved),
+      "상품금액": String(subtotal),
+      "배송비": String(shippingFee),
+      "할인": String(discount),
+      "총결제금액": String(payable),
+      "배송유형": shipType,
+      "출고그룹": suppliers.join(", "),
+      "알림발송": shipType === "분리배송" ? "대기" : "-",
+      "배송상태": "접수",
+      "택배사": "",
+      "송장번호": "",
+      "CS메모": "",
+      ...(idempotencyKey ? { "멱등키": idempotencyKey } : {}),
+    });
+
+    // ── 7. 재고 차감 — PG 주문은 결제 검증 후로 이연, 무통장은 즉시 (미션 §19~22) ──
+    if (paymentMethod === "bank_transfer") {
+      const decrement = await decrementStagingStock(gateLines, orderId);
+      console.log(
+        `[stock-decrement] ${orderId} — staging 차감: [${decrement.decremented.join(", ") || "없음"}] 보류: [${decrement.skipped.join(", ") || "없음"}]`,
+      );
+    } else {
+      console.log(`[stock-decrement] ${orderId} — PG 결제수단: 차감을 결제 검증 후로 이연`);
+    }
+
+    return { orderId, customerId, isMember };
   });
 
-  // ── 5. 주문번호 생성 + 시트 인입 ──
-  const now = new Date();
-  const orderId = `ORD-${now.toISOString().slice(0, 10).replace(/-/g, "")}-${String(now.getMilliseconds()).padStart(3, "0")}${String(Math.floor(Math.random() * 90) + 10)}`;
-  const ordersSheet = await getOrdersSheet(doc);
-  if (!ordersSheet) {
-    // [SESSION L] 내부 저장소 구조 문제 — 고객 메시지는 고정 문구로, 원문은 로그로만
-    console.error("[orders] Orders 시트 탭을 찾지 못했습니다");
-    throw Object.assign(new Error("주문 접수 중 문제가 발생했습니다"), { status: 500 });
-  }
-  if (idempotencyKey) await ensureOrdersIdempotencyColumn(doc);
-  await ordersSheet.addRow({
-    "주문번호": orderId,
-    "주문일시": now.toISOString(),
-    "결제수단": DEFAULT_PAYMENT_METHOD, // V1: 무통장입금 고정 (PG 연동 시 여기 교체)
-    "결제상태": "입금대기",
-    "입금자명": customer.depositor || customer.name,
-    "PG거래ID": "",
-    "고객ID": customerId,
-    "고객명": customer.name,
-    "연락처": customer.phone,
-    "배송지": customer.address,
-    "고객이메일": isMember ? String(customer.email) : "",
-    "주문출처": source === "buynow" ? "buynow" : "cart",
-    "주문항목": JSON.stringify(resolved),
-    "총결제금액": String(total),
-    "배송유형": shipType,
-    "출고그룹": suppliers.join(", "),
-    "알림발송": shipType === "분리배송" ? "대기" : "-",
-    "배송상태": "접수",
-    "택배사": "",
-    "송장번호": "",
-    "CS메모": "",
-    ...(idempotencyKey ? { "멱등키": idempotencyKey } : {}),
-  });
+  const { orderId, customerId, isMember } = createOutcome;
 
-  // ── 6. [SESSION H] 재고 차감 — Stock_Staging 기준 ──
-  // 기존 Products AB열(getCell(row,27)) 차감은 제거했다: 신규 시트의 AB열은 unisex_score라
-  // 옵션 문자열을 쓰면 실 데이터를 오염시킨다 (Session B 리포트 지뢰 1). 검증 원장
-  // Stock_Staging의 확인된 숫자만 차감하며(검증일시 불변·비고에 근거 기록), staging 미기입
-  // sku는 차감을 보류한다 — 다음 공급처 재검증(cadence)이 값을 다시 맞춘다.
-  const decrement = await decrementStagingStock(gateLines, orderId);
-  console.log(
-    `[stock-decrement] ${orderId} — staging 차감: [${decrement.decremented.join(", ") || "없음"}] 보류: [${decrement.skipped.join(", ") || "없음"}]`,
-  );
-
-  // ── 7. 디렉터 텔레그램 알림 ──
-  const itemsDesc = resolved.map((r) => `${r.sku}(${r.color}${r.size ? " " + r.size : ""})x${r.qty}`).join(", ");
-  await notifyNewOrder(orderId, customer.name, total, shipType, itemsDesc);
-
-  // ── 8. 고객 응답 (입금 안내 포함) ──
-  return {
-    duplicate: false,
+  // ── 8. 운영 이벤트 (HERMES) — best-effort, 고객 흐름 차단 없음 ──
+  await emitHermesEvent(() => getDoc(), {
+    eventType: "ORDER_DRAFTED",
+    orderId,
+    amount: payable,
     payload: {
-      ok: true,
-      order_id: orderId,
-      customer_id: customerId,
-      payment_method: DEFAULT_PAYMENT_METHOD,
-      status: "PAYMENT_PENDING", // canonical (lib/orderState) — 생성 직후 유일한 합법 상태
-      status_label: displayLabel("PAYMENT_PENDING"),
-      total_amount: total,
-      shipping: {
-        type: shipType,
-        notice: shipType === "분리배송"
-          ? "고객님의 주문 상품은 신속한 출고를 위해 각각 개별 포장되어 순차 발송됩니다."
-          : undefined,
-      },
-      deposit_info: {
-        ...DEPOSIT_ACCOUNT,
-        amount: total,
-        depositor: customer.depositor || customer.name,
-      },
+      payment_method: paymentMethod,
+      ship_type: shipType,
+      source: source === "buynow" ? "buynow" : "cart",
+      customer_type: isMember ? "MEMBER" : "GUEST",
+    },
+  });
+
+  // ── 9. 봇2 알림 — 무통장만 즉시 (PG는 결제 확정 알림이 webhook 경로에서 간다) ──
+  const itemsDesc = resolved.map((r) => `${r.sku}(${r.color}${r.size ? " " + r.size : ""})x${r.qty}`).join(", ");
+  if (paymentMethod === "bank_transfer") {
+    await notifyNewOrder(orderId, customer.name!, payable, shipType, itemsDesc);
+  }
+
+  // ── 10. 고객 응답 ──
+  const basePayload: Record<string, unknown> = {
+    ok: true,
+    order_id: orderId,
+    customer_id: customerId,
+    payment_method: paymentMethod,
+    status: "PAYMENT_PENDING", // canonical — 생성 직후 유일한 합법 상태 (PAID는 검증 후에만)
+    status_label: displayLabel("PAYMENT_PENDING"),
+    total_amount: subtotal, // 하위호환 — 상품금 합계 (이전 계약 유지)
+    payable_amount: payable, // 최종 결제대금 — 서버 계산 (클라이언트 표시·입금 기준)
+    shipping: {
+      type: shipType,
+      notice: shipType === "분리배송"
+        ? "고객님의 주문 상품은 신속한 출고를 위해 각각 개별 포장되어 순차 발송됩니다."
+        : undefined,
     },
   };
+
+  if (paymentMethod === "bank_transfer") {
+    basePayload.deposit_info = {
+      ...DEPOSIT_ACCOUNT,
+      amount: payable,
+      depositor: customer.depositor || customer.name,
+    };
+    return { duplicate: false, payload: basePayload };
+  }
+
+  // ── pg_card: PG 결제 요청 생성 (어댑터는 이미 live로 수용된 상태) ──
+  console.log(`[orders] PG payment request — ${orderId} provider=${provider.name} (${configSummary})`);
+  const deps = await buildPaymentFlowDeps(provider);
+  const payment = await createPaymentRequestForOrder(deps, orderId);
+  if (!payment.ok) {
+    // 주문은 PAYMENT_PENDING 으로 존재 — 고객은 재시도 가능(/api/payments/request), 거짓 성공 없음
+    basePayload.payment = { ok: false, code: payment.payload.code, error: payment.payload.error };
+    return { duplicate: false, payload: basePayload };
+  }
+  basePayload.payment = { ok: true, ...payment.payload };
+  return { duplicate: false, payload: basePayload };
 }
 
 export async function POST(req: Request) {
@@ -270,11 +360,18 @@ export async function POST(req: Request) {
       isDuplicate ? { ...value.payload, duplicate: true } : value.payload,
     );
   } catch (e: unknown) {
-    // [SESSION L · TASK 29] 계약 오류(400/409)는 그대로, 나머지는 고정 문구 + 502 —
-    // 내부 예외 원문(Google 오류·JSON 파서 메시지)은 고객에게 보내지 않는다.
-    const failure = clientSafeFailure(e);
-    if (failure.status >= 500) logInternal("api/orders", e);
-    return NextResponse.json({ ok: false, error: failure.message }, { status: failure.status });
+    // [SESSION L · TASK 29] 위생 계약 — 라우트는 clientSafeRejection 결과만 응답에 실는다.
+    // code가 붙은 계약 거절(PAYMENT_PROVIDER_NOT_CONFIGURED 등)은 원래 상태(503)와
+    // 고객 문구("결제 시스템 준비 중입니다.")를 유지하고, 그 외 5xx는 고정 문구로 치환된다.
+    const rejection = clientSafeRejection(e);
+    return NextResponse.json(
+      {
+        ok: false,
+        ...(rejection.code ? { code: rejection.code } : {}),
+        error: rejection.message,
+      },
+      { status: rejection.status },
+    );
   }
 }
 

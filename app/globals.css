@@ -362,6 +362,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: var(
 .checkout-cart { border: 1px solid var(--line, #e5e5e5); padding: 14px 16px; margin-bottom: 18px; }
 .checkout-item { display: flex; justify-content: space-between; font-size: var(--t-body); padding: 5px 0; }
 .checkout-fields { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.checkout-fields .addr-postal { max-width: 170px; }
 .checkout-fields input {
   padding: 12px 14px; font-size: 14px; border: 1px solid var(--line, #e5e5e5);
   background: transparent; color: inherit;
