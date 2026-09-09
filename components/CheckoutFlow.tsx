@@ -420,6 +420,12 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
           <div className="deposit-row"><span>입금 계좌</span><b>{DEPOSIT.bank} {DEPOSIT.account}</b></div>
         </div>
         <p className="buy-note">이 페이지를 닫아도 우측 하단 장바구니 아이콘의 '결제 진행 현황'에서 상태를 확인할 수 있습니다.</p>
+        {/* [Session I] 주문 조회·반품/교환 진입 — 회원 주문내역 / 게스트 주문번호+연락처 조회 */}
+        <p className="buy-note">
+          <Link href="/orders" style={{ color: "inherit", textDecoration: "underline" }}>
+            주문 조회 · 반품/교환 요청 →
+          </Link>
+        </p>
       </div>
     </main>
   );

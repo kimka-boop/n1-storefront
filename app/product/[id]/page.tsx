@@ -40,7 +40,7 @@ import { interpretFit, categoryOf } from "@/lib/fit";
 import {
   genderKo,
   categoryShort,
-  noticeQualityText,
+  noticeQualityParagraphs,
   noticeAsText,
   sizeSummary,
   washingText,
@@ -610,7 +610,12 @@ export default function ProductPage() {
           {product.notice?.quality ? (
             <>
               <dt>교환·반품</dt>
-              <dd>{noticeQualityText(product.notice.quality)}</dd>
+              {/* TASK 15: 승인 문구를 문장 단위 문단으로 — 줄바꿈/line-height 개선 (내용 불변) */}
+              <dd className={styles.quality}>
+                {noticeQualityParagraphs(product.notice.quality).map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </dd>
             </>
           ) : null}
           {product.notice?.as ? (

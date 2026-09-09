@@ -271,7 +271,10 @@
 }
 .facts dt { color: #999999; }
 .facts dd { color: #333333; line-height: 1.7; }
-@media (max-width: 640px) { .facts { grid-template-columns: 1fr; gap: 2px 0; } .facts dt { margin-top: 12px; } }
+/* TASK 15: 교환·반품 승인 문구 — 문장 단위 문단, 긴 문장 가독 line-height */
+.quality p { line-height: 1.85; }
+.quality p + p { margin-top: 10px; }
+@media (max-width: 640px) { .facts { grid-template-columns: 1fr; gap: 2px 0; } .facts dt { margin-top: 12px; } .quality p + p { margin-top: 8px; } }
 .homeLinkWrap { margin-top: 48px; }
 .homeLink {
   color: #111111;

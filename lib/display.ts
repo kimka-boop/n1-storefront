@@ -29,15 +29,32 @@ export function colorLabel(color: string): string {
 }
 
 /** 교환·반품 문구 (Owner 승인 표기 — 시트 값이 새 문구면 그대로 통과) */
-const QUALITY_NEW =
-  "수령 후 7일 이내에 청약철회를 요청하실 수 있습니다. 이미 사용했거나 훼손된 상품은 청약철회 대상에서 제외됩니다. 전자상거래법상 소비자 청약철회 가능 범위를 준수합니다.";
 const QUALITY_OLD =
   "전자상거래 법에 규정되어 있는 소비자 청약철회 가능 범위를 준수합니다.";
 
-export function noticeQualityText(value?: string): string {
+/**
+ * 승인 정책을 문장 단위 문단으로 분리 (Session I · TASK 15 — 줄바꿈/line-height 개선).
+ * 문장 순서·표현은 승인 문구 그대로 — 정책 의미 변경 없음.
+ * 시트가 새 문구를 내려주면 그 값은 문단 분리 없이 그대로 통과한다 (창작 금지).
+ */
+const QUALITY_NEW_PARAGRAPHS: readonly string[] = [
+  "수령 후 7일 이내에 청약철회를 요청하실 수 있습니다.",
+  "이미 사용했거나 훼손된 상품은 청약철회 대상에서 제외됩니다.",
+  "전자상거래법상 소비자 청약철회 가능 범위를 준수합니다.",
+];
+
+const QUALITY_NEW = QUALITY_NEW_PARAGRAPHS.join(" ");
+
+export function noticeQualityParagraphs(value?: string): string[] {
   const v = (value || "").trim();
-  if (!v || v === QUALITY_OLD) return QUALITY_NEW;
-  return v;
+  if (!v || v === QUALITY_OLD || v === QUALITY_NEW) {
+    return [...QUALITY_NEW_PARAGRAPHS];
+  }
+  return [v];
+}
+
+export function noticeQualityText(value?: string): string {
+  return noticeQualityParagraphs(value).join("\n\n");
 }
 
 /** 세탁 안내 — "상세 페이지 및 고객센터 문의" 보일러플레이트 문장 제거 (Owner 지시 2026-09-08) */
@@ -55,9 +72,12 @@ export function washingText(value?: string): string {
     .replace(/\s{2,}/g, " ");
 }
 
-/** 문의 안내 문구 (Owner 승인 표기 — 말풍선 아이콘 위치 안내) */
+/** 문의 안내 문구 (Owner 승인 표기 — 말풍선 아이콘 위치 안내)
+ *  Session I · TASK 15: "우측" → "좌측" 수정 — 실제 고객센터 위젯(.cs-fab)은
+ *  페이지 하단 좌측 고정(globals.css: left anchor, 모바일 left:16px)이며
+ *  장바구니 플로팅 바(.float-bar)가 우측이다. 문구를 실제 위치와 일치시켰다. */
 const AS_NEW =
-  "N°1 고객센터 (상품 문의는 페이지 하단 우측 말풍선 아이콘을 이용해 문의 부탁드립니다)";
+  "N°1 고객센터 (상품 문의는 페이지 하단 좌측 말풍선 아이콘을 이용해 문의 부탁드립니다)";
 
 export function noticeAsText(value?: string): string {
   const v = (value || "").trim();
