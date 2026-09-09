@@ -16,7 +16,6 @@
  */
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
-import SmartFitFlow from "@/components/SmartFitFlow";
 import { useAuth } from "@/components/AuthProvider";
 import { mediaFor } from "@/lib/media";
 import { FIT_LABEL, fitPresetSize, preferenceShift, categoryOf, interpretFit, type FitProductInput } from "@/lib/fit";
@@ -210,7 +209,6 @@ void editorialWeight; // 페어 뷰 전환 후 예비 — 스코어 정렬은 �
 export default function Home() {
   // ── 스마트 핏 — 컨텍스트는 AuthProvider 단일 진실(게스트 즉시 저장, §8) ──
   const { fit } = useAuth();
-  const [showFitModal, setShowFitModal] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [pairs, setPairs] = useState<CollectionPair[]>([]);
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
@@ -259,19 +257,31 @@ export default function Home() {
     const saved = localStorage.getItem("n1_gender_tab");
     if (saved === "male" || saved === "female" || saved === "genderless") setGenderTab(saved);
   }, []);
-  const changeTab = (t: GenderKey) => {
+  const changeTab = (t: GenderKey, opts?: { fromDrag?: boolean }) => {
+    // 드래그 종료 직후에 오는 synthetic click은 탭 전환으로 이중 처리된다 — 그것만 무시
+    if (!opts?.fromDrag && suppressTabClickRef.current) { suppressTabClickRef.current = false; return; }
     setGenderTab(t);
     if (t === "all") localStorage.removeItem("n1_gender_tab");
     else localStorage.setItem("n1_gender_tab", t);
   };
 
-  // ── 페어 컬렉션: 한 row = 추천 코디 1벌 (LEFT=TOP, RIGHT=BOTTOM) ──
+  // ── 페어 컬렉션: 한 row = 추천 코디 1쌍 (LEFT=TOP, RIGHT=BOTTOM) ──
   // N1_PAIRING_POLICY_V1 — HERMES가 사전 계산한 mapping만 소비, 프론트에서 조합 생성 금지.
   const scope = genderTab === "all" ? "all" : GENDER_API[genderTab];
   const { rows: pairRows, singles } = buildCollectionPairs(products, pairs, scope, query);
-  const collection = pairRows.length
-    ? [...pairRows.flatMap((r) => [r.top, r.bottom]), ...singles]
-    : selectCollection(products, scope, query);
+  // §10 — 단품 구간도 LEFT=TOP / RIGHT=BOTTOM 구조를 유지한다 (무작위 혼합 금지)
+  const singlesByRole = (() => {
+    const tops: Product[] = [];
+    const bottoms: Product[] = [];
+    for (const p of singles) {
+      if (categoryOf({ name: p.name, category: p.category }) === "bottom") bottoms.push(p);
+      else tops.push(p);
+    }
+    const rows: { left?: Product; right?: Product }[] = [];
+    const len = Math.max(tops.length, bottoms.length);
+    for (let i = 0; i < len; i++) rows.push({ left: tops[i], right: bottoms[i] });
+    return rows;
+  })();
   const genderCount = (g: "male" | "female" | "genderless") =>
     selectCollection(products, GENDER_API[g]).length;
 
@@ -284,6 +294,8 @@ export default function Home() {
   const trackRef = useRef<HTMLDivElement>(null);
   const lensRef = useRef<HTMLSpanElement>(null);
   const dragRef = useRef<{ pointerId: number; startX: number; baseLeft: number; active: boolean; lastHover: number } | null>(null);
+  // §2 — 드래그 직후 발생하는 click(버튼 위에서 시작한 드래그)을 한 번 무시하기 위한 플래그
+  const suppressTabClickRef = useRef(false);
   const [lensPlacement, setLensPlacement] = useState<{ left: number; width: number } | null>(null);
 
   const syncLens = useCallback(() => {
@@ -294,7 +306,9 @@ export default function Home() {
       track?.querySelector<HTMLElement>('[data-tab="all"]');
     if (!track || !btn) return;
     // Glass Lab §9 + 긴 라벨 규칙(§4): 렌즈 폭은 interaction zone과
-    // 라벨+카운트 group(+breathing) 중 큰 값, 최소폭 64px 보장.
+    // 라벨+카운트 group(+breathing) 중 큰 값, 최소폭 보장.
+    // Storefront Repair(§4·§23): 라벨+카운트가 숨 쉬는 폭 — breathing 24→44px,
+    // 최소폭 64→88px. 활성 렌즈가 크게 의도 있게 읽히고 텍스트를 클리핑하지 않는다.
     // offsetLeft는 track(offsetParent) 기준이라 rect 방식보다 안정적.
     const labels = Array.from(track.querySelectorAll<HTMLElement>("[data-tab]"));
     const trackW = track.clientWidth;
@@ -305,11 +319,12 @@ export default function Home() {
     const zoneL = (prevC + centers[i]) / 2;
     const zoneR = (centers[i] + nextC) / 2;
     const zone = zoneR - zoneL;
-    const byGroup = btn.offsetWidth + 24; // 라벨+카운트 group + breathing room
-    const byZone = zone * 0.78;
-    const cap = zone * 0.92; // 이웃 zone 침범 방지 상한
-    const w = Math.max(64, Math.min(Math.max(byGroup, Math.min(byZone, cap)), cap));
-    const left = centers[i] - w / 2;
+    const byGroup = btn.offsetWidth + 44; // 라벨+카운트 group + breathing room
+    const byZone = zone * 0.82;
+    const cap = zone * 0.94; // 이웃 zone 침범 방지 상한
+    const w = Math.max(88, Math.min(Math.max(byGroup, Math.min(byZone, cap)), cap));
+    // §1 — 렌즈는 track 밖으로 절대 나가지 않는다 (뷰포트 가장자리 클리핑 방지)
+    const left = Math.max(0, Math.min(centers[i] - w / 2, trackW - w));
     setLensPlacement((prev) =>
       prev && Math.abs(prev.left - left) < 0.5 && Math.abs(prev.width - w) < 0.5 ? prev : { left, width: w });
   }, [genderTab]);
@@ -334,10 +349,15 @@ export default function Home() {
     return () => { ro.disconnect(); mq.removeEventListener?.("change", onChange); };
   }, [syncLens]);
 
-  const onLensPointerDown = (e: React.PointerEvent<HTMLSpanElement>) => {
+  // §2 — 포인터down은 트랙 레벨에서 잡는다: 렌즈 가장자리뿐 아니라 활성 탭 라벨 위에서
+  // 시작한 드래그도 렌즈 드래그가 된다(버튼이 렌즈 중앙을 덮는 z 구조 때문에 렌즈 단독
+  // 핸들러로는 중앙 드래그가 닿지 않았다). tap(무이동)은 click 경로가 그대로 처리한다.
+  const onTrackPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const lens = lensRef.current;
     if (!lens) return;
-    try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* 합성 포인터 등 — 없어도 동작 */ }
+    suppressTabClickRef.current = false; // 새 제스처 — 이전 드래그의 미소비 억제 플래그는 버린다
+    // 주의: 여기서 setPointerCapture 하면 tap의 click이 트랙으로 리타깃되어 버튼 선택이 깨진다.
+    // 캡처는 드래그가 활성화된 시점(pointerMove)에만 건다.
     dragRef.current = {
       pointerId: e.pointerId, startX: e.clientX,
       baseLeft: lensPlacement?.left ?? 0, active: false, lastHover: -1,
@@ -352,6 +372,8 @@ export default function Home() {
       if (Math.abs(dx) < 6) return; // 수평 의도 확인 전엔 무동작 (세로 스크롤 보호)
       ds.active = true;
       lens.classList.add("dragging");
+      // 드래그 확정 시점에만 캡처 — 이후 click은 트랙으로 가 버튼 이중 선택도 막힌다
+      try { track.setPointerCapture(e.pointerId); } catch { /* 합성 포인터 등 — 없어도 동작 */ }
     }
     const maxX = Math.max(0, track.offsetWidth - lens.offsetWidth);
     const left = Math.max(0, Math.min(ds.baseLeft + dx, maxX));
@@ -386,8 +408,10 @@ export default function Home() {
       const d = Math.abs(b.offsetLeft + b.offsetWidth / 2 - center);
       if (d < bestD) { bestD = d; best = k; }
     });
-    if (best !== genderTab) changeTab(best);
+    if (best !== genderTab) changeTab(best, { fromDrag: true });
     else syncLens(); // 제자리 안정화 스냅
+    // 스냅 후 같은 제스처의 click이 활성 버튼을 다시 누르는 것을 막는다 (§2)
+    if (ds.active) suppressTabClickRef.current = true;
   };
 
   // ── 빠른 주문 상태 (원시 색상/사이즈 값) ──
@@ -462,7 +486,7 @@ export default function Home() {
     );
     document.querySelectorAll("[data-reveal]:not(.revealed)").forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [collection.length]);
+  }, [products.length]);
 
   const openDetail = useCallback(async (p: Product, preset?: { color?: string; size?: string }) => {
     const fid = folderIdFromUrl(p.lookbookImage);
@@ -623,8 +647,9 @@ export default function Home() {
     <main>
       <header className="hero">
         <div className="hero-brand">
+          {/* §43 — 카피는 데이터를 따른다: 60 Pieces · 17 Outfits 카운트는 시트 기준 실시간 */}
           <h1>N°1</h1>
-          <p className="hero-tag">60 Pieces · 20 Outfits</p>
+          <p className="hero-tag">{products.length} Pieces · {pairs.length} Outfits</p>
           <p className="hero-tagline">매주 일요일, 마음에 드는 몇 벌만 골라 보여드립니다</p>
         </div>
         <p className="hero-drop">
@@ -643,9 +668,17 @@ export default function Home() {
       )}
 
       {/* ── 컬렉션 내비 (sticky glass rail + 드래그 가능한 Liquid Glass 셀렉터) ──
-          N°1 브랜드 내비는 이 그룹 밖 — 홈은 위 hero 브랜드, 그 외 페이지는 SiteHeader. */}
+          N°1 브랜드 내비는 이 그룹 밖 — 홈은 위 hero 브랜드, 그 외 페이지는 SiteHeader.
+          §5 — 스마트 핏은 카테고리 행에서 제거되어 상단 유틸리티(AuthNav)로 이동했다. */}
       <nav className="collection-nav" aria-label="컬렉션 필터">
-        <div className="gtab-track" ref={trackRef}>
+        <div
+          className="gtab-track"
+          ref={trackRef}
+          onPointerDown={onTrackPointerDown}
+          onPointerMove={onLensPointerMove}
+          onPointerUp={onLensPointerEnd}
+          onPointerCancel={onLensPointerEnd}
+        >
           <span
             ref={lensRef}
             className="gtab-lens"
@@ -655,10 +688,6 @@ export default function Home() {
                 ? { width: lensPlacement.width, transform: `translate3d(${lensPlacement.left}px, 0, 0)` }
                 : undefined
             }
-            onPointerDown={onLensPointerDown}
-            onPointerMove={onLensPointerMove}
-            onPointerUp={onLensPointerEnd}
-            onPointerCancel={onLensPointerEnd}
           />
           <button data-tab="all" className={`gtab ${genderTab === "all" ? "active" : ""}`} onClick={() => changeTab("all")}>
             전체 <span className="gcount">({products.length})</span>
@@ -673,20 +702,15 @@ export default function Home() {
             젠더리스 <span className="gcount">({genderCount("genderless")})</span>
           </button>
         </div>
-        <button className="gtab gtab-fit" onClick={() => setShowFitModal(true)}
-          aria-label={fit ? "스마트 핏 — 설정됨, 열어서 수정" : "스마트 핏 설정하기"}>
-          {fit ? "스마트 핏 · 설정됨" : "스마트 핏"}
-        </button>
       </nav>
 
       {/* ── 컬렉션: 에디토리얼 위계 ── */}
       <section className="collection">
         <div className="collection-head">
           <h2 className="collection-title">이번 컬렉션</h2>
+          {/* §3·§25 — 성별 카운트 나열 금지. 조용한 두 줄 요약만. */}
           <p className="collection-sub">
-            {genderTab === "all"
-              ? `남성 ${genderCount("male")} · 여성 ${genderCount("female")} · 젠더리스 ${genderCount("genderless")} — 코디 ${pairRows.length}벌 · 단품 ${singles.length}개`
-              : `${({ male: "남성", female: "여성", genderless: "젠더리스" } as Record<string, string>)[genderTab]} 컬렉션 — 코디 ${pairRows.length}벌 · 단품 ${singles.length}개`}
+            {productsLoaded ? `${products.length} Pieces · 추천 코디 ${pairRows.length}쌍` : "불러오는 중 —"}
           </p>
           <div className="collection-search">
             <input
@@ -704,7 +728,12 @@ export default function Home() {
 
         {pairRows.length ? (
           <div className="pair-collection">
-            {/* §34: 상의/하의는 column header — pair view를 깨는 interactive 탭이 아니다 */}
+            {/* §11 — 첫 화면 사용자가 경계를 즉시 읽도록: 조용한 eyebrow + 부제.
+                 상의/하의는 column header — pair view를 깨는 interactive 탭이 아니다 */}
+            <div className="section-eyebrow" data-reveal>
+              <p className="section-eyebrow-title">추천 코디</p>
+              <p className="section-eyebrow-sub">함께 입기 좋은 조합</p>
+            </div>
             <div className="pair-head" aria-hidden="true">
               <span>상의</span>
               <span>하의</span>
@@ -770,63 +799,38 @@ export default function Home() {
           </div>
         ) : null}
 
-        {singles.length ? (
+        {singlesByRole.some((r) => r.left || r.right) ? (
           <div className="pair-singles">
-            <p className="pair-singles-label">단품으로 보기</p>
-            <div className="pieces">
-              {singles.map((p) => {
-                const img = failedImg[p.id] ? null : imageOf(p);
-                const soldOut = p.stockStatus === "품절";
-                const altShot = img
-                  ? mediaFor(p.id, p.lookbookImage)?.views.find((v) => v.src !== img)?.src ?? null
-                  : null;
-                return (
-                  <Link
-                    key={p.id}
-                    href={`/product/${p.id}`}
-                    className="piece piece-quiet"
-                    data-reveal
-                  >
-                    <div className={`piece-media ${img ? "" : "empty"}`}>
-                      {img ? (
-                        <>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={img}
-                            alt={`${p.name} 대표 이미지`}
-                            loading="lazy"
-                            onError={() =>
-                              setFailedImg((f) => (f[p.id] ? f : { ...f, [p.id]: true }))
-                            }
-                          />
-                          {altShot && (
-                            /* eslint-disable-next-line @next/next/no-img-element */
-                            <img className="piece-alt" src={altShot} alt="" aria-hidden="true" loading="lazy" />
-                          )}
-                        </>
-                      ) : (
-                        <span>이미지 준비 중</span>
-                      )}
-                      {soldOut && <span className="piece-soldout">품절</span>}
-                    </div>
-                    <div className="piece-caption">
-                      <p className="piece-eyebrow">
-                        {[genderKo(p.gender), categoryShort(p.category)].filter(Boolean).join(" · ")}
-                      </p>
-                      <h3 className="piece-name">{p.name}</h3>
-                      <p className="piece-price">₩{p.price.toLocaleString("ko-KR")}</p>
-                    </div>
-                  </Link>
-                );
-              })}
+            {/* §11 — 추천 코디와의 경계: hairline + 여백, 그 다음 조용한 eyebrow.
+                 §10 — 단품도 LEFT=TOP / RIGHT=BOTTOM 열 구조를 유지한다 */}
+            <div className="singles-divider" role="presentation" />
+            <div className="section-eyebrow" data-reveal>
+              <p className="section-eyebrow-title">개별 셀렉션</p>
+            </div>
+            <div className="pair-head singles-head" aria-hidden="true">
+              <span>상의</span>
+              <span>하의</span>
+            </div>
+            <div className="singles-rows">
+              {singlesByRole.map(({ left, right }, rowIndex) => (
+                <div className="pair-cards singles-cards" key={`srow-${rowIndex}`}>
+                  {[{ p: left, eager: false }, { p: right, eager: false }].map(({ p }, colIdx) =>
+                    p ? (
+                      <SingleCard key={p.id} p={p} eager={rowIndex === 0 && colIdx === 0} />
+                    ) : (
+                      <span key={`gap-${rowIndex}-${colIdx}`} aria-hidden="true" />
+                    ),
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         ) : null}
 
-        {!pairRows.length && !singles.length && !collection.length ? (
-          !productsLoaded ? (
-            <p className="collection-empty">불러오는 중 — 잠시만 기다려 주세요.</p>
-          ) : query ? (
+        {!pairRows.length && !singles.length && !productsLoaded ? (
+          <p className="collection-empty">불러오는 중 — 잠시만 기다려 주세요.</p>
+        ) : !pairRows.length && !singles.length ? (
+          query ? (
             <p className="collection-empty">
               검색 결과가 없습니다 — 다른 이름으로 찾아보세요.
             </p>
@@ -849,7 +853,7 @@ export default function Home() {
           <br />
           눈이 편한 쇼핑을 위해서입니다.
         </p>
-        <button className="story-cta" onClick={() => setShowFitModal(true)}>
+        <button className="story-cta" onClick={() => window.dispatchEvent(new Event("n1:open-fit"))}>
           {fit
             ? `내 핏 — ${FIT_LABEL[fit.preferredFit as "A"|"B"|"C"] ?? ""} · 수정하기 →`
             : "스마트 핏 →"}
@@ -857,10 +861,6 @@ export default function Home() {
       </section>
 
       <footer>© N°1 — 매주 일요일, 새로운 컬렉션</footer>
-
-      {showFitModal && (
-        <SmartFitFlow onClose={() => setShowFitModal(false)} />
-      )}
 
       {/* ── 빠른 주문 모달 (PDP 구매 진입점) ── */}
       {selected && (
@@ -1088,4 +1088,50 @@ export default function Home() {
       )}
     </main>
   );
+}
+
+/** 개별 셀렉션 카드 — 페어에 오르지 않은 상품의 조용한 단품 카드 (§10·§24) */
+function SingleCard({ p, eager }: { p: Product; eager?: boolean }) {
+  const [failed, setFailed] = useState(false);
+  const img = failed ? null : imageOfCard(p);
+  const soldOut = p.stockStatus === "품절";
+  const altShot = img
+    ? mediaFor(p.id, p.lookbookImage)?.views.find((v) => v.src !== img)?.src ?? null
+    : null;
+  return (
+    <Link href={`/product/${p.id}`} className="piece" data-reveal>
+      <div className={`piece-media ${img ? "" : "empty"}`}>
+        {img ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={img}
+              alt={`${p.name} 대표 이미지`}
+              loading={eager ? "eager" : "lazy"}
+              onError={() => setFailed(true)}
+            />
+            {altShot && (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img className="piece-alt" src={altShot} alt="" aria-hidden="true" loading="lazy" />
+            )}
+          </>
+        ) : (
+          <span>이미지 준비 중</span>
+        )}
+        {soldOut && <span className="piece-soldout">품절</span>}
+      </div>
+      <div className="piece-caption">
+        <p className="piece-eyebrow">
+          {[genderKo(p.gender), categoryShort(p.category)].filter(Boolean).join(" · ")}
+        </p>
+        <h3 className="piece-name">{p.name}</h3>
+        <p className="piece-price">₩{p.price.toLocaleString("ko-KR")}</p>
+      </div>
+    </Link>
+  );
+}
+
+/** 카드 이미지 해상 — 에디토리얼 로컬 샷 → Drive 썸네일 (Home 카드와 동일 폴백 체인) */
+function imageOfCard(p: Product): string | null {
+  return mediaFor(p.id, p.lookbookImage)?.front || null;
 }

@@ -73,6 +73,7 @@ interface Product {
   lookbookImage: string;
   material?: string;
   washingInfo?: string;
+  careSource?: string;
   sizeChart?: string;
   modelInfo?: string;
   fit?: FitInfo;
@@ -81,6 +82,8 @@ interface Product {
   colorOptions?: string[];
   sizeOptions?: string[];
   optionStock?: Record<string, number>;
+  /** 왜 이 제품인가 — 소싱 파이프라인 생성 (§30). 없으면 데이터 QA 위반 */
+  whyThisProduct?: string;
 }
 
 function clean(value?: string): string {
@@ -273,6 +276,9 @@ export default function ProductPage() {
   const origin = clean(product.origin);
   const manufacturer = clean(product.notice?.manufacturer);
   const washing = washingText(product.washingInfo);
+  // §15 RULE C — 공급사 세탁 정보 부재 시 제조사 지침으로 위장하지 않고 안전 상태를 보인다
+  const carePending = !washing;
+  const whyThis = clean(product.whyThisProduct);
   const sizes = sizeSummary(product.sizeChart);
   const genderLabel = genderKo(product.gender);
   const categoryLabel = categoryShort(product.category);
@@ -280,6 +286,9 @@ export default function ProductPage() {
   const colors = productColors(product.colorOptions); // {value: 원시, label: 표시}
   const activeView = media?.views.find((v) => v.key === viewKey) ?? media?.views[0];
   const effBuy = effectiveBuyState(sheetBuy, stockUi, sizeChoices, selSize);
+  // §34 VALIDATING — /api/stock 응답 대기 구간. sheetBuy 폴백이 잠깐 잘못된 CTA를
+  // 그리는 플리커를 막는다 (결과 전까지는 어떤 구매 약속도 하지 않는다)
+  const stockValidating = stockView === null && !stockLookupFailed;
 
   // ── 구매 (미션 §6): 장바구니에 담기 / 바로 구매 — 원시 옵션 값 그대로 전달 (미션 §8) ──
   const variantStockSnap =
@@ -334,14 +343,22 @@ export default function ProductPage() {
         </SceneSection>
       </div>
 
-      {/* ── Scene 2 WHY + VIEWPOINTS — 서사 + 각도는 수동 선택 ── */}
+      {/* ── Scene 2 WHY + VIEWPOINTS — 파이프라인 생성 선정이유(§30) + 각도는 수동 선택 ── */}
       <SceneSection id="scene2" kicker="Why this product" title="왜 이 상품인가">
         <div className={styles.twoCol}>
           <div>
-            {story ? (
+            {whyThis ? (
+              <p className={styles.lede}>{whyThis}</p>
+            ) : story ? (
               <p className={styles.lede}>{story.description}</p>
             ) : (
-              <p className={styles.lede}>{product.name}</p>
+              /* §33: 예상 밖 결핍 — 임시 문구 + 데이터 QA 실패 로그 (출고 파이프라인이 막아야 함) */
+              <>
+                <p className={styles.lede}>선정 이유를 정리 중입니다.</p>
+                {process.env.NODE_ENV !== "production" && (
+                  console.warn(`[data-qa] why_this_product missing: ${product.id}`)
+                )}
+              </>
             )}
             {media && media.views.length > 1 ? (
               <div className={styles.viewBlock}>
@@ -549,7 +566,11 @@ export default function ProductPage() {
             ) : null}
             <p className={styles.price}>{won(product.price)}</p>
 
-            {effBuy === "soldout" || soldOut ? (
+            {/* ── §34 구매 CTA 상태 — OPTIONS_REQUIRED / READY / OUT_OF_STOCK / VALIDATING /
+                ERROR(+ 데이터 미스테이징 quiet path). 단일 disabled 남발 금지 ── */}
+            {stockValidating && effBuy !== "soldout" ? (
+              <button type="button" className={styles.cta} disabled aria-live="polite">재고 확인 중</button>
+            ) : effBuy === "soldout" || soldOut ? (
               <>
                 <button type="button" className={styles.cta} disabled>품절</button>
                 <p className={styles.holdNotice}>공급 확인 정보가 보강 중인 상품입니다.</p>
@@ -558,15 +579,18 @@ export default function ProductPage() {
               <button type="button" className={styles.cta} disabled>옵션을 선택해 주세요</button>
             ) : effBuy === "unconfirmed" ? (
               <>
-                <button type="button" className={`${styles.cta} ${styles.ctaQuiet}`} onClick={openCs}>
-                  재고 확인 후 구매 가능
-                </button>
-                {/* [SESSION H · TASK 14] 정상 재고 파이프라인(조회 성공)에서는 기존 "옵션 재고가
-                    확인 중입니다…" copy를 내보내지 않는다. 조회 실패(lookup failure)일 때만
-                    별도의 truthful fallback — 실패 사실을 실패대로 말한다. */}
                 {stockUi.lookup === "failed" ? (
-                  <p className={styles.holdNotice}>{STOCK_LOOKUP_FAILURE_NOTE}</p>
-                ) : null}
+                  <>
+                    {/* §34 ERROR — 조회 실패는 미확인과 다른, 실패대로의 상태 */}
+                    <button type="button" className={styles.cta} disabled>구매 가능 여부를 확인할 수 없습니다</button>
+                    <p className={styles.holdNotice}>{STOCK_LOOKUP_FAILURE_NOTE}</p>
+                  </>
+                ) : (
+                  /* 데이터 미스테이징(재고 레코드 없음) — 구매 가능처럼 보이지 않는 조용한 문의 경로 */
+                  <button type="button" className={`${styles.cta} ${styles.ctaQuiet}`} onClick={openCs}>
+                    구매 가능 여부 문의하기
+                  </button>
+                )}
               </>
             ) : (
               <>
@@ -622,6 +646,11 @@ export default function ProductPage() {
             <>
               <dt>세탁 안내</dt>
               <dd>{washing}</dd>
+            </>
+          ) : carePending ? (
+            <>
+              <dt>세탁 안내</dt>
+              <dd>세탁 정보 확인 중 — 확인되는 대로 이 자리에 안내해 드립니다.</dd>
             </>
           ) : null}
           {origin ? (

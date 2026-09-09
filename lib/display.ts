@@ -72,12 +72,11 @@ export function washingText(value?: string): string {
     .replace(/\s{2,}/g, " ");
 }
 
-/** 문의 안내 문구 (Owner 승인 표기 — 말풍선 아이콘 위치 안내)
- *  Session I · TASK 15: "우측" → "좌측" 수정 — 실제 고객센터 위젯(.cs-fab)은
- *  페이지 하단 좌측 고정(globals.css: left anchor, 모바일 left:16px)이며
- *  장바구니 플로팅 바(.float-bar)가 우측이다. 문구를 실제 위치와 일치시켰다. */
+/** 문의 안내 문구 (Owner 승인 표기 — 상단 유틸리티 문의 아이콘 위치 안내)
+ *  2026-09-10 Storefront Repair: 하단 플로팅 FAB이 상단 분할 글래스 유틸리티로 이동함에 따라
+ *  "페이지 하단 좌측 말풍선 아이콘" 안내는 더 이상 사실이 아니다 — 상단 기준으로 갱신. */
 const AS_NEW =
-  "N°1 고객센터 (상품 문의는 페이지 하단 좌측 말풍선 아이콘을 이용해 문의 부탁드립니다)";
+  "N°1 고객센터 (상품 문의는 화면 상단의 문의 아이콘을 이용해 주세요)";
 
 export function noticeAsText(value?: string): string {
   const v = (value || "").trim();

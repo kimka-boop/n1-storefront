@@ -1,0 +1,172 @@
+[
+ {
+  "pairId": "PAIR-MA-03",
+  "collectionScope": "MALE",
+  "scopeLabel": "남성",
+  "topProductId": "PRD-N1-03",
+  "bottomProductId": "PRD-N1-09",
+  "trendClusters": [],
+  "pairReasonShort": "데님 밸런스 · 오버 핏 × 일자 하의 균형"
+ },
+ {
+  "pairId": "PAIR-FE-13",
+  "collectionScope": "FEMALE",
+  "scopeLabel": "여성",
+  "topProductId": "PRD-N1-21",
+  "bottomProductId": "PRD-N1-26",
+  "trendClusters": [
+   "T09"
+  ],
+  "pairReasonShort": "같은 트렌드 무드 · 여유로운 실루엣 완성"
+ },
+ {
+  "pairId": "PAIR-MA-01",
+  "collectionScope": "MALE",
+  "scopeLabel": "남성",
+  "topProductId": "PRD-N1-01",
+  "bottomProductId": "PRD-N1-14",
+  "trendClusters": [
+   "T09"
+  ],
+  "pairReasonShort": "같은 트렌드 무드 · 여유로운 실루엣 완성"
+ },
+ {
+  "pairId": "PAIR-MA-02",
+  "collectionScope": "MALE",
+  "scopeLabel": "남성",
+  "topProductId": "PRD-N1-02",
+  "bottomProductId": "PRD-N1-12",
+  "trendClusters": [
+   "T08"
+  ],
+  "pairReasonShort": "같은 트렌드 무드 · 초겨울 보온 조합"
+ },
+ {
+  "pairId": "PAIR-FE-09",
+  "collectionScope": "FEMALE",
+  "scopeLabel": "여성",
+  "topProductId": "PRD-N1-17",
+  "bottomProductId": "PRD-N1-27",
+  "trendClusters": [],
+  "pairReasonShort": "데님 밸런스"
+ },
+ {
+  "pairId": "PAIR-MA-06",
+  "collectionScope": "MALE",
+  "scopeLabel": "남성",
+  "topProductId": "PRD-N1-06",
+  "bottomProductId": "PRD-N1-13",
+  "trendClusters": [
+   "T08"
+  ],
+  "pairReasonShort": "같은 트렌드 무드 · 초겨울 보온 조합"
+ },
+ {
+  "pairId": "PAIR-MA-08",
+  "collectionScope": "MALE",
+  "scopeLabel": "남성",
+  "topProductId": "PRD-N1-08",
+  "bottomProductId": "PRD-N1-11",
+  "trendClusters": [],
+  "pairReasonShort": "데님 밸런스 · 오버 핏 × 일자 하의 균형"
+ },
+ {
+  "pairId": "PAIR-FE-11",
+  "collectionScope": "FEMALE",
+  "scopeLabel": "여성",
+  "topProductId": "PRD-N1-19",
+  "bottomProductId": "PRD-N1-32",
+  "trendClusters": [],
+  "pairReasonShort": "데님 밸런스"
+ },
+ {
+  "pairId": "PAIR-GE-16",
+  "collectionScope": "GENDERLESS",
+  "scopeLabel": "젠더리스",
+  "topProductId": "PRD-N1-34",
+  "bottomProductId": "PRD-N1-44",
+  "trendClusters": [],
+  "pairReasonShort": "데님 밸런스"
+ },
+ {
+  "pairId": "PAIR-GE-18",
+  "collectionScope": "GENDERLESS",
+  "scopeLabel": "젠더리스",
+  "topProductId": "PRD-N1-36",
+  "bottomProductId": "PRD-N1-42",
+  "trendClusters": [
+   "T01",
+   "T07"
+  ],
+  "pairReasonShort": "같은 트렌드 무드"
+ },
+ {
+  "pairId": "PAIR-MA-04",
+  "collectionScope": "MALE",
+  "scopeLabel": "남성",
+  "topProductId": "PRD-N1-04",
+  "bottomProductId": "PRD-N1-15",
+  "trendClusters": [],
+  "pairReasonShort": "여유로운 실루엣 완성"
+ },
+ {
+  "pairId": "PAIR-MA-07",
+  "collectionScope": "MALE",
+  "scopeLabel": "남성",
+  "topProductId": "PRD-N1-07",
+  "bottomProductId": "PRD-N1-10",
+  "trendClusters": [],
+  "pairReasonShort": "데님 밸런스"
+ },
+ {
+  "pairId": "PAIR-FE-14",
+  "collectionScope": "FEMALE",
+  "scopeLabel": "여성",
+  "topProductId": "PRD-N1-22",
+  "bottomProductId": "PRD-N1-29",
+  "trendClusters": [
+   "T08"
+  ],
+  "pairReasonShort": "같은 트렌드 무드 · 초겨울 보온 조합"
+ },
+ {
+  "pairId": "PAIR-FE-10",
+  "collectionScope": "FEMALE",
+  "scopeLabel": "여성",
+  "topProductId": "PRD-N1-18",
+  "bottomProductId": "PRD-N1-25",
+  "trendClusters": [],
+  "pairReasonShort": "베이스 캐주얼 조합"
+ },
+ {
+  "pairId": "PAIR-FE-12",
+  "collectionScope": "FEMALE",
+  "scopeLabel": "여성",
+  "topProductId": "PRD-N1-20",
+  "bottomProductId": "PRD-N1-28",
+  "trendClusters": [],
+  "pairReasonShort": "데님 밸런스"
+ },
+ {
+  "pairId": "PAIR-MA-05",
+  "collectionScope": "MALE",
+  "scopeLabel": "남성",
+  "topProductId": "PRD-N1-05",
+  "bottomProductId": "PRD-N1-16",
+  "trendClusters": [
+   "T08"
+  ],
+  "pairReasonShort": "같은 트렌드 무드"
+ },
+ {
+  "pairId": "PAIR-GE-20",
+  "collectionScope": "GENDERLESS",
+  "scopeLabel": "젠더리스",
+  "topProductId": "PRD-N1-38",
+  "bottomProductId": "PRD-N1-43",
+  "trendClusters": [
+   "T08"
+  ],
+  "pairReasonShort": "같은 트렌드 무드"
+ }
+]

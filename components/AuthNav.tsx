@@ -96,6 +96,15 @@ export default function AuthNav() {
   return (
     <>
       <div className="auth-nav">
+        {/* §5 — 스마트 핏은 카테고리 행이 아닌 상단 유틸리티 그룹의 일원.
+            같은 auth-link 패밀리 — 작고 조용한 텍스트 링크. */}
+        <button
+          className="auth-link"
+          onClick={() => window.dispatchEvent(new Event("n1:open-fit"))}
+          aria-label={fit ? "스마트 핏 — 설정됨, 열어서 수정" : "스마트 핏 설정하기"}
+        >
+          {fit ? "스마트 핏 · 설정됨" : "스마트 핏"}
+        </button>
         {token && email ? (
           <>
             <span className="auth-user">{username || email.split("@")[0]}님{fit && ` (${fitLabel})`} ⚙️</span>

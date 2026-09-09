@@ -1,0 +1,4631 @@
+{
+ "summary": {
+  "generatedAt": "2026-09-09T19:54:40.287Z",
+  "catalog": 60,
+  "failCount": 0,
+  "unknownAllowed": 168,
+  "passCount": 552
+ },
+ "products": [
+  {
+   "product_id": "PRD-N1-01",
+   "checks": [
+    {
+     "product_id": "PRD-N1-01",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-01",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-01",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-01",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-01",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-01",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-01",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-01",
+     "field": "colors",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-01",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-01",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-01",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-01",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-02",
+   "checks": [
+    {
+     "product_id": "PRD-N1-02",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-02",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-02",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-02",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-02",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-02",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-02",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-02",
+     "field": "colors",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-02",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-02",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-02",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-02",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-03",
+   "checks": [
+    {
+     "product_id": "PRD-N1-03",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-03",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-03",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-03",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-03",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-03",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-03",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-03",
+     "field": "colors",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-03",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-03",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-03",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-03",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-04",
+   "checks": [
+    {
+     "product_id": "PRD-N1-04",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-04",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-04",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-04",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-04",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-04",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-04",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-04",
+     "field": "colors",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-04",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-04",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-04",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-04",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-05",
+   "checks": [
+    {
+     "product_id": "PRD-N1-05",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-05",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-05",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-05",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-05",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-05",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-05",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-05",
+     "field": "colors",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-05",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-05",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-05",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-05",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-06",
+   "checks": [
+    {
+     "product_id": "PRD-N1-06",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-06",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-06",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-06",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-06",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-06",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-06",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-06",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-06",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-06",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-06",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-06",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-07",
+   "checks": [
+    {
+     "product_id": "PRD-N1-07",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-07",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-07",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-07",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-07",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-07",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-07",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-07",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-07",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-07",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-07",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-07",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-08",
+   "checks": [
+    {
+     "product_id": "PRD-N1-08",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-08",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-08",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-08",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-08",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-08",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-08",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-08",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-08",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-08",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-08",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-08",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-09",
+   "checks": [
+    {
+     "product_id": "PRD-N1-09",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-09",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-09",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-09",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-09",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-09",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-09",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-09",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-09",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-09",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-09",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-09",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-10",
+   "checks": [
+    {
+     "product_id": "PRD-N1-10",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-10",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-10",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-10",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-10",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-10",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-10",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-10",
+     "field": "colors",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-10",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-10",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-10",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-10",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-11",
+   "checks": [
+    {
+     "product_id": "PRD-N1-11",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-11",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-11",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-11",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-11",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-11",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-11",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-11",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-11",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-11",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-11",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-11",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-12",
+   "checks": [
+    {
+     "product_id": "PRD-N1-12",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-12",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-12",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-12",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-12",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-12",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-12",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-12",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-12",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-12",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-12",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-12",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-13",
+   "checks": [
+    {
+     "product_id": "PRD-N1-13",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-13",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-13",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-13",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-13",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-13",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-13",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-13",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-13",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-13",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-13",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-13",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-14",
+   "checks": [
+    {
+     "product_id": "PRD-N1-14",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-14",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-14",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-14",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-14",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-14",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-14",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-14",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-14",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-14",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-14",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-14",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-15",
+   "checks": [
+    {
+     "product_id": "PRD-N1-15",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-15",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-15",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-15",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-15",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-15",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-15",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-15",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-15",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-15",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-15",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-15",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-16",
+   "checks": [
+    {
+     "product_id": "PRD-N1-16",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-16",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-16",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-16",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-16",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-16",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-16",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-16",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-16",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-16",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-16",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-16",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-17",
+   "checks": [
+    {
+     "product_id": "PRD-N1-17",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-17",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-17",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-17",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-17",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-17",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-17",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-17",
+     "field": "colors",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-17",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-17",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-17",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-17",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-18",
+   "checks": [
+    {
+     "product_id": "PRD-N1-18",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-18",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-18",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-18",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-18",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-18",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-18",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-18",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-18",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-18",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-18",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-18",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-19",
+   "checks": [
+    {
+     "product_id": "PRD-N1-19",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-19",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-19",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-19",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-19",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-19",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-19",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-19",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-19",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-19",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-19",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-19",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-20",
+   "checks": [
+    {
+     "product_id": "PRD-N1-20",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-20",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-20",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-20",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-20",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-20",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-20",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-20",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-20",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-20",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-20",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-20",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-21",
+   "checks": [
+    {
+     "product_id": "PRD-N1-21",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-21",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-21",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-21",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-21",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-21",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-21",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-21",
+     "field": "colors",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-21",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-21",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-21",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-21",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-22",
+   "checks": [
+    {
+     "product_id": "PRD-N1-22",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-22",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-22",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-22",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-22",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-22",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-22",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-22",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-22",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-22",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-22",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-22",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-23",
+   "checks": [
+    {
+     "product_id": "PRD-N1-23",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-23",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-23",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-23",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-23",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-23",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-23",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-23",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-23",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-23",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-23",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-23",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-24",
+   "checks": [
+    {
+     "product_id": "PRD-N1-24",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-24",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-24",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-24",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-24",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-24",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-24",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-24",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-24",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-24",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-24",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-24",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-25",
+   "checks": [
+    {
+     "product_id": "PRD-N1-25",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-25",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-25",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-25",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-25",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-25",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-25",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-25",
+     "field": "colors",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-25",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-25",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-25",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-25",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-26",
+   "checks": [
+    {
+     "product_id": "PRD-N1-26",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-26",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-26",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-26",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-26",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-26",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-26",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-26",
+     "field": "colors",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-26",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-26",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-26",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-26",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-27",
+   "checks": [
+    {
+     "product_id": "PRD-N1-27",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-27",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-27",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-27",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-27",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-27",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-27",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-27",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-27",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-27",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-27",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-27",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-28",
+   "checks": [
+    {
+     "product_id": "PRD-N1-28",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-28",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-28",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-28",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-28",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-28",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-28",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-28",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-28",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-28",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-28",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-28",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-29",
+   "checks": [
+    {
+     "product_id": "PRD-N1-29",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-29",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-29",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-29",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-29",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-29",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-29",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-29",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-29",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-29",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-29",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-29",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-30",
+   "checks": [
+    {
+     "product_id": "PRD-N1-30",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-30",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-30",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-30",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-30",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-30",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-30",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-30",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-30",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-30",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-30",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-30",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-31",
+   "checks": [
+    {
+     "product_id": "PRD-N1-31",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-31",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-31",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-31",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-31",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-31",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-31",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-31",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-31",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-31",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-31",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-31",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-32",
+   "checks": [
+    {
+     "product_id": "PRD-N1-32",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-32",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-32",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-32",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-32",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-32",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-32",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-32",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-32",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-32",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-32",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-32",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-33",
+   "checks": [
+    {
+     "product_id": "PRD-N1-33",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-33",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-33",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-33",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-33",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-33",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-33",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-33",
+     "field": "colors",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-33",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-33",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-33",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-33",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-34",
+   "checks": [
+    {
+     "product_id": "PRD-N1-34",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-34",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-34",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-34",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-34",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-34",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-34",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-34",
+     "field": "colors",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-34",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-34",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-34",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-34",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-35",
+   "checks": [
+    {
+     "product_id": "PRD-N1-35",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-35",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-35",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-35",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-35",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-35",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-35",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-35",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-35",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-35",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-35",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-35",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-36",
+   "checks": [
+    {
+     "product_id": "PRD-N1-36",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-36",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-36",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-36",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-36",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-36",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-36",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-36",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-36",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-36",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-36",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-36",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-37",
+   "checks": [
+    {
+     "product_id": "PRD-N1-37",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-37",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-37",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-37",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-37",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-37",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-37",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-37",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-37",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-37",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-37",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-37",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-38",
+   "checks": [
+    {
+     "product_id": "PRD-N1-38",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-38",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-38",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-38",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-38",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-38",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-38",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-38",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-38",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-38",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-38",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-38",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-39",
+   "checks": [
+    {
+     "product_id": "PRD-N1-39",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-39",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-39",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-39",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-39",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-39",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-39",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-39",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-39",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-39",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-39",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-39",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-40",
+   "checks": [
+    {
+     "product_id": "PRD-N1-40",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-40",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-40",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-40",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-40",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-40",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-40",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-40",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-40",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-40",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-40",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-40",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-41",
+   "checks": [
+    {
+     "product_id": "PRD-N1-41",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-41",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-41",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-41",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-41",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-41",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-41",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-41",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-41",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-41",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-41",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-41",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-42",
+   "checks": [
+    {
+     "product_id": "PRD-N1-42",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-42",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-42",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-42",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-42",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-42",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-42",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-42",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-42",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-42",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-42",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-42",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-43",
+   "checks": [
+    {
+     "product_id": "PRD-N1-43",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-43",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-43",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-43",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-43",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-43",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-43",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-43",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-43",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-43",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-43",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-43",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-44",
+   "checks": [
+    {
+     "product_id": "PRD-N1-44",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-44",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-44",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-44",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-44",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-44",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-44",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-44",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-44",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-44",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-44",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-44",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-45",
+   "checks": [
+    {
+     "product_id": "PRD-N1-45",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-45",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-45",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-45",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-45",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-45",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-45",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-45",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-45",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-45",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-45",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-45",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-46",
+   "checks": [
+    {
+     "product_id": "PRD-N1-46",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-46",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-46",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-46",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-46",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-46",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-46",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-46",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-46",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-46",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-46",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-46",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-47",
+   "checks": [
+    {
+     "product_id": "PRD-N1-47",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-47",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-47",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-47",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-47",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-47",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-47",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-47",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-47",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-47",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-47",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-47",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-48",
+   "checks": [
+    {
+     "product_id": "PRD-N1-48",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-48",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-48",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-48",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-48",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-48",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-48",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-48",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-48",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-48",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-48",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-48",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-49",
+   "checks": [
+    {
+     "product_id": "PRD-N1-49",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-49",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-49",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-49",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-49",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-49",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-49",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-49",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-49",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-49",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-49",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-49",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-50",
+   "checks": [
+    {
+     "product_id": "PRD-N1-50",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-50",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-50",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-50",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-50",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-50",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-50",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-50",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-50",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-50",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-50",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-50",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-51",
+   "checks": [
+    {
+     "product_id": "PRD-N1-51",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-51",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-51",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-51",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-51",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-51",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-51",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-51",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-51",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-51",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-51",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-51",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-52",
+   "checks": [
+    {
+     "product_id": "PRD-N1-52",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-52",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-52",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-52",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-52",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-52",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-52",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-52",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-52",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-52",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-52",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-52",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-53",
+   "checks": [
+    {
+     "product_id": "PRD-N1-53",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-53",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-53",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-53",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-53",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-53",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-53",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-53",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-53",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-53",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-53",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-53",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-54",
+   "checks": [
+    {
+     "product_id": "PRD-N1-54",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-54",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-54",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-54",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-54",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-54",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-54",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-54",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-54",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-54",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-54",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-54",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-55",
+   "checks": [
+    {
+     "product_id": "PRD-N1-55",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-55",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-55",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-55",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-55",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-55",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-55",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-55",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-55",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-55",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-55",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-55",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-56",
+   "checks": [
+    {
+     "product_id": "PRD-N1-56",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-56",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-56",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-56",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-56",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-56",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-56",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-56",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-56",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-56",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-56",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-56",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-57",
+   "checks": [
+    {
+     "product_id": "PRD-N1-57",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-57",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-57",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-57",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-57",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-57",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-57",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-57",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-57",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-57",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-57",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-57",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-58",
+   "checks": [
+    {
+     "product_id": "PRD-N1-58",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-58",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-58",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-58",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-58",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-58",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-58",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-58",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-58",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-58",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-58",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-58",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-59",
+   "checks": [
+    {
+     "product_id": "PRD-N1-59",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-59",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-59",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-59",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-59",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-59",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-59",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-59",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-59",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-59",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-59",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-59",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  },
+  {
+   "product_id": "PRD-N1-60",
+   "checks": [
+    {
+     "product_id": "PRD-N1-60",
+     "field": "product_id",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-60",
+     "field": "display_name",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-60",
+     "field": "gender",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-60",
+     "field": "top_bottom",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-60",
+     "field": "source_url",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-60",
+     "field": "wholesale_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-60",
+     "field": "retail_price",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-60",
+     "field": "colors",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 타이틀 토큰 외 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-60",
+     "field": "sizes",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "공급사 옵션 select 비공개(AJAX) — 수집 불가, 창작 금지"
+    },
+    {
+     "product_id": "PRD-N1-60",
+     "field": "material",
+     "verdict": "PASS",
+     "reason": ""
+    },
+    {
+     "product_id": "PRD-N1-60",
+     "field": "measurements",
+     "verdict": "UNKNOWN_ALLOWED",
+     "reason": "실측치 미확보 — PDP safe state"
+    },
+    {
+     "product_id": "PRD-N1-60",
+     "field": "why_this_product",
+     "verdict": "PASS",
+     "reason": ""
+    }
+   ]
+  }
+ ]
+}

@@ -570,10 +570,12 @@
 }
 .ctaBuyNow:hover { background: #111; color: #faf9f7; }
 
-/* ── 페어 제안 — 조용한 단일 추천 (§49–§52: 박스·배지 없이) ── */
+/* ── 페어 제안 — 조용한 단일 추천 (§49–§52: 박스·배지 없이) ──
+   Storefront Repair(2026-09-10): 이미지 열을 minmax로 유동 폭으로 — 좁은 뷰포트에서
+   고정 132px+gap이 텍스트 열을 0으로 밀어 겹쳐 보이던 결함 수정. 텍스트 열은 min-width:0. */
 .pairLink {
   display: grid;
-  grid-template-columns: 132px 1fr;
+  grid-template-columns: minmax(88px, 132px) minmax(0, 1fr);
   gap: 22px;
   align-items: center;
   max-width: 420px;
@@ -582,7 +584,7 @@
 }
 .pairLink:hover .pairName { box-shadow: inset 0 -1px 0 0 #242722; }
 .pairImage {
-  width: 132px;
+  width: 100%;
   aspect-ratio: 3 / 4;
   object-fit: cover;
   object-position: 50% 22%;
@@ -590,7 +592,7 @@
   display: block;
 }
 .pairImageEmpty {
-  width: 132px;
+  width: 100%;
   aspect-ratio: 3 / 4;
   display: flex;
   align-items: center;
@@ -602,7 +604,7 @@
   text-transform: uppercase;
   text-align: center;
 }
-.pairInfo { display: flex; flex-direction: column; gap: 6px; }
+.pairInfo { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .pairName {
   font-size: 14px;
   font-weight: 500;
@@ -617,5 +619,5 @@
 .pairFitLine { font-size: 11.5px; line-height: 1.55; color: #77746b; }
 .pairReason { font-size: 12px; color: #8b877e; letter-spacing: 0.06em; }
 @media (max-width: 640px) {
-  .pairLink { grid-template-columns: 108px 1fr; gap: 16px; }
+  .pairLink { grid-template-columns: minmax(84px, 108px) minmax(0, 1fr); gap: 14px; }
 }

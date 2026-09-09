@@ -5,6 +5,7 @@ import { AuthProvider } from "@/components/AuthProvider";
 import { CartProvider } from "@/components/CartProvider";
 import CartDrawer from "@/components/CartDrawer";
 import CsWidget from "@/components/CsWidget";
+import FitLauncher from "@/components/FitLauncher";
 import SiteHeader from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <CartProvider>
             <SiteHeader />
             {children}
+            <FitLauncher />
             <FloatingOrderTracker />
             <CartDrawer />
             <CsWidget />

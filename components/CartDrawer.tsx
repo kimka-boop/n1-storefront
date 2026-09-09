@@ -8,7 +8,7 @@
  * - 결제하기 → /checkout (cart 전체)
  * - 스타일: 중립 UI — Liquid Glass 재질 정의는 Glass Lab 영역 (미션 §53)
  */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/CartProvider";
@@ -19,6 +19,19 @@ export default function CartDrawer() {
   const { items, ready, open, setOpen, remove, setQty, subtotal, count } = useCart();
   const router = useRouter();
   const panelRef = useRef<HTMLDivElement>(null);
+  // 빈 카트에서도 '결제 진행 현황' 경로 유지 — 하단 플로팅 바 제거(§12)의 보완
+  const [hasPending, setHasPending] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    try {
+      const raw = localStorage.getItem("n1_pending_order");
+      const d = raw ? JSON.parse(raw) : null;
+      setHasPending(Boolean(d && d.order_id && Array.isArray(d.items)));
+    } catch {
+      setHasPending(false);
+    }
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -72,6 +85,11 @@ export default function CartDrawer() {
             <Link href="/" className="cart-empty-link" onClick={() => setOpen(false)}>
               컬렉션 보러가기 →
             </Link>
+            {hasPending && (
+              <p className="cart-meta">
+                <button className="cart-linklike" onClick={openTracker}>결제 진행 현황 확인 →</button>
+              </p>
+            )}
           </div>
         ) : (
           <>

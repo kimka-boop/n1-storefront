@@ -8,9 +8,14 @@
  *   같은 대화를 유지한다 (사고 #C: identity는 서버가 발급하고 클라이언트는 기억만 한다)
  * - 역할 구분 표시: AI 답변 / 전문 상담원 답변 / 시스템 안내 (미션 §42)
  * - 상담원 응대 중(HUMAN_*)엔 4초 폴링으로 답변 수신
+ *
+ * Storefront Repair(2026-09-10):
+ * - 하단 좌측 FAB 제거 — 진입은 상단 분할 글래스(UtilityDock)의 n1:open-cs 이벤트로 통일 (§12)
+ *   닫기는 대화를 리셋하지 않는다(§35 — session sid 유지).
+ * - §7B 모바일 키보드: visualViewport 실측치로 창을 키보드 위로 재배치
+ *   (키보드 높이 가정 없음 — 뷰포트가 실제로 줄어든 만큼만), 데스크톱은 중앙 하단 그대로.
  */
 import { useState, useRef, useEffect, useCallback } from "react";
-import { ChatIcon } from "./Icons";
 import { useAuth } from "./AuthProvider";
 
 interface Msg { role: "customer" | "ai" | "agent" | "system"; text: string; }
@@ -43,13 +48,11 @@ export default function CsWidget() {
   const [typing, setTyping] = useState(false);
   const [restored, setRestored] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const fabRef = useRef<HTMLButtonElement>(null);
   // outside-dismiss: pointerdown→up 이동 거리 체크로 스와이프 오타 방지 (§16)
   const pressStart = useRef<{ x: number; y: number } | null>(null);
 
   const closePanel = () => {
     setOpen(false);
-    fabRef.current?.focus(); // 닫히면 문의하기 트리거로 포커스 반환 (§20)
   };
 
   // ESC 닫기 (§12 CLOSE METHOD C)
@@ -58,6 +61,27 @@ export default function CsWidget() {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") closePanel(); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  // §7B 모바일 키보드 대응 — visualViewport 실측(키보드 높이 추정 금지).
+  // 키보드가 차지한 영역만큼 --cs-kb를 올려 창·입력창·전송 버튼이 보이는 영역에 머문다.
+  // 데스크톱은 visualViewport 리사이즈가 없어 --cs-kb=0 — 기존 중앙 하단 위치 유지.
+  useEffect(() => {
+    if (!open) return;
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      const overlap = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      document.documentElement.style.setProperty("--cs-kb", `${Math.round(overlap)}px`);
+    };
+    update();
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+      document.documentElement.style.setProperty("--cs-kb", "0px");
+    };
   }, [open]);
 
   useEffect(() => {
@@ -168,17 +192,7 @@ export default function CsWidget() {
 
   return (
     <>
-      {/* 채팅 버튼 */}
-      {!open && (
-        <button
-          ref={fabRef}
-          className="cs-fab"
-          onClick={() => setOpen(true)}
-          aria-label="고객센터 채팅"
-        >
-          <ChatIcon size={14} />
-        </button>
-      )}
+      {/* 채팅 버튼 — §12: 하단 FAB는 상단 분할 글래스(UtilityDock)로 대체. 진입은 n1:open-cs. */}
 
       {/* outside-dismiss — 투명한 interaction layer (어두운 backdrop 아님, §14).
           실제 탭 intent(click)만 닫힘: pointerdown→up 이동이 크면 스와이프로 보고 유지(§16). */}

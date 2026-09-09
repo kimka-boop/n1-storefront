@@ -25,7 +25,20 @@ export interface CatalogProduct {
   colorOptions: string[];
   sizeOptions: string[];
   optionStock: Record<string, number>;
+  /** 왜 이 제품인가 — 소싱 파이프라인이 생성(§30), 시트 선정이유 컬럼 */
+  whyThisProduct: string;
+  /** 근거 출처 (§29): SUPPLIER / HERMES_MD / MATERIAL_GUIDANCE / SUPPLIER_HTML / UNKNOWN */
+  materialSource: string;
+  careSource: string;
+  measurementSource: string;
+  stockSource: string;
+  whySource: string;
 }
+
+const UNKNOWN = (v: string | null, fallback = "UNKNOWN"): string => {
+  const s = (v || "").trim();
+  return s ? s : fallback;
+};
 
 export async function fetchCatalog(): Promise<CatalogProduct[]> {
   const doc = await getDoc();
@@ -59,11 +72,17 @@ export async function fetchCatalog(): Promise<CatalogProduct[]> {
       madeAt: r.get("제조연월") || "",
       colorSize: "상세페이지 참조",
       quality: "전자상거래 법에 규정되어 있는 소비자 청약철회 가능 범위를 준수합니다.",
-      as: "N°1 고객센터 (상품 문의는 페이지 하단 문의하기 이용)",
+      as: "N°1 고객센터 (상품 문의는 화면 상단의 문의 아이콘을 이용해 주세요)",
     },
     colorOptions: (r.get("색상옵션") || "").split(",").map((s: string) => s.trim()).filter(Boolean),
     sizeOptions: (r.get("사이즈옵션") || "").split(",").map((s: string) => s.trim()).filter(Boolean),
     optionStock: parseStock(r.get("옵션별재고") || ""),
+    whyThisProduct: UNKNOWN(r.get("선정이유")),
+    materialSource: UNKNOWN(r.get("소재출처")),
+    careSource: UNKNOWN(r.get("세탁출처")),
+    measurementSource: UNKNOWN(r.get("치수출처")),
+    stockSource: UNKNOWN(r.get("재고출처")),
+    whySource: UNKNOWN(r.get("선정이유출처")),
   }));
 }
 

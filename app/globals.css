@@ -42,9 +42,13 @@ body {
   text-align: center; padding: 88px 16px 60px; }
 @media (max-width: 640px) { .hero { padding: 48px 12px 36px; } .hero-brand h1 { font-size: 26px; letter-spacing: 6px; } .hero-tag { font-size: var(--t-label); margin-top: 8px; } }
 .hero-brand { opacity: 0; transform: translateY(20px); animation: heroIn .8s ease .1s forwards; }
-.hero-brand h1 { font-size: var(--t-heading); letter-spacing: 0.32em; font-weight: 500; text-transform: uppercase; }
-.hero-tag { margin-top: 8px; color: var(--muted); letter-spacing: 0.24em; font-size: var(--t-label); text-transform: uppercase; }
+.hero-brand h1 { font-size: var(--t-heading); letter-spacing: 0.32em; text-indent: 0.32em; /* trailing tracking 광학 보정 */ font-weight: 500; text-transform: uppercase; }
+.hero-tag { margin-top: 8px; color: var(--muted); letter-spacing: 0.24em; text-indent: 0.24em; font-size: var(--t-label); text-transform: uppercase; }
 @keyframes heroIn { to { opacity: 1; transform: none; } }
+/* §21 모바일: 브랜드는 헤더 중앙으로 — hero는 서포팅 카피만 남긴다 */
+@media (max-width: 640px) {
+  .hero-brand { display: none; }
+}
 
 /* ── 그리드 ── */
 .grid {
@@ -234,25 +238,15 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: var(
 /* ── CS 채팅 위젯 (좌측 여백 중앙 — 장바구니와 x축 미러) ──
    fixed 요소의 100% = ICB(스크롤바 제외) → 컬럼 중심 기준과 정확히 일치.
    여백 중앙 = (뷰포트-컬럼)/4 + 6vw의 절반 - 버튼 절반(가변) - 4px 바깥 럭. */
-.cs-fab {
-  position: fixed;
-  left: max(16px, calc((100% - 1160px) / 4 + 3% - (var(--n1-fab-size) / 2) - 4px));
-  bottom: var(--n1-fab-bottom);
-  z-index: 999;
-  width: var(--n1-fab-size); height: var(--n1-fab-size); border-radius: 50%;
-  background: #fff; color: #0a0a0a;
-  border: 1px solid var(--line, #e8e8e5); cursor: pointer;
-  display: flex; align-items: center; justify-content: center; /* 아이콘 중앙 정렬 */
-  box-shadow: 0 4px 18px rgba(10,10,10,0.10);
-  transition: border-color 0.2s, transform 0.25s cubic-bezier(.22,.61,.36,1);
-}
-.cs-fab:hover { border-color: #0a0a0a; transform: translateY(-2px); }
-/* 글리프는 컨테이너의 39% — 종전 14/36 비율 그대로, 크기와 함께 스케일 */
-.cs-fab svg { width: 39%; height: 39%; }
-@media (max-width: 640px) { .cs-fab { left: 16px; bottom: max(14px, env(safe-area-inset-bottom, 0px)); } } /* .float-bar right:16/bottom:14 미러 */
+/* CS 위젯 진입 버튼(cs-fab)은 §12에 따라 상단 분할 글래스(.util-dock)로 대체되었다.
+   .cs-window는 n1:open-cs 이벤트로만 열린다.
+   --cs-kb: CsWidget이 visualViewport 실측으로 기록하는 키보드 overlap(§7B).
+   데스크톱은 리스너가 0으로 유지 — 기존 하단 위치 그대로. */
 .cs-window {
-  position: fixed; left: max(16px, calc((100% - 1160px) / 4 + 3% - (var(--n1-fab-size) / 2) - 4px)); bottom: max(20px, env(safe-area-inset-bottom, 0px)); z-index: 1000;
+  position: fixed; left: max(16px, calc((100% - 1160px) / 4 + 3% - (var(--n1-fab-size) / 2) - 4px));
+  bottom: calc(max(20px, env(safe-area-inset-bottom, 0px)) + var(--cs-kb, 0px)); z-index: 1000;
   width: 320px; max-width: calc(100vw - 32px); height: 440px;
+  max-height: calc(100dvh - 40px - var(--cs-kb, 0px));
   background: #fff; color: #111; border: 1px solid #e5e5e5;
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
   display: flex; flex-direction: column;
@@ -403,32 +397,11 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: var(
 .pending-icon { font-size: 44px; margin-bottom: 12px; }
 .pending-text { font-size: 14px; line-height: 1.9; color: #555; margin-bottom: 24px; }
 
-/* ═══ 우측 여백 중앙 플로팅 바 (V2: 벡터 쇼핑백 아이콘, 리퀴드 글래스) ═══ */
-.float-bar {
-  position: fixed;
-  right: max(16px, calc((100% - 1160px) / 4 + 3% - (var(--n1-fab-size) / 2) - 4px));
-  bottom: var(--n1-fab-bottom);
-  z-index: 900;
-  width: var(--n1-fab-size); height: var(--n1-fab-size); border-radius: 50%;
-  background: #fff; color: #0a0a0a; border: 1px solid var(--line, #e8e8e5);
-  box-shadow: 0 4px 18px rgba(10,10,10,0.10);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  transition: border-color 0.2s, transform 0.25s cubic-bezier(.22,.61,.36,1);
-}
-.float-bar .float-icon svg { width: 39%; height: 39%; } /* 컨테이너와 함께 스케일 */
-.float-bar:hover { border-color: #0a0a0a; transform: translateY(-2px); }
-.float-bar .float-icon { line-height: 1; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
-.float-bar .float-status {
-  position: absolute; top: -4px; left: -4px;
-  font-size: var(--t-label); font-weight: 700; padding: 2px 6px;
-  background: #d93025; color: #fff; border-radius: 999px; white-space: nowrap;
-}
-.float-bar .float-status.done { background: #0b7a3e; }
+/* ═══ 결제 진행 현황 팝업 — float-bar 제거(§12) 후 CartDrawer 링크로 진입 ═══ */
 .float-popup {
   position: fixed;
   right: max(16px, calc((100% - 1160px) / 4 + 3% - (var(--n1-fab-size) / 2) - 4px));
-  bottom: calc(var(--n1-fab-bottom) + var(--n1-fab-size) + 8px);
+  bottom: calc(var(--n1-fab-bottom) + 64px);
   z-index: 901;
   width: 290px; max-width: calc(100vw - 32px);
   background: #fff; color: #111; border: 1px solid #e5e5e5;
@@ -438,14 +411,11 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: var(
   display: flex; justify-content: space-between; align-items: center;
   padding: 12px 14px; background: #111; color: #fff; font-size: var(--t-body);
 }
-@media (max-width: 640px) { .float-bar { right: 16px; bottom: max(14px, env(safe-area-inset-bottom, 0px)); } }
 
-/* ── 플로팅 렌즈 — 문의하기·장바구니 (탭 렌즈와 같은 N°1 유리 family) ──
-   페이지 위에 떠 있는 작은 유리 렌즈: 가장자리 밀도 + 맑은 중앙 +
-   specular 하이라이트(::before) + 코스틱 그림자. 탭 렌즈보다 살짝
-   독립적인 부유감. backdrop 미지원 브라우저는 흰 단색 폴백. */
+/* ── 플로팅 렌즈 — 탭 렌즈와 같은 N°1 유리 family.
+   cs-fab·float-bar는 제거되었고(§12), .util-dock이 이 재질을 계승한다. ── */
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .float-bar, .cs-fab {
+  .util-dock {
     background: var(--n1-glass-fill);
     -webkit-backdrop-filter: var(--n1-glass-optics);
     backdrop-filter: var(--n1-glass-optics);
@@ -453,17 +423,17 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: var(
     box-shadow: var(--n1-glass-shadow), var(--n1-glass-edge);
   }
   @media (hover: hover) {
-    .float-bar:hover, .cs-fab:hover {
+    .util-dock-btn:hover ~ .util-dock-divider,
+    .util-dock:hover {
+      background-color: rgba(178, 172, 154, 0.06);
+    }
+    .util-dock-btn:hover {
       background: var(--n1-glass-fill-active);
       -webkit-backdrop-filter: var(--n1-glass-optics-active);
       backdrop-filter: var(--n1-glass-optics-active);
-      border-color: transparent;
-    }
-    .float-bar:hover::before, .cs-fab:hover::before {
-      opacity: 1; transform: translateX(5%); /* 빛이 받는 방향으로 하이라이트 이동 */
     }
   }
-  .float-bar:active, .cs-fab:active {
+  .util-dock-btn:active {
     transform: translateY(1px); /* 눌림 = 재질 깊이 살짝 감소 */
     box-shadow:
       0 1px 2px rgba(36, 39, 34, 0.06),
@@ -548,18 +518,18 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: var(
 }
 .collection-nav::-webkit-scrollbar { display: none; }
 .collection-nav .gtab-track { grid-column: 2; }
-.collection-nav .gtab-fit { grid-column: 3; }
 @media (max-width: 640px) {
-  /* 모바일: 중앙 정렬 대신 왼쪽 흐름 + 가로 스크롤 (스마트 핏은 우측 고정) */
-  .collection-nav { display: flex; gap: 20px; justify-content: flex-start; }
-  .gtab-track { gap: 12px; }
-  .gtab { padding: 9px 11px; }
+  /* 모바일(§23): 4개 카테고리가 하나의 의도 있는 인터랙션 영역 — 중앙 정렬 + 좌우 균형 여백.
+     스마트 핏은 이 행에서 제거되었다(§5). 가로 스크롤은 예외 경로(≤360px)만 허용. */
+  .collection-nav { display: flex; justify-content: center; padding: 12px 18px; }
+  .gtab-track { gap: 8px; }
+  .gtab { padding: 10px 10px; }
 }
 
 /* ── 컬렉션 섹션 ── */
 .collection { max-width: 1160px; margin: 0 auto; padding: 64px 6vw 24px; }
 .collection-head { text-align: center; margin-bottom: 64px; }
-.collection-title { font-size: var(--t-body); letter-spacing: 0.3em; color: var(--ink); font-weight: 600;
+.collection-title { font-size: var(--t-body); letter-spacing: 0.3em; text-indent: 0.3em; color: var(--ink); font-weight: 600;
   text-transform: uppercase; }
 .collection-sub { margin-top: 10px; font-size: 13px; color: var(--muted); letter-spacing: 0.06em;
   word-break: keep-all; /* 수량어("10개") 중간 줄바꿈 금지 — 공백 단위로만 */ }
@@ -649,13 +619,14 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: var(
   max-width: 880px; width: 100%; margin: 0 auto;
   text-align: center; font-size: var(--t-meta); letter-spacing: 0.08em; color: #8b877e;
 }
-/* 모바일: 상의 → 하의 스택. 페어 관계는 인접 간격 + 근거 문구로 유지 (§79) */
+/* 모바일: 상의 → 하의 스택이 아니라 §8 좌상의/우하하 2열 — 카드 컴팩트화와 함께.
+   페어 관계는 열 구조(L=TOP R=BOTTOM) + 인접 간격 + 근거 문구로 유지 (§79) */
 @media (max-width: 640px) {
-  .pair-head { display: none; }
-  .pair-cards { grid-template-columns: 1fr; row-gap: 10px; }
-  .pair-cards .piece-media { aspect-ratio: 4/5; }
+  .pair-head { display: grid; padding: 0 0 4px; }
+  .pair-cards { grid-template-columns: 1fr 1fr; column-gap: 12px; }
+  .pair-cards .piece-media { aspect-ratio: 3/4; }
   .pair-reason { margin-top: 2px; }
-  .pair-collection { gap: 52px; }
+  .pair-collection { gap: 40px; }
 }
 /* 단품 영역 — 페어에 오르지 못한 상품을 조용히 */
 .pair-singles { margin-top: clamp(72px, 9vw, 120px); }
@@ -744,19 +715,16 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: var(
 /* ── 플로팅 상태 배지 아이콘 정렬 ── */
 .float-status svg { display: inline-block; vertical-align: -2px; margin-right: 3px; }
 
-/* ═══ V2 접근성 (2026-09-08) ═══ */
-/* PDP(구매 바 존재)에서만 플로팅 버튼을 구매 바 위로 — 홈에서는 기존 위치 유지 */
-body:has([class*="buyBar"]) .cs-fab { bottom: 88px; }
-body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
-@media (max-width: 640px) {
-  body:has([class*="buyBar"]) .cs-fab { bottom: 92px; }
-  body:has([class*="buyBar"]) .float-bar { bottom: 92px; }
-}
+/* ═══ V2 접근성 (2026-09-08) — 업데이트 2026-09-10:
+   cs-fab·float-bar 제거(§12)에 따라 구매바 겹침 보정 블록은 삭제. */
 /* 텍스트 탭·정책 탭 터치 타겟 확보 */
 .gtab, .policy-tab { min-height: 44px; }
 
-/* ── 사이트 상단 바 (모든 페이지 — PDP에서도 브랜드/로그인 노출) ── */
+/* ── 사이트 상단 바 (모든 페이지 — PDP에서도 브랜드/로그인 노출) ──
+   §21 — 브랜드는 grid 중앙 열: 뷰포트 기준 중앙이 좌측 유틸리티 폭에 흔들리지 않는다.
+   §12·§22 — 분할 글래스 유틸리티는 fixed overlay(좌상단)라 이 그리드를 침범하지 않는다. */
 .site-header {
+  position: relative;
   display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
   padding: 16px 4vw 0;
 }
@@ -764,10 +732,21 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
   grid-column: 2; display: flex; flex-direction: column; align-items: center; gap: 3px;
   text-decoration: none;
 }
-.site-brand-mark { font-size: 15px; letter-spacing: 0.24em; font-weight: 600; color: var(--ink); }
-.site-brand-tag { font-size: 10px; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; }
+.site-brand-mark { font-size: 15px; letter-spacing: 0.24em; text-indent: 0.24em; /* 중앙 광학 보정 — trailing tracking */ font-weight: 600; color: var(--ink); }
+.site-brand-tag { font-size: 10px; letter-spacing: 0.2em; text-indent: 0.2em; color: var(--muted); text-transform: uppercase; }
 .site-brand-block:hover .site-brand-mark { opacity: 0.7; }
 .site-header .auth-nav { grid-column: 3; justify-self: end; padding: 0; }
+/* 홈 데스크톱: hero 대형 브랜드가 같은 역할 — 헤더 브랜드는 자리만 유지(정렬 보존) */
+@media (min-width: 641px) {
+  .site-header.is-home .site-brand-block { visibility: hidden; }
+}
+/* 모바일(§21): 상단 유틸리티 행 → 중앙 브랜드 → 서포팅 카피.
+   브랜드를 헤더 중앙으로 올리고(모든 페이지 동일), 홈 hero의 브랜드 블록은 물러난다. */
+@media (max-width: 640px) {
+  .site-header { padding-top: 12px; align-items: start; }
+  .site-header .auth-nav { gap: 14px; justify-content: flex-end; flex-wrap: wrap; row-gap: 4px; }
+  .site-header.is-home .site-brand-block { visibility: visible; }
+}
 
 /* ════════════════════════════════════════════════════════════════
    N1 LIQUID SURFACE SYSTEM (2026-09-08, Liquid Glass Modal 미션)
@@ -996,8 +975,8 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
   --n1-glass-transition: 240ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-/* 세 유리(탭 렌즈·문의하기·장바구니)가 공유하는 재질 — specular은 정점 광원만 (전체를 씻지 않음) */
-.gtab-lens::before, .cs-fab::before, .float-bar::before {
+/* 유리 재질(탭 렌즈·유틸리티 독)이 공유하는 specular — 정점 광원만 (전체를 씻지 않음) */
+.gtab-lens::before, .util-dock::before {
   content: ""; position: absolute; inset: 0; border-radius: inherit;
   background: var(--n1-glass-specular);
   opacity: 0.8; pointer-events: none; z-index: 2;
@@ -1154,15 +1133,6 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
   .cart-panel { width: 100vw; }
 }
 
-/* ── 플로팅 바 카트 카운트 ── */
-.float-bar .float-count {
-  position: absolute; top: -5px; right: -5px;
-  min-width: 18px; height: 18px; padding: 0 5px;
-  background: #111; color: #fff; border-radius: 999px;
-  font-size: var(--t-label); font-weight: 700; line-height: 18px; text-align: center;
-}
-.float-bar .float-status { border: none; cursor: pointer; font: inherit; }
-
 /* ── 체크아웃 섹션 구조 ── */
 .checkout-section { border-top: 1px solid #e8e8e5; padding-top: 18px; margin-top: 18px; }
 .checkout-section:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
@@ -1238,4 +1208,132 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
   font-size: 11.5px;
   line-height: 1.55;
   color: #77746b;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   STOREFRONT REPAIR (2026-09-10) — append-only 블록
+   §1·§4·§5·§6·§7·§8·§11·§12·§22·§23·§26 — N1_FINAL_STOREFRONT_REPAIR_MISSION
+   기존 규칙 수정 최소화, 새 클래스만 추가 (세션 A/J append 패턴 동일)
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── §12·§22 상단 분할 글래스 유틸리티 — 문의 · 장바구니 ──
+   세로 라운드 렌즈 + 중앙 수평 디바이더. fixed overlay라 브랜드 중앙을 밀지 않는다.
+   재질: C Perfume Liquid Glass (@supports 블록에서 탭 렌즈와 동일 토큰 적용). */
+.util-dock {
+  position: fixed;
+  top: 12px;
+  left: max(12px, 1.5vw);
+  z-index: 920;
+  display: flex; flex-direction: column; align-items: stretch;
+  width: 44px;
+  border-radius: 15px 13px 14px 16px / 16px 14px 15px 13px; /* 유기적 렌즈 곡률 */
+  background: #fff;
+  border: 1px solid var(--line, #e8e8e5);
+  box-shadow: 0 4px 18px rgba(10, 10, 10, 0.10);
+  overflow: hidden;
+  transition: background-color var(--n1-glass-transition), box-shadow var(--n1-glass-transition);
+}
+.util-dock-btn {
+  position: relative; z-index: 3; /* specular(::before) 위에 아이콘 */
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 41px;
+  background: none; border: none; cursor: pointer;
+  color: var(--ink);
+  transition: background-color 200ms ease, transform 160ms ease;
+}
+.util-dock-btn svg { display: block; }
+.util-dock-btn:focus-visible { outline: 1.5px solid #555e4c; outline-offset: -3px; border-radius: inherit; }
+.util-dock-divider {
+  height: 1px; margin: 0 8px;
+  background: rgba(36, 39, 34, 0.18);
+  flex-shrink: 0;
+}
+/* 장바구니 카운트 — 하단 반쪽 우상단에 조용히 */
+.util-dock-count {
+  position: absolute; top: 5px; right: 5px;
+  min-width: 16px; height: 16px; padding: 0 4px;
+  background: var(--ink); color: #fff; border-radius: 999px;
+  font-size: 10px; font-weight: 700; line-height: 16px; text-align: center;
+}
+/* 좁은 화면(§22): 살짝 축소 — 두 터치 타깃은 유지 */
+@media (max-width: 640px) {
+  .util-dock { top: 10px; left: 10px; width: 40px; }
+  .util-dock-btn { height: 38px; }
+}
+/* PDP 구매 바(sticky)와의 겹침 없음 — dock은 상단 고정 */
+
+/* ── §11 컬렉션 구간 경계 — eyebrow + hairline ── */
+.section-eyebrow { text-align: center; margin: 0 0 26px; }
+.section-eyebrow-title {
+  font-size: var(--t-label); letter-spacing: 0.3em; text-indent: 0.3em;
+  color: #a8a49c; text-transform: uppercase;
+}
+.section-eyebrow-sub {
+  margin-top: 8px; font-size: var(--t-meta); letter-spacing: 0.08em; color: #8b877e;
+}
+.singles-divider {
+  border: none; height: 1px;
+  background: rgba(36, 39, 34, 0.10);
+  margin: clamp(64px, 9vw, 110px) auto clamp(44px, 6vw, 72px);
+  max-width: 880px; width: 100%;
+}
+.singles-head { margin-bottom: 22px; }
+.singles-rows { display: flex; flex-direction: column; row-gap: clamp(32px, 5vw, 56px); }
+
+/* ── §26 모바일 밀도 — 수직 낭비 축소 (조용한 프리미엄 유지) ── */
+@media (max-width: 640px) {
+  .collection { padding: 36px 16px 24px; }
+  .collection-head { margin-bottom: 36px; }
+  .piece-caption { margin-top: 10px; }
+  .piece-name { font-size: 13px; }
+  .piece-price { font-size: 12.5px; margin-top: 4px; }
+  .piece-eyebrow { font-size: 9.5px; }
+  .pair-reason { font-size: 11px; line-height: 1.6; }
+  .pair-row { gap: 8px; }
+  .section-eyebrow { margin-bottom: 18px; }
+  .singles-divider { margin: 48px auto 36px; }
+}
+
+/* ≤400px — 카운트 대신 라벨만: 4개 카테고리가 한 행에 모두 보인다 (§23) */
+@media (max-width: 400px) {
+  .gcount { display: none; }
+}
+
+/* ── §6 모바일 검색 폭 — 반응형 max-width, iOS 줌 방지 16px ── */
+@media (max-width: 640px) {
+  .collection-search { margin-top: 22px; }
+  .collection-search input {
+    width: min(200px, 56vw);
+    font-size: 16px; /* iOS Safari 자동 줌 방지 — 16px 미만 input은 포커스 시 확대된다 */
+  }
+}
+
+/* ── §6·§7A 모든 고객 입력 필드 — 모바일 16px (iOS 자동 줌 방지, 핀치줌은 유지) ── */
+@media (max-width: 640px) {
+  .order-input,
+  .checkout-fields input,
+  .lq-input,
+  .cs-input-row input,
+  .option-select {
+    font-size: 16px;
+  }
+}
+
+/* ── §7B CS 창 — 키보드 overlap 변수는 CsWidget이 visualViewport 실측으로 기록 ──
+   (본체 규칙은 cs-window 블록에 --cs-kb로 반영되어 있다. 모바일에서 창이
+    키보드 위로 재배치되고, 데스크톱은 변수 0 — 기존 위치 유지.) */
+@media (max-width: 640px) {
+  .cs-window {
+    left: 16px;
+    height: min(440px, calc(100dvh - 90px));
+  }
+}
+
+/* §2 — 렌즈 드래그 중 탭 라벨 텍스트 선택 방지 (트랙 레벨 포인터 캡처와 짝) */
+.gtab-track { user-select: none; -webkit-user-select: none; }
+
+/* §21·§26 — 모바일 hero: 브랜드는 헤더로 올라갔으므로 서포팅 카피만 조밀하게 */
+@media (max-width: 640px) {
+  .hero { padding: 18px 16px 26px; }
+  .hero-drop { margin-top: 14px; padding-top: 18px; min-width: 220px; }
 }
