@@ -13,3 +13,8 @@ lookbook/
 .vercel
 .env*
 tsconfig.tsbuildinfo
+
+# SESSION M runtime artifacts (ops)
+ops/logs/
+ops/state.json
+ops/supervisor.pid
