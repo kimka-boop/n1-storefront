@@ -229,7 +229,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: var(
   /* 플로팅 액션 반응형 토큰 — 고정 px 금지(clamp), 다른 UI와 함께 스케일.
      36px 고정 → 모바일 44px~와이드 52px (기준 뷰포트 대비 약 +30%). */
   --n1-fab-size: clamp(44px, 42px + 0.5vw, 52px);
-  --n1-fab-bottom: clamp(14px, 1.6vw + 6px, 30px);
+  --n1-fab-bottom: max(clamp(14px, 1.6vw + 6px, 30px), env(safe-area-inset-bottom, 0px));
 }
 /* ── CS 채팅 위젯 (좌측 여백 중앙 — 장바구니와 x축 미러) ──
    fixed 요소의 100% = ICB(스크롤바 제외) → 컬럼 중심 기준과 정확히 일치.
@@ -249,9 +249,9 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: var(
 .cs-fab:hover { border-color: #0a0a0a; transform: translateY(-2px); }
 /* 글리프는 컨테이너의 39% — 종전 14/36 비율 그대로, 크기와 함께 스케일 */
 .cs-fab svg { width: 39%; height: 39%; }
-@media (max-width: 640px) { .cs-fab { left: 16px; bottom: 14px; } } /* .float-bar right:16/bottom:14 미러 */
+@media (max-width: 640px) { .cs-fab { left: 16px; bottom: max(14px, env(safe-area-inset-bottom, 0px)); } } /* .float-bar right:16/bottom:14 미러 */
 .cs-window {
-  position: fixed; left: max(16px, calc((100% - 1160px) / 4 + 3% - (var(--n1-fab-size) / 2) - 4px)); bottom: 20px; z-index: 1000;
+  position: fixed; left: max(16px, calc((100% - 1160px) / 4 + 3% - (var(--n1-fab-size) / 2) - 4px)); bottom: max(20px, env(safe-area-inset-bottom, 0px)); z-index: 1000;
   width: 320px; max-width: calc(100vw - 32px); height: 440px;
   background: #fff; color: #111; border: 1px solid #e5e5e5;
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
@@ -438,7 +438,7 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: var(
   display: flex; justify-content: space-between; align-items: center;
   padding: 12px 14px; background: #111; color: #fff; font-size: var(--t-body);
 }
-@media (max-width: 640px) { .float-bar { right: 16px; bottom: 14px; } }
+@media (max-width: 640px) { .float-bar { right: 16px; bottom: max(14px, env(safe-area-inset-bottom, 0px)); } }
 
 /* ── 플로팅 렌즈 — 문의하기·장바구니 (탭 렌즈와 같은 N°1 유리 family) ──
    페이지 위에 떠 있는 작은 유리 렌즈: 가장자리 밀도 + 맑은 중앙 +

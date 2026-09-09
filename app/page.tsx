@@ -624,7 +624,7 @@ export default function Home() {
       <header className="hero">
         <div className="hero-brand">
           <h1>N°1</h1>
-          <p className="hero-tag">44 Pieces · 20 Outfits</p>
+          <p className="hero-tag">60 Pieces · 20 Outfits</p>
           <p className="hero-tagline">매주 일요일, 마음에 드는 몇 벌만 골라 보여드립니다</p>
         </div>
         <p className="hero-drop">

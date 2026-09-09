@@ -18,7 +18,7 @@ export default function SiteHeader() {
       {!isHome && (
         <Link href="/" className="site-brand-block" aria-label="N°1 메인 페이지로 가기">
           <span className="site-brand-mark">N°1</span>
-          <span className="site-brand-tag">44 Pieces · 20 Outfits</span>
+          <span className="site-brand-tag">60 Pieces · 20 Outfits</span>
         </Link>
       )}
       <AuthNav />

@@ -8,7 +8,7 @@ import CsWidget from "@/components/CsWidget";
 import SiteHeader from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
-  title: "N°1 — 44 Pieces. One Wardrobe.",
+  title: "N°1 — 60 Pieces. One Wardrobe.",
   description: "AI가 선별한 큐레이션 패션 스토어",
 };
 
