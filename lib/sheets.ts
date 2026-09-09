@@ -65,6 +65,11 @@ function loadSheetId(): string {
   return "";
 }
 
+// [SESSION L · TASK 29] 시트 조회 상한 — Google Sheets 무응답 시 라우트가 함께 매달려
+// 클라이언트가 무한 로딩에 빠지는 것을 끊는다. 시간 초과는 즉시 실패로 전환되어
+// 각 라우트의 502 fallback으로 나간다 (무한 spinner 금지).
+const SHEET_TIMEOUT_MS = 12_000;
+
 export async function getDoc(): Promise<GoogleSpreadsheet> {
   let email: string, key: string;
   if (process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
@@ -81,7 +86,17 @@ export async function getDoc(): Promise<GoogleSpreadsheet> {
     scopes: ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"],
   });
   const doc = new GoogleSpreadsheet(loadSheetId(), auth);
-  await doc.loadInfo();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    await Promise.race([
+      doc.loadInfo(),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`sheets loadInfo timeout (${SHEET_TIMEOUT_MS}ms)`)), SHEET_TIMEOUT_MS);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
   return doc;
 }
 

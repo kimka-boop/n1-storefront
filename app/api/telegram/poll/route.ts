@@ -10,23 +10,30 @@
  */
 import { NextResponse } from "next/server";
 import { ensureTelegramInbound, inboundStatus } from "@/lib/telegramInbound";
+import { GENERIC_UPSTREAM_MESSAGE, logInternal } from "@/lib/errorSanitize";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  await ensureTelegramInbound();
-  const st = inboundStatus();
-  return NextResponse.json({
-    ok: true,
-    consumer: st.running ? "process_long_poll" : st.lastError ? "error_backoff" : "not_started",
-    started_at: st.startedAt,
-    last_tick_at: st.lastTickAt,
-    last_processed_update_id: st.lastProcessedUpdateId,
-    confirmed_offset: st.confirmedOffset,
-    processed_count: st.processedCount,
-    last_error: st.lastError,
-    conflict_since: st.conflictSince,
-  });
+  try {
+    await ensureTelegramInbound();
+    const st = inboundStatus();
+    return NextResponse.json({
+      ok: true,
+      consumer: st.running ? "process_long_poll" : st.lastError ? "error_backoff" : "not_started",
+      started_at: st.startedAt,
+      last_tick_at: st.lastTickAt,
+      last_processed_update_id: st.lastProcessedUpdateId,
+      confirmed_offset: st.confirmedOffset,
+      processed_count: st.processedCount,
+      last_error: st.lastError,
+      conflict_since: st.conflictSince,
+    });
+  } catch (e: unknown) {
+    // [SESSION L] 진단 엔드포인트도 계약 밖 크래시 없이 ok:false로 응답한다
+    logInternal("api/telegram/poll", e);
+    return NextResponse.json({ ok: false, error: GENERIC_UPSTREAM_MESSAGE }, { status: 502 });
+  }
 }
 
 export async function POST() {

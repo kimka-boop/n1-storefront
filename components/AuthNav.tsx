@@ -64,7 +64,7 @@ export default function AuthNav() {
         });
         const data = await res.json();
         if (data.ok) { login(data.token, data.email, data.profile, data.username); setConfirmMsg("시작했어요 — 이 핏을 기억할게요"); }
-        else setErr(data.error);
+        else setErr(data.error || "가입에 실패했어요 — 잠시 후 다시 시도해 주세요");
       } catch { setErr("서버 오류"); } finally { setBusy(false); }
     })();
   };
@@ -79,7 +79,7 @@ export default function AuthNav() {
       });
       const data = await res.json();
       if (data.ok) { login(data.token, data.email, data.profile, data.username); setConfirmMsg("기억했어요"); }
-      else setErr(data.error);
+      else setErr(data.error || "로그인에 실패했어요 — 잠시 후 다시 시도해 주세요");
     } catch { setErr("서버 오류"); } finally { setBusy(false); }
   };
 
@@ -103,8 +103,8 @@ export default function AuthNav() {
           </>
         ) : (
           <>
-            <button className="auth-link" onClick={() => { setModal("login"); setStep(1); setErr(""); }}>로그인</button>
-            <button className="auth-link primary" onClick={() => { setModal("register"); setStep(1); setErr(""); }}>회원가입</button>
+            <button className="auth-link" onClick={() => { setModal("login"); setStep(1); setErr(""); setConfirmMsg(null); }}>로그인</button>
+            <button className="auth-link primary" onClick={() => { setModal("register"); setStep(1); setErr(""); setConfirmMsg(null); }}>회원가입</button>
           </>
         )}
       </div>
@@ -133,7 +133,7 @@ export default function AuthNav() {
                     {busy ? "확인 중..." : "들어가기"}
                   </button>
                   <div className="lq-ghost-row">
-                    <button className="lq-ghost" onClick={() => { setModal("register"); setStep(1); setErr(""); }}>
+                    <button className="lq-ghost" onClick={() => { setModal("register"); setStep(1); setErr(""); setConfirmMsg(null); }}>
                       계정이 없나요? 나의 N°1 시작하기
                     </button>
                   </div>

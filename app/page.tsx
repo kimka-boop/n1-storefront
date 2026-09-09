@@ -215,6 +215,9 @@ export default function Home() {
   const [pairs, setPairs] = useState<CollectionPair[]>([]);
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
+  // [SESSION L · TASK 29] 최초 로딩과 진짜 빈 컬렉션을 구분한다 —
+  // 로딩 중 "상품이 없습니다"를 보여주는 거짓 빈 상태 금지
+  const [productsLoaded, setProductsLoaded] = useState(false);
   const [selected, setSelected] = useState<Product | null>(null);
   const [slide, setSlide] = useState(0);
   const [slideIds, setSlideIds] = useState<string[]>([]);
@@ -404,9 +407,15 @@ export default function Home() {
       if (data.ok) {
         setProducts(data.products);
         setPairs(data.pairs || []);
-      } else setError(data.error || "시트 조회 실패");
+        setError(""); // [SESSION L] 재폴링 복구 시 실패 문구가 남지 않는다
+      } else {
+        // [SESSION L] 서버 사유를 그대로 노출하지 않는다 — 실제 상태(지금 못 불러옴)만 안내
+        setError("지금 상품 목록을 불러오지 못했어요 — 잠시 후 다시 시도해 주세요");
+      }
     } catch {
-      setError("서버 연결 실패");
+      setError("서버에 연결하지 못했어요 — 잠시 후 다시 시도해 주세요");
+    } finally {
+      setProductsLoaded(true);
     }
   }, []);
 
@@ -623,7 +632,15 @@ export default function Home() {
         </p>
       </header>
 
-      {error && <p className="error">⚠️ {error}</p>}
+      {error && (
+        <div className="error" role="alert">
+          ⚠️ {error}
+          <br />
+          <button type="button" className="error-retry" onClick={() => void fetchProducts()}>
+            다시 시도
+          </button>
+        </div>
+      )}
 
       {/* ── 컬렉션 내비 (sticky glass rail + 드래그 가능한 Liquid Glass 셀렉터) ──
           N°1 브랜드 내비는 이 그룹 밖 — 홈은 위 hero 브랜드, 그 외 페이지는 SiteHeader. */}
@@ -807,11 +824,17 @@ export default function Home() {
         ) : null}
 
         {!pairRows.length && !singles.length && !collection.length ? (
-          <p className="collection-empty">
-            {query
-              ? "검색 결과가 없습니다 — 다른 이름으로 찾아보세요."
-              : "이번 컬렉션에는 해당하는 상품이 없습니다 — 다음 컬렉션에서 만나요."}
-          </p>
+          !productsLoaded ? (
+            <p className="collection-empty">불러오는 중 — 잠시만 기다려 주세요.</p>
+          ) : query ? (
+            <p className="collection-empty">
+              검색 결과가 없습니다 — 다른 이름으로 찾아보세요.
+            </p>
+          ) : (
+            <p className="collection-empty">
+              이번 컬렉션에는 해당하는 상품이 없습니다 — 다음 컬렉션에서 만나요.
+            </p>
+          )
         ) : null}
       </section>
 

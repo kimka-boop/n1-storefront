@@ -24,8 +24,14 @@ export default function FloatingOrderTracker() {
     const load = () => {
       try {
         const raw = localStorage.getItem("n1_pending_order");
-        if (raw) setOrder(JSON.parse(raw));
-      } catch {}
+        // [SESSION L · TASK 29] 저장본 검증(CheckoutFlow.loadPending과 동일 기준) —
+        // 손상·부재 레코드로 ₩0 유령 팝업을 띄우지 않고, 제거된 주문은 팝업도 내린다
+        if (!raw) { setOrder(null); return; }
+        const d = JSON.parse(raw);
+        setOrder(d && d.order_id && Array.isArray(d.items) ? d : null);
+      } catch {
+        setOrder(null);
+      }
     };
     load();
     window.addEventListener("n1_order_update", load);
@@ -45,7 +51,20 @@ export default function FloatingOrderTracker() {
   const fee = subtotal >= 50000 ? 0 : 3000;
   const total = order?.total || subtotal + fee;
 
-  const copy = () => navigator.clipboard?.writeText(DEPOSIT.account);
+  // [SESSION L] 복사 결과를 정직하게 표시한다 — 성공/실패 무피드백 금지
+  const [copied, setCopied] = useState(false);
+  const [copyFailed, setCopyFailed] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(DEPOSIT.account);
+      setCopied(true);
+      setCopyFailed(false);
+    } catch {
+      setCopied(false);
+      setCopyFailed(true);
+    }
+    setTimeout(() => { setCopied(false); setCopyFailed(false); }, 2000);
+  };
 
   const onBarClick = () => {
     if (count === 0 && status) {
@@ -83,7 +102,7 @@ export default function FloatingOrderTracker() {
             <div className="deposit-row"><span>주문번호</span><b>{order.order_id}</b></div>
             <div className="deposit-row"><span>상태</span><b className={status?.includes("완료") ? "green" : ""}>{status}</b></div>
             <div className="deposit-row"><span>입금 계좌</span>
-              <b>{DEPOSIT.bank} {DEPOSIT.account} <button className="copy-btn" onClick={copy}>복사</button></b>
+              <b>{DEPOSIT.bank} {DEPOSIT.account} <button className="copy-btn" onClick={copy}>{copied ? "✓ 복사됨" : copyFailed ? "복사 실패" : "복사"}</button></b>
             </div>
             <div className="deposit-row"><span>예금주</span><b>{DEPOSIT.holder}</b></div>
             <div className="deposit-row highlight"><span>입금 금액</span><b>₩{Number(total).toLocaleString()}</b></div>

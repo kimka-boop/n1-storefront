@@ -285,6 +285,13 @@
   border-bottom: 1px solid #111111;
   padding-bottom: 2px;
 }
+/* [SESSION L] PDP 조회 실패 재시도 버튼 — homeLink 어휘를 버튼으로 */
+.retryBtn {
+  margin-top: 14px; padding: 8px 22px; cursor: pointer;
+  color: #111111; background: transparent;
+  font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
+  border: 1px solid #111111; border-radius: 999px;
+}
 
 /* ── Glass ① 고정 구매 바 ── */
 .buyBar {

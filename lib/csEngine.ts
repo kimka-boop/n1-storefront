@@ -10,6 +10,7 @@
 import {
   AI_GREETING,
   AI_FALLBACK_NOTICE,
+  ESCALATION_DELIVERY_PENDING_NOTICE,
   ESCALATION_NOTICE,
   LOOKUP_FAILURE_NOTICE,
   POLICY_EXCHANGE,
@@ -414,15 +415,15 @@ async function escalateSession(
   }
   session.escalated = true;
   session.status = "HUMAN_PENDING";
-  const notice = customNotice || ESCALATION_NOTICE;
-  appendSystemMessage(session, notice);
-
-  // Telegram 원문 전송 (summary + RAW transcript — 미션 §26)
+  // [SESSION L · TASK 29] 전송 결과를 먼저 확인한 뒤 고객 안내를 확정한다 —
+  // Telegram 전달 실패를 "대화가 상담원에게 전달됩니다"라고 말하지 않는다.
+  // 접수(HUMAN_PENDING)와 재시도 훅(고객 다음 메시지 → notifyOperatorNewCustomerMessage)은 유지.
   const sent = await sendEscalationTranscript(session, reason);
   if (!sent) {
-    // 실패해도 연결 완료라고 거짓말하지 않는다 — 재시도 훅을 남긴다 (미션 §47)
     console.error(`[cs] Telegram escalation 전송 실패 — session=${session.id}`);
   }
+  const notice = customNotice || (sent ? ESCALATION_NOTICE : ESCALATION_DELIVERY_PENDING_NOTICE);
+  appendSystemMessage(session, notice);
   await appendCsMemoToOrder(session, reason).catch(() => {});
 
   return { ok: true, sid: session.id, reply: notice, status: session.status, escalated: true };

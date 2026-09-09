@@ -153,9 +153,13 @@ export default function CsWidget() {
         }
         // reply === null → 상담원 응대 중: AI가 끼어들지 않는다 (미션 §29)
       } else {
+        // [SESSION L · TASK 29] 실패한 메시지를 입력창으로 되돌린다 — 재전송이 곧 재시도
+        setInput(text);
         setMsgs((prev) => [...prev, { role: "system", text: "지금 자동 상담 연결이 원활하지 않습니다. 잠시 후 다시 시도해주세요." }]);
       }
     } catch {
+      // [SESSION L] 통신 실패도 같은 재시도 경로 — 입력 보존
+      setInput(text);
       setMsgs((prev) => [...prev, { role: "system", text: "연결이 불안정합니다. 잠시 후 다시 시도해주세요." }]);
     } finally {
       setTyping(false);

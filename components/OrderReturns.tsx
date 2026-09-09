@@ -49,6 +49,9 @@ export default function OrderReturns() {
   // 회원 주문내역
   const [orders, setOrders] = useState<OwnerOrderView[] | null>(null);
   const [memberError, setMemberError] = useState("");
+  // [SESSION L · TASK 29] 조회 실패는 영구 정지가 아니라 재시도 가능한 상태다 —
+  // memberError를 의존성에서 뺀 트릭 변수로 "다시 시도" 재조회를 건다 (무한 루프 없음)
+  const [memberRetryTick, setMemberRetryTick] = useState(0);
 
   // 게스트 조회
   const [guestId, setGuestId] = useState("");
@@ -61,20 +64,26 @@ export default function OrderReturns() {
   const [requestState, setRequestState] = useState<RequestState | null>(null);
 
   useEffect(() => {
-    if (token && !orders && !memberError) {
+    if (token && !orders) {
       void (async () => {
         try {
           const res = await fetch(`/api/orders?token=${encodeURIComponent(token)}`, { cache: "no-store" });
           const data = await res.json();
-          if (data.ok) setOrders(data.orders || []);
-          else setMemberError(data.error || "주문 내역을 불러오지 못했습니다");
+          if (data.ok) {
+            setOrders(data.orders || []);
+          } else if (res.status === 401) {
+            // [SESSION L] 로그인 만료와 조회 실패는 다른 상태다 — 구분해서 안내한다
+            setMemberError("로그인 상태가 만료되었어요 — 페이지를 새로고침한 뒤 다시 로그인해 주세요.");
+          } else {
+            setMemberError("주문 내역을 불러오지 못했어요 — 일시적인 문제일 수 있어요.");
+          }
         } catch {
-          setMemberError("주문 내역을 불러오지 못했습니다");
+          setMemberError("주문 내역을 불러오지 못했어요 — 연결 상태를 확인해 주세요.");
         }
       })();
     }
     if (!token && mode === "member") setMode("guest");
-  }, [token, orders, memberError, mode]);
+  }, [token, orders, memberRetryTick, mode]);
 
   const loadRequestState = useCallback(async (orderId: string, auth: { token?: string; phone?: string }) => {
     try {
@@ -172,7 +181,17 @@ export default function OrderReturns() {
             로그인 후 이용할 수 있습니다 — 페이지 상단에서 로그인해 주세요.
           </p>
         ) : memberError ? (
-          <p className={styles.empty}>{memberError}</p>
+          <p className={styles.empty}>
+            {memberError}
+            <br />
+            <button
+              type="button"
+              className={styles.cta}
+              onClick={() => { setMemberError(""); setMemberRetryTick((t) => t + 1); }}
+            >
+              다시 시도
+            </button>
+          </p>
         ) : orders === null ? (
           <p className={styles.empty}>주문 내역을 불러오는 중…</p>
         ) : orders.length === 0 ? (

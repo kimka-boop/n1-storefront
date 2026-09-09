@@ -9,6 +9,7 @@
 import { NextResponse } from "next/server";
 import { handleCustomerMessage } from "@/lib/csEngine";
 import { ensureTelegramInbound } from "@/lib/telegramInbound";
+import { GENERIC_UPSTREAM_MESSAGE, logInternal } from "@/lib/errorSanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,8 @@ export async function POST(req: Request) {
     }, sessionKey);
     return NextResponse.json(result);
   } catch (e: unknown) {
-    return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : String(e) }, { status: 500 });
+    // [SESSION L · TASK 29] 내부 예외 원문(파서·시트 오류)을 고객에게 보내지 않는다
+    logInternal("api/chat", e);
+    return NextResponse.json({ ok: false, error: GENERIC_UPSTREAM_MESSAGE }, { status: 502 });
   }
 }

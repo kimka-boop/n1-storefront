@@ -27,6 +27,7 @@ import {
   currentOrderStatusLabel,
 } from "@/lib/returnRequest";
 import { sendTelegramMessage } from "@/lib/telegram";
+import { clientSafeFailure, logInternal } from "@/lib/errorSanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -84,8 +85,10 @@ export async function POST(req: Request) {
       request: result.request,
     });
   } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    // [SESSION L · TASK 29] 계약 오류(400/404/409)는 그대로, 나머지는 고정 문구 + 502
+    const failure = clientSafeFailure(e);
+    if (failure.status >= 500) logInternal("api/orders/return-request", e);
+    return NextResponse.json({ ok: false, error: failure.message }, { status: failure.status });
   }
 }
 
@@ -129,7 +132,9 @@ export async function GET(req: Request) {
       requests: rows.map(projectRequestRow),
     });
   } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    // [SESSION L · TASK 29] 계약 오류(400/404/409)는 그대로, 나머지는 고정 문구 + 502
+    const failure = clientSafeFailure(e);
+    if (failure.status >= 500) logInternal("api/orders/return-request", e);
+    return NextResponse.json({ ok: false, error: failure.message }, { status: failure.status });
   }
 }

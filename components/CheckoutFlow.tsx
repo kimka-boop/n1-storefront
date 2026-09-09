@@ -101,6 +101,7 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [copyFailed, setCopyFailed] = useState(false); // [SESSION L] 복사 실패를 성공으로 덮지 않는다
 
   // ── 소스 결정: buynow stash 우선(직전 PDP 진입), 없으면 카트 — 위 두 화면은 pending 저장본
   // cartReady 게이팅: CartProvider의 localStorage 로드는 부모 이펙트라 자식보다 늦는다 (직접 진입 레이스 방지)
@@ -175,7 +176,7 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
         setError(
           res.status === 409
             ? `${data.error} — 장바구니는 그대로 유지됩니다.`
-            : data.error || "주문 처리 실패",
+            : data.error || "주문 처리에 실패했어요 — 잠시 후 다시 시도해 주세요",
         );
         return;
       }
@@ -232,10 +233,17 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
     }
   };
 
-  const copyAccount = () => {
-    navigator.clipboard?.writeText(DEPOSIT.account);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  // [SESSION L · TASK 29] 복사 결과를 실제로 확인한다 — 실패를 "✓ 복사됨"으로 위장 금지
+  const copyAccount = async () => {
+    try {
+      await navigator.clipboard.writeText(DEPOSIT.account);
+      setCopied(true);
+      setCopyFailed(false);
+    } catch {
+      setCopied(false);
+      setCopyFailed(true);
+    }
+    setTimeout(() => { setCopied(false); setCopyFailed(false); }, 2000);
   };
 
   // ══════════ 화면 1: 상품 확인 → 정보 입력 → 결제 정보 → 최종 검토 ══════════
@@ -355,6 +363,30 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
   // ══════════ 화면 2: 무통장입금 안내 ══════════
   if (stage === "payment") {
     const pending = lines.length ? null : loadPending();
+    // [SESSION L · TASK 29] pending 주문 없는 직접 진입(저장 만료·타 기기)에서
+    // ₩0 입금 화면(무의미한 상태)을 렌더하지 않는다 — 실제 상태를 안내한다.
+    if (!lines.length && !pending) {
+      return (
+        <main className="checkout-page">
+          <div className="checkout-box pending-box">
+            <h1 className="checkout-title">진행 중인 결제가 없습니다</h1>
+            <p className="pending-text">
+              이 화면은 주문 접수 후 생성된 결제 안내예요.<br />
+              주문이 완료되었거나 결제 정보가 만료되었을 수 있습니다.
+            </p>
+            <p className="buy-note">
+              <Link href="/" style={{ color: "inherit", textDecoration: "underline" }}>
+                컬렉션으로 →
+              </Link>
+              {"　"}
+              <Link href="/orders" style={{ color: "inherit", textDecoration: "underline" }}>
+                주문 조회 · 반품/교환 →
+              </Link>
+            </p>
+          </div>
+        </main>
+      );
+    }
     const total = pending?.total ?? finalTotal;
     return (
       <main className="checkout-page">
@@ -386,7 +418,7 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
               <span>계좌번호</span>
               <b className="account-num">
                 {DEPOSIT.account}
-                <button className="copy-btn" onClick={copyAccount}>{copied ? "✓ 복사됨" : "복사"}</button>
+                <button className="copy-btn" onClick={copyAccount}>{copied ? "✓ 복사됨" : copyFailed ? "복사 실패" : "복사"}</button>
               </b>
             </div>
             <div className="deposit-row"><span>예금주</span><b>{DEPOSIT.holder}</b></div>
@@ -405,6 +437,28 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
 
   // ══════════ 화면 3: 입금 확인 중 ══════════
   const pending = loadPending();
+  // [SESSION L · TASK 29] pending 없는 직접 진입 — ₩0·"-" 확인 화면 대신 실제 상태 안내
+  if (!pending) {
+    return (
+      <main className="checkout-page">
+        <div className="checkout-box pending-box">
+          <h1 className="checkout-title">진행 중인 결제가 없습니다</h1>
+          <p className="pending-text">
+            주문이 완료되었거나 결제 정보가 만료되었을 수 있습니다.
+          </p>
+          <p className="buy-note">
+            <Link href="/" style={{ color: "inherit", textDecoration: "underline" }}>
+              컬렉션으로 →
+            </Link>
+            {"　"}
+            <Link href="/orders" style={{ color: "inherit", textDecoration: "underline" }}>
+              주문 조회 · 반품/교환 →
+            </Link>
+          </p>
+        </div>
+      </main>
+    );
+  }
   return (
     <main className="checkout-page">
       <div className="checkout-box pending-box">

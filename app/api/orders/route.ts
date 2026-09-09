@@ -45,6 +45,7 @@ import { displayLabel } from "@/lib/orderState";
 import { sendTelegramMessage } from "@/lib/telegram";
 import { checkoutFinalStockCheck, decrementStagingStock, sheetOptionQty } from "@/lib/stockCheckout";
 import { gateFromStockCheck, gateFromSheetStock, GateLine } from "@/lib/stockGate";
+import { clientSafeFailure, logInternal } from "@/lib/errorSanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -182,7 +183,9 @@ async function createOrderRecord(body: OrderBody): Promise<CreateResult> {
   const orderId = `ORD-${now.toISOString().slice(0, 10).replace(/-/g, "")}-${String(now.getMilliseconds()).padStart(3, "0")}${String(Math.floor(Math.random() * 90) + 10)}`;
   const ordersSheet = await getOrdersSheet(doc);
   if (!ordersSheet) {
-    throw Object.assign(new Error("Orders 시트 없음"), { status: 500 });
+    // [SESSION L] 내부 저장소 구조 문제 — 고객 메시지는 고정 문구로, 원문은 로그로만
+    console.error("[orders] Orders 시트 탭을 찾지 못했습니다");
+    throw Object.assign(new Error("주문 접수 중 문제가 발생했습니다"), { status: 500 });
   }
   if (idempotencyKey) await ensureOrdersIdempotencyColumn(doc);
   await ordersSheet.addRow({
@@ -267,9 +270,11 @@ export async function POST(req: Request) {
       isDuplicate ? { ...value.payload, duplicate: true } : value.payload,
     );
   } catch (e: unknown) {
-    const status = (e as { status?: number })?.status || 500;
-    const message = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ ok: false, error: message }, { status });
+    // [SESSION L · TASK 29] 계약 오류(400/409)는 그대로, 나머지는 고정 문구 + 502 —
+    // 내부 예외 원문(Google 오류·JSON 파서 메시지)은 고객에게 보내지 않는다.
+    const failure = clientSafeFailure(e);
+    if (failure.status >= 500) logInternal("api/orders", e);
+    return NextResponse.json({ ok: false, error: failure.message }, { status: failure.status });
   }
 }
 
@@ -292,7 +297,8 @@ export async function GET(req: Request) {
       .sort((a, b) => (a.order_time < b.order_time ? 1 : -1));
     return NextResponse.json({ ok: true, email, orders });
   } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    const failure = clientSafeFailure(e);
+    if (failure.status >= 500) logInternal("api/orders", e);
+    return NextResponse.json({ ok: false, error: failure.message }, { status: failure.status });
   }
 }

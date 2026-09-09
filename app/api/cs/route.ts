@@ -13,36 +13,43 @@
 import { NextResponse } from "next/server";
 import { getStore } from "@/lib/csStore";
 import { ensureTelegramInbound } from "@/lib/telegramInbound";
+import { GENERIC_UPSTREAM_MESSAGE, logInternal } from "@/lib/errorSanitize";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
-  // 복원/폴링 접근 시에도 운영자 답장 소비자가 살아 있는지 보장한다 (사고 #A)
-  await ensureTelegramInbound();
-  const sid = new URL(req.url).searchParams.get("sid");
-  if (!sid) return NextResponse.json({ ok: false, error: "sid 누락" }, { status: 400 });
-  const store = getStore();
-  const sess = store.sessions[sid];
-  if (!sess) return NextResponse.json({ ok: false, error: "세션 없음" }, { status: 404 });
+  try {
+    // 복원/폴링 접근 시에도 운영자 답장 소비자가 살아 있는지 보장한다 (사고 #A)
+    await ensureTelegramInbound();
+    const sid = new URL(req.url).searchParams.get("sid");
+    if (!sid) return NextResponse.json({ ok: false, error: "sid 누락" }, { status: 400 });
+    const store = getStore();
+    const sess = store.sessions[sid];
+    if (!sess) return NextResponse.json({ ok: false, error: "세션 없음" }, { status: 404 });
 
-  const undelivered = sess.messages.filter((m) => m.role === "agent" && !m.delivered);
-  if (undelivered.length) {
-    for (const m of sess.messages) {
-      if (m.role === "agent") m.delivered = true;
+    const undelivered = sess.messages.filter((m) => m.role === "agent" && !m.delivered);
+    if (undelivered.length) {
+      for (const m of sess.messages) {
+        if (m.role === "agent") m.delivered = true;
+      }
     }
-  }
 
-  return NextResponse.json({
-    ok: true,
-    sid,
-    status: sess.status,
-    agent_messages: undelivered.map((m) => m.text),
-    messages: sess.messages.map((m) => ({
-      id: m.id,
-      role: m.role,
-      source: m.source,
-      text: m.text,
-      ts: m.ts,
-    })),
-  });
+    return NextResponse.json({
+      ok: true,
+      sid,
+      status: sess.status,
+      agent_messages: undelivered.map((m) => m.text),
+      messages: sess.messages.map((m) => ({
+        id: m.id,
+        role: m.role,
+        source: m.source,
+        text: m.text,
+        ts: m.ts,
+      })),
+    });
+  } catch (e: unknown) {
+    // [SESSION L] 핸들러 무방비 크래시(=계약 밖 500) 차단 — ok:false 계약 유지
+    logInternal("api/cs", e);
+    return NextResponse.json({ ok: false, error: GENERIC_UPSTREAM_MESSAGE }, { status: 502 });
+  }
 }

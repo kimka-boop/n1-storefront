@@ -10,6 +10,7 @@
 import { NextResponse } from "next/server";
 import { getDoc, findOrderById } from "@/lib/sheets";
 import { projectOrderForOwner, verifyGuestOwnership, publicOrderProbeRejected } from "@/lib/orderView";
+import { clientSafeFailure, logInternal } from "@/lib/errorSanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +31,12 @@ export async function POST(req: Request) {
     }
     return NextResponse.json({ ok: true, order: projectOrderForOwner(record) });
   } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    // [SESSION L] 시트 실패가 generic 404로 위장하지 않게 한다 — 고정 문구 + 502로
+    // "조회 불가"와 "없음"을 구분한다 (존재 유출 방지 디사이플린 유지)
+    logInternal("api/orders/lookup", e);
+    return NextResponse.json(
+      { ok: false, error: "지금 주문 조회가 되지 않아요 — 잠시 후 다시 시도해 주세요" },
+      { status: 502 },
+    );
   }
 }

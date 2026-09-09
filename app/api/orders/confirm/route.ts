@@ -18,6 +18,7 @@ import { withIdempotency } from "@/lib/idempotency";
 import { toCanonicalStatus } from "@/lib/orderState";
 import { confirmMemoAlreadyRequested } from "@/lib/orderView";
 import { sendTelegramMessage } from "@/lib/telegram";
+import { clientSafeFailure, logInternal } from "@/lib/errorSanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +36,9 @@ export async function POST(req: Request) {
       const doc = await getDoc();
       const sheet = await getOrdersSheet(doc);
       if (!sheet) {
-        throw Object.assign(new Error("Orders 시트 없음"), { status: 500 });
+        // [SESSION L] 내부 저장소 구조 문제 — 고정 문구로 던지고 원문은 로그로만
+        console.error("[orders/confirm] Orders 시트 탭을 찾지 못했습니다");
+        throw Object.assign(new Error("확인 요청 처리 중 문제가 발생했습니다"), { status: 500 });
       }
       const rows = await sheet.getRows();
       const row = rows.find((r) => String(r.get("주문번호")) === orderId);
@@ -77,8 +80,9 @@ export async function POST(req: Request) {
     }
     return NextResponse.json({ ok: true, ...(value.alreadyRequested ? { duplicate: true } : {}) });
   } catch (e: unknown) {
-    const status = (e as { status?: number })?.status || 500;
-    const message = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ ok: false, error: message }, { status });
+    // [SESSION L · TASK 29] 계약 오류(400/404)는 그대로, 나머지는 고정 문구 + 502
+    const failure = clientSafeFailure(e);
+    if (failure.status >= 500) logInternal("api/orders/confirm", e);
+    return NextResponse.json({ ok: false, error: failure.message }, { status: failure.status });
   }
 }

@@ -11,6 +11,7 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import { JWT } from "google-auth-library";
+import { GENERIC_UPSTREAM_MESSAGE, logInternal } from "@/lib/errorSanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -43,7 +44,11 @@ async function getAccessToken(mode: { which: string }): Promise<string> {
       }),
     });
     const data = await res.json();
-    if (!data.access_token) throw new Error(`토큰 갱신 실패: ${JSON.stringify(data).slice(0, 150)}`);
+    if (!data.access_token) {
+      // [SESSION L] OAuth 응답 본문(토큰 엔드포인트 오류)을 고객 응답에 실어 보내지 않는다
+      console.error("[lookbook-files] 토큰 갱신 실패:", JSON.stringify(data).slice(0, 150));
+      throw new Error("drive token refresh failed");
+    }
     mode.which = "oauth-env";
     return data.access_token;
   }
@@ -95,7 +100,9 @@ export async function GET(req: Request) {
     });
     const data = await driveRes.json();
     if (!driveRes.ok || data.error) {
-      return NextResponse.json({ ok: false, error: `drive ${driveRes.status}: ${JSON.stringify(data).slice(0, 200)}`, files: [], thumb: null }, { status: 502 });
+      // [SESSION L] Drive 오류 본문은 로그로만 — 고객 응답은 고정 문구
+      logInternal("api/lookbook-files:drive", data?.error || driveRes.status);
+      return NextResponse.json({ ok: false, error: GENERIC_UPSTREAM_MESSAGE, files: [], thumb: null }, { status: 502 });
     }
 
     const order: Record<string, number> = { "01_full": 1, "02_45deg": 2, "03_90deg": 3, "04_back": 4, "05_product": 5 };
@@ -108,7 +115,8 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ ok: true, files: sorted, thumb });
   } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ ok: false, error: message, files: [], thumb: null }, { status: 500 });
+    // [SESSION L · TASK 29] 토큰 파일 경로·갱신 오류 원문 노출 금지 — 고정 문구 + 502
+    logInternal("api/lookbook-files", e);
+    return NextResponse.json({ ok: false, error: GENERIC_UPSTREAM_MESSAGE, files: [], thumb: null }, { status: 502 });
   }
 }

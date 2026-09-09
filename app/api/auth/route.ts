@@ -28,6 +28,7 @@ import {
 } from "@/lib/authServer";
 import { deferredEmailVerify } from "@/lib/emailVerify";
 import { RESET_FIT_PROFILE_FLAG } from "@/lib/fitContext";
+import { logInternal } from "@/lib/errorSanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -80,7 +81,9 @@ async function getUsersSheet(doc: any) {
   const missing = EXT_HEADERS.filter((h) => !hv.includes(h));
   if (missing.length) {
     // 기존 컬럼 순서는 그대로 두고 새 컬럼을 끝에 덧붙인다 — 레거시 행 호환.
-    await sheet.setHeaderValues([...hv, ...missing]);
+    // [SESSION L] google-spreadsheet v5 API명은 setHeaderRow다 — setHeaderValues(v4)는
+    // 존재하지 않아 TypeError로 /api/auth 전체가 실패했다 (런타임 스모크로 발견).
+    await sheet.setHeaderRow([...hv, ...missing]);
   }
   return sheet;
 }
@@ -260,16 +263,23 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-  const token = new URL(req.url).searchParams.get("token");
-  if (!token) return bad("token 누락", 400);
-  const store = await ensureStore();
-  const account = store.accountOf(token);
-  if (!account) return bad("세션 만료", 401);
-  return NextResponse.json({
-    ok: true,
-    email: account.email,
-    username: account.username,
-    profile: account.profile,
-    emailVerified: account.emailVerified,
-  });
+  try {
+    const token = new URL(req.url).searchParams.get("token");
+    if (!token) return bad("token 누락", 400);
+    const store = await ensureStore();
+    const account = store.accountOf(token);
+    if (!account) return bad("세션 만료", 401);
+    return NextResponse.json({
+      ok: true,
+      email: account.email,
+      username: account.username,
+      profile: account.profile,
+      emailVerified: account.emailVerified,
+    });
+  } catch (e: unknown) {
+    // [SESSION L · TASK 29] ensureStore(시트 접근) 실패가 핸들러 크래시(계약 밖 500)로
+    // 이어지지 않게 한다 — ok:false 고정 문구로 정직 응답
+    logInternal("api/auth", e);
+    return bad("지금 계정 정보를 확인하지 못했어요 — 잠시 후 다시 시도해 주세요", 502);
+  }
 }

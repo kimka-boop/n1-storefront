@@ -80,6 +80,17 @@ export const ESCALATION_NOTICE = [
   "지금까지의 대화 내용은 상담원에게 함께 전달됩니다.",
 ].join(" ");
 
+/**
+ * [SESSION L · TASK 29] Telegram 전달 실패 시의 고객 안내 — 전달이 "되었습니다"라고
+ * 말하지 않는다. 접수 사실과 재시도 방법만 정직하게 안내한다.
+ * (전송 성공 시에만 ESCALATION_NOTICE가, 실패 시에만 이 문구가 내려간다.)
+ */
+export const ESCALATION_DELIVERY_PENDING_NOTICE = [
+  "전문 상담원 연결을 요청했어요.",
+  "지금 상담원 전달이 지연되고 있어요 —",
+  "잠시 후 메시지를 한 번 더 보내주시면 바로 다시 전달을 시도합니다.",
+].join(" ");
+
 export const LOOKUP_FAILURE_NOTICE = "지금 주문 정보를 바로 확인하지 못해 상담원에게 확인을 요청하겠습니다.";
 
 export const AI_FALLBACK_NOTICE = "지금 자동 상담 연결이 원활하지 않아 전문 상담원에게 바로 전달하겠습니다.";

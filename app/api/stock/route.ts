@@ -20,6 +20,7 @@ import { StockRecord, StockView } from "@/lib/stock/types";
 import { freshnessOf, stagingRowToRecord } from "@/lib/stock/normalize";
 import { STOCK_STAGING_TAB } from "@/lib/stock/bridge";
 import { loadLedgerFile } from "@/lib/stock/ledger";
+import { logInternal } from "@/lib/errorSanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -115,46 +116,56 @@ export async function GET(req: Request) {
     return NextResponse.json({ ok: false, contractVersion: CONTRACT_VERSION, error: "sku/skus 파라미터가 비어 있다" }, { status: 400 });
   }
 
-  const now = new Date();
-  const staging = await loadStagingRecords();
-  const ledger = await ledgerRecords();
+  try {
+    const now = new Date();
+    const staging = await loadStagingRecords();
+    const ledger = await ledgerRecords();
 
-  // 대상 집합: 요청 skus ∪ (요청 없으면 staging ∪ ledger 전체)
-  const knownIds = new Set<string>([...Object.keys(staging ?? {}), ...Object.keys(ledger)]);
-  const targets = requested ?? Array.from(knownIds).sort();
+    // 대상 집합: 요청 skus ∪ (요청 없으면 staging ∪ ledger 전체)
+    const knownIds = new Set<string>([...Object.keys(staging ?? {}), ...Object.keys(ledger)]);
+    const targets = requested ?? Array.from(knownIds).sort();
 
-  const stocks: Record<string, StockView> = {};
-  for (const id of targets) {
-    const fromStaging = staging?.[id];
-    if (fromStaging) {
-      stocks[id] = toView(fromStaging, true, now);
-      continue;
+    const stocks: Record<string, StockView> = {};
+    for (const id of targets) {
+      const fromStaging = staging?.[id];
+      if (fromStaging) {
+        stocks[id] = toView(fromStaging, true, now);
+        continue;
+      }
+      const fromLedger = ledger[id];
+      stocks[id] = fromLedger ? toView(fromLedger, false, now) : unknownView(id, false);
     }
-    const fromLedger = ledger[id];
-    stocks[id] = fromLedger ? toView(fromLedger, false, now) : unknownView(id, false);
-  }
 
-  // missing: 카탈로그(Products)에 존재하지 않는 요청 sku — staging/ledger 어디에도 없고
-  // 카탈로그 조회가 불가능하면 판정하지 않는다 (추측 금지).
-  const missing: string[] = [];
-  if (requested) {
-    try {
-      const doc = await getDoc();
-      const products = doc.sheetsByIndex[0];
-      const rows = await products.getRows();
-      const catalogIds = new Set(rows.map((r) => String(r.get("상품ID") || "").trim()).filter(Boolean));
-      for (const id of requested) if (!catalogIds.has(id)) missing.push(id);
-    } catch {
-      // 카탈로그 미도달 — missing 미판정 (빈 배열, 판단 유보)
+    // missing: 카탈로그(Products)에 존재하지 않는 요청 sku — staging/ledger 어디에도 없고
+    // 카탈로그 조회가 불가능하면 판정하지 않는다 (추측 금지).
+    const missing: string[] = [];
+    if (requested) {
+      try {
+        const doc = await getDoc();
+        const products = doc.sheetsByIndex[0];
+        const rows = await products.getRows();
+        const catalogIds = new Set(rows.map((r) => String(r.get("상품ID") || "").trim()).filter(Boolean));
+        for (const id of requested) if (!catalogIds.has(id)) missing.push(id);
+      } catch {
+        // 카탈로그 미도달 — missing 미판정 (빈 배열, 판단 유보)
+      }
     }
-  }
 
-  return NextResponse.json({
-    ok: true,
-    contractVersion: CONTRACT_VERSION,
-    checkedAt: now.toISOString(),
-    stagedReadable: staging !== null,
-    stocks,
-    missing,
-  });
+    return NextResponse.json({
+      ok: true,
+      contractVersion: CONTRACT_VERSION,
+      checkedAt: now.toISOString(),
+      stagedReadable: staging !== null,
+      stocks,
+      missing,
+    });
+  } catch (e: unknown) {
+    // [SESSION L · TASK 29] n1.stock.v1 계약 밖 크래시(=계약 밖 500) 차단 —
+    // ok:false + 고정 문구로 응답해 클라이언트가 "조회 실패" fallback을 정확히 타게 한다
+    logInternal("api/stock", e);
+    return NextResponse.json(
+      { ok: false, contractVersion: CONTRACT_VERSION, error: "지금 재고 정보를 확인하지 못했어요 — 잠시 후 다시 시도해 주세요" },
+      { status: 502 },
+    );
+  }
 }

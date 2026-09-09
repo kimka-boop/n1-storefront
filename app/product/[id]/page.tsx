@@ -98,7 +98,10 @@ export default function ProductPage() {
   const id = typeof params?.id === "string" ? params?.id : "";
 
   const [product, setProduct] = useState<Product | null>(null);
-  const [state, setState] = useState<"loading" | "ready" | "notfound">("loading");
+  // [SESSION L · TASK 29] "error" 상태 — 조회 실패(네트워크·서버)를 "상품 없음"으로
+  // 위장하지 않는다. 실패는 재시도 가능한 안내로만.
+  const [state, setState] = useState<"loading" | "ready" | "notfound" | "error">("loading");
+  const [loadRetryTick, setLoadRetryTick] = useState(0);
   const [selColor, setSelColor] = useState(""); // 원시(raw) 색상 값
   const [selSize, setSelSize] = useState("");
   const [viewKey, setViewKey] = useState<string>("front");
@@ -124,6 +127,11 @@ export default function ProductPage() {
       .then((r) => r.json())
       .then((data: unknown) => {
         if (!alive) return;
+        // [SESSION L] 서버가 ok:false(조회 실패)를 반환하면 notfound가 아니라 error로
+        if (!data || (data as { ok?: boolean }).ok === false) {
+          setState("error");
+          return;
+        }
         const list: Product[] = Array.isArray(data)
           ? (data as Product[])
           : ((data as { products?: Product[] })?.products ?? []);
@@ -139,11 +147,14 @@ export default function ProductPage() {
         setSelSize(p.sizeOptions?.length === 1 ? p.sizeOptions[0] : "");
         setBuyQty(1);
       })
-      .catch(() => alive && setState("notfound"));
+      .catch(() => {
+        // [SESSION L] 통신 실패를 "상품을 찾을 수 없습니다"로 위장하지 않는다
+        if (alive) setState("error");
+      });
     return () => {
       alive = false;
     };
-  }, [id]);
+  }, [id, loadRetryTick]);
 
   // ── [SESSION H] /api/stock?sku= 조회 — ok:true + unknown 레코드도 정상(미스테이징)이며,
   //    통신 실패(non-ok·파싱 실패)만 lookup 실패로 별도 truthful fallback 한다 (TASK H7) ──
@@ -209,6 +220,21 @@ export default function ProductPage() {
 
   if (state === "loading") {
     return <main className={styles.page}><p className={styles.loading}>불러오는 중</p></main>;
+  }
+  if (state === "error") {
+    return (
+      <main className={styles.page}>
+        <p className={styles.loading}>상품 정보를 불러오지 못했어요 — 일시적인 문제일 수 있어요.</p>
+        <p className={styles.loading}>
+          <button type="button" className={styles.retryBtn} onClick={() => setLoadRetryTick((t) => t + 1)}>
+            다시 시도
+          </button>
+        </p>
+        <p className={styles.homeLinkWrap}>
+          <Link href="/" className={styles.homeLink}>N°1 홈으로</Link>
+        </p>
+      </main>
+    );
   }
   if (state === "notfound" || !product) {
     return (

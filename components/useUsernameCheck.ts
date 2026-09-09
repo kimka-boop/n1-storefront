@@ -43,6 +43,7 @@ export function useUsernameCheck(raw: string) {
     }
     let alive = true;
     setStatus("checking");
+    setMessage(""); // [SESSION L] 이전 판정 문구가 확인 중에 잔존하지 않는다
     const t = setTimeout(async () => {
       try {
         const res = await fetch("/api/auth", {
@@ -84,6 +85,7 @@ export function useUsernameCheck(raw: string) {
     }
     if (!value) return;
     setStatus("checking");
+    setMessage(""); // [SESSION L] 이전 판정 문구가 확인 중에 잔존하지 않는다
     fetch("/api/auth", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
