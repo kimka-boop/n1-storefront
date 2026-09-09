@@ -17,6 +17,13 @@
  *  - 로그아웃: 인증 토큰만 제거. localStorage 핏은 마지막 계정의 기기 기억으로
  *    유지되지만 게스트는 읽지 않으므로 새 세션에 노출되지 않는다.
  *  - reset: 로컬 저장소 + (회원이면) 서버 핏 필드 공백화까지 — 숨은 상태 잔존 금지.
+ *
+ * Session J — PERSONALIZATION FULL INTEGRATION (2026-09-09):
+ *  - logout이 화면 상태(fit)도 게스트 세션 컨텍스트로 되돌린다 — 로그아웃 직후의
+ *    게스트에게 마지막 계정의 핏이 개인화로 보이는 것을 막는다(member returning의
+ *    전제: 재로그인 시 login 병합으로 계정 핏이 복원되어 Pair/PDP에 즉시 적용).
+ *  - login에서 이 계정에도 게스트 세션에도 핏이 없으면 기기 슬롯을 비운다 —
+ *    이전 계정의 기기 핏이 새 계정으로 새어들지 않도록 슬롯을 활성 계정에 재바인딩.
  */
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import {
@@ -114,6 +121,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const merged = mergeOnLogin(profile, promoted);
         if (merged.ctx) setFit(merged.ctx);
       });
+    } else {
+      // 이 계정에도(서버) 게스트 세션에도 핏이 없다 — 기기 슬롯에 남아 있을 수 있는
+      // 이전 계정의 핏을 지워 슬롯을 활성 계정에 다시 묶는다(계정 간 누수 없음,
+      // [SESSION J] 재로그인 시 삭제된 핏이 되살아나지 않는다).
+      clearFitContext(localStorage);
+      setFit(null);
     }
   };
 
@@ -124,6 +137,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("n1_auth_username");
     // 핏 컨텍스트(localStorage)는 마지막 계정의 기기 기억으로 유지 — 게스트는
     // sessionStorage만 읽으므로 노출되지 않는다. 다음 로그인에서 병합 정책이 적용된다.
+    // [SESSION J — member returning] 화면 상태도 게스트 경계로 되돌린다: 로그아웃
+    // 직후의 게스트에게 마지막 계정의 핏이 개인화로 보이지 않게 하고, 재로그인 시
+    // 서버 프로필 병합(login)으로 계정 핏이 복원·즉시 적용된다.
+    setFit(loadGuestFitContext());
   };
 
   const saveFit = (ctx: FitContext) => {

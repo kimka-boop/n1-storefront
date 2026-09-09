@@ -489,6 +489,19 @@
   font-size: 12.5px;
   color: #66685f;
 }
+/* TASK 9 (Session J): 치수 컨텍스트 라벨·값 — "내 설정 — " 접두사를 두 줄로 분리 */
+.yourFitDimsLabel {
+  margin: 0 0 3px;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: #99958b;
+}
+.yourFitDims {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: #55534e;
+  line-height: 1.6;
+}
 .yourFitEntry {
   margin-top: 32px;
   background: none;
@@ -592,6 +605,8 @@
   align-self: flex-start;
 }
 .pairPrice { font-size: 12.5px; color: #55534e; letter-spacing: 0.03em; }
+/* TASKS 27·28 (Session J): 짝 상품의 개인화 라인 — 조용한 metadata 톤 */
+.pairFitLine { font-size: 11.5px; line-height: 1.55; color: #77746b; }
 .pairReason { font-size: 11.5px; color: #8b877e; letter-spacing: 0.06em; }
 @media (max-width: 640px) {
   .pairLink { grid-template-columns: 108px 1fr; gap: 16px; }

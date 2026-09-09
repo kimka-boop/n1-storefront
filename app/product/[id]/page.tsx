@@ -37,6 +37,7 @@ import {
   StockViewLite,
 } from "@/lib/stockDisplay";
 import { interpretFit, categoryOf } from "@/lib/fit";
+import { MY_DIMENSIONS_LABEL, pairFitLine } from "@/lib/fitDisplay";
 import {
   genderKo,
   categoryShort,
@@ -411,7 +412,9 @@ export default function ProductPage() {
           <div className={styles.yourFit}>
             <p className={styles.yourFitKicker}>Your fit</p>
             <p className={styles.yourFact}>{fitInterp.productFact}</p>
-            <p className={styles.yourFitNote}>내 설정 — {fitInterp.yourContext}</p>
+            {/* TASK 9 (Session J): 치수 컨텍스트를 라벨·값 두 줄로 분리 (구 "내 설정" 접두사 폐지) */}
+            <p className={styles.yourFitDimsLabel}>{MY_DIMENSIONS_LABEL}</p>
+            <p className={styles.yourFitDims}>{fitInterp.yourContext}</p>
             <p className={styles.yourFitText}>{fitInterp.interpretation}</p>
             {fitInterp.sizeHint ? <p className={styles.yourFitNote}>{fitInterp.sizeHint}</p> : null}
             <p className={styles.yourFitNote}>{fitInterp.limitation}</p>
@@ -655,8 +658,11 @@ interface CatalogPairInfo {
   pairReasonShort: string;
 }
 
-/** 함께 추천된 페어 — 사전 계산된 mapping만 읽는다 (§37·§47). 스코어 노출 금지(§40). */
+/** 함께 추천된 페어 — 사전 계산된 mapping만 읽는다 (§37·§47). 스코어 노출 금지(§40).
+ *  TASKS 27·28 (Session J): 짝 상품도 같은 User Fit Context로 상품별 해석 라인을
+ *  함께 보여준다 — 페어 단위 사이즈는 존재하지 않는다. */
 function PairSuggestion({ productId }: { productId: string }) {
+  const { fit } = useAuth();
   const [suggestion, setSuggestion] = useState<{
     productId: string;
     name: string;
@@ -664,6 +670,17 @@ function PairSuggestion({ productId }: { productId: string }) {
     gender?: string;
     image: string | null;
     reason: string;
+    fitInput: {
+      name: string;
+      category?: string;
+      fitShape?: string;
+      stretch?: string;
+      sizeChart?: string;
+      sizeOptions?: string[];
+      optionStock?: Record<string, number>;
+      stockStatus?: string;
+      modelInfo?: string;
+    };
   } | null>(null);
 
   useEffect(() => {
@@ -690,6 +707,17 @@ function PairSuggestion({ productId }: { productId: string }) {
           gender: other.gender,
           image: img,
           reason: pair.pairReasonShort,
+          fitInput: {
+            name: other.name,
+            category: other.category,
+            fitShape: other.fit?.shape,
+            stretch: other.fit?.stretch,
+            sizeChart: other.sizeChart,
+            sizeOptions: other.sizeOptions,
+            optionStock: other.optionStock,
+            stockStatus: other.stockStatus,
+            modelInfo: other.modelInfo,
+          },
         });
       } catch {
         /* 페어 제안은 실패해도 조용히 사라진다 — 구매 흐름을 방해하지 않는다 */
@@ -699,6 +727,9 @@ function PairSuggestion({ productId }: { productId: string }) {
       alive = false;
     };
   }, [productId]);
+
+  // 렌더 시점의 fit으로 계산 — 핏을 수정·초기화하면 짝 상품 라인도 즉시 따라간다
+  const pairLine = suggestion && fit ? pairFitLine(interpretFit(suggestion.fitInput, fit)) : "";
 
   if (!suggestion) return null;
   return (
@@ -713,6 +744,7 @@ function PairSuggestion({ productId }: { productId: string }) {
         <span className={styles.pairInfo}>
           <span className={styles.pairName}>{suggestion.name}</span>
           <span className={styles.pairPrice}>₩{suggestion.price.toLocaleString("ko-KR")}</span>
+          {pairLine ? <span className={styles.pairFitLine}>{pairLine}</span> : null}
           {suggestion.reason ? <span className={styles.pairReason}>{suggestion.reason}</span> : null}
         </span>
       </Link>

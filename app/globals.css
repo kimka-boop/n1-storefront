@@ -1195,3 +1195,18 @@ body:has([class*="buyBar"]) .float-bar { bottom: 88px; }
 
 /* 뒤로 컨트롤이 있을 때는 내용이 컨트롤 열을 피해 들어간다 (겹침 방지) */
 .lq-surface:has(.lq-back) .lq-stage { padding-left: 30px; }
+
+/* ══════════════════════════════════════════════════════════════════
+   SESSION J — PERSONALIZATION FULL INTEGRATION (TASKS 9·27·28)
+   append-only 블록 — 기존 스타일은 무수정 (Session A append 패턴 동일)
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Pair row 카드의 상품별 개인화 라인 — 조용한 metadata 톤.
+   같은 User Fit Context로 상의/하의 각각 해석한 문장만 담는다
+   (페어 단위 사이즈 없음 — lib/fitDisplay.ts pairFitLine). */
+.piece-fit {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: #77746b;
+}

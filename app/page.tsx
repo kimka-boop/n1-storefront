@@ -19,7 +19,8 @@ import Link from "next/link";
 import SmartFitFlow from "@/components/SmartFitFlow";
 import { useAuth } from "@/components/AuthProvider";
 import { mediaFor } from "@/lib/media";
-import { FIT_LABEL, fitPresetSize, preferenceShift, categoryOf } from "@/lib/fit";
+import { FIT_LABEL, fitPresetSize, preferenceShift, categoryOf, interpretFit, type FitProductInput } from "@/lib/fit";
+import { pairFitLine } from "@/lib/fitDisplay";
 import {
   productColors,
   purchaseState,
@@ -66,6 +67,21 @@ function orRef(v?: string): string {
   const s = (v || "").trim();
   if (s && s !== "상세페이지 참조") return s;
   return "";
+}
+
+/** interpretFit 입력 조립 — 페어 카드 상품별 해석에 쓴다 (TASKS 27·28) */
+function fitInputOf(p: Product): FitProductInput {
+  return {
+    name: p.name,
+    category: p.category,
+    fitShape: p.fit?.shape,
+    stretch: p.fit?.stretch,
+    sizeChart: p.sizeChart,
+    sizeOptions: p.sizeOptions,
+    optionStock: p.optionStock,
+    stockStatus: p.stockStatus,
+    modelInfo: p.modelInfo,
+  };
 }
 
 function parseSizeChart(chart: string): { cols: string[]; rows: { label: string; vals: string[] }[] } | null {
@@ -685,6 +701,9 @@ export default function Home() {
                     const altShot = img
                       ? mediaFor(p.id, p.lookbookImage)?.views.find((v) => v.src !== img)?.src ?? null
                       : null;
+                    // TASKS 27·28 (Session J): 같은 User Fit Context로 이 카드 상품(상의/하의
+                    // 슬롯)을 각각 해석 — 페어 전체를 위한 하나의 사이즈는 존재하지 않는다.
+                    const fitLine = fit ? pairFitLine(interpretFit(fitInputOf(p), fit)) : "";
                     return (
                       <Link
                         key={p.id}
@@ -720,6 +739,7 @@ export default function Home() {
                           </p>
                           <h3 className="piece-name">{p.name}</h3>
                           <p className="piece-price">₩{p.price.toLocaleString("ko-KR")}</p>
+                          {fitLine ? <p className="piece-fit">{fitLine}</p> : null}
                         </div>
                       </Link>
                     );
