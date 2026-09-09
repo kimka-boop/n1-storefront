@@ -86,9 +86,20 @@ translate/보정치 하드코딩 일체 없음.
 
 ## 7. 환경 / 운영 노트
 
-- **dev server 교체:** port 3000의 기존 hermes 기동 서버(PID 17772)가 응답 없는
-  freeze 상태였다(≤45s 무응답 확인). 재기동 과정에서 `/_not-found` 컴파일 후 API 404
-  파생 → `.next` 삭제 후 `next dev -p 3000` 클린 재기동. 현재 `/`·`/api/products` 200.
+- **dev server 교체:** 세션 시작 시 port 3000의 기존 hermes 기동 서버(PID 17772)가
+  응답 없는 freeze 상태였다(45s+ 무응답). `rm -rf .next` + 클린 기동으로 완전 복구된
+  직후 본 세션의 전체 QA(5개 폭 측정·캡처, 기능 테스트)를 `200` 구간에서 수행했다 —
+  모든 증적은 이 건강 구간의 산출물이다.
+- **재발 (세션 범위 밖 — 인프라 이슈로 인계):** 클린 기동 후에도 수 분 내 dev server가
+  다시 느려지는 현상이 재발했다. 종증: (a) 404 fast-path(`/api/cs`)는 16ms로 정상 처리,
+  (b) `/api/products`는 hang → 이후 **500 완료**(구글 시트 fetch 계열 오류), (c) 홈 SSR
+  컴파일(1374 modules)이 무기한 지연. 즉 서버 프로세스는 살아 있고 경량 요청은 처리
+  되며, 무거운 라우트가 기기 부하에서 막히는 패턴이다. 원인 후보: 상시 실행 중인
+  hermes 봇들(오전 2:11/2:29 기동 node 다수) + `/api/cs?sid=CS-001` 초단위 폴링 루프가
+  dev 컴파일러를 압박. **헤더 카테고리 소유권 밖이므로 이 세션에서 수정하지 않았다 —
+  운영/hermes 측 확인 필요.** 최종 코드는 디스크에 확정되어 있으며, 정상 서버는 그대로
+  최종 상태를 서빙한다. 현재 port 3000에 분리 프로세스 유지 중
+  (로그: `n1-dev-sessionF.log/.err.log`). 서버 교체 시 `.next` 잔재 정리 필수.
 - **Typecheck:** `npx tsc --noEmit` — 헤더 관련 파일 오류 0건. 기존(lib) 오류 2건은
   세션 무관 pre-existing: `lib/idempotency.ts:76`, `lib/stock/normalize.ts:200,212`.
 - **내장 브라우저(IAB) 한계:** 이 QA 환경의 Chromium은 강제 프레임 사이 CSS transition
