@@ -18,3 +18,7 @@ tsconfig.tsbuildinfo
 ops/logs/
 ops/state.json
 ops/supervisor.pid
+node_modules/
+__pycache__/
+.next/
+*.log

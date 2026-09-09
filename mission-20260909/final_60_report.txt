@@ -1,0 +1,23 @@
+new items: 16
+{'id': 'PRD-N1-45', 'seg': ('FEMALE', 'BOTTOM'), 'score': 90, 'sub': 'JEANS', 'clusters': ['T01', 'T05'], 'title': '여성 워싱 밴딩 부츠컷 데님 팬츠 청바지', 'cost': 24300, 'retail': 46170, 'ev': 13}
+{'id': 'PRD-N1-46', 'seg': ('FEMALE', 'BOTTOM'), 'score': 82, 'sub': 'PANTS', 'clusters': ['T01', 'T08'], 'title': '여성코듀로이팬츠 멜라드 바지 용 봄가을겨울 신상 하이웨이스트 루즈핏 스트레이트 ', 'cost': 8650, 'retail': 16435, 'ev': 15}
+{'id': 'PRD-N1-47', 'seg': ('FEMALE', 'TOP'), 'score': 90, 'sub': 'SHIRT', 'clusters': ['T02', 'T06'], 'title': '긴팔 브이넥 스타일 여성셔츠 블라우스 노카라 깔끔한 여성 봄가을 셔츠 데일리 원', 'cost': 16400, 'retail': 31160, 'ev': 21}
+{'id': 'PRD-N1-48', 'seg': ('FEMALE', 'TOP'), 'score': 90, 'sub': 'SHIRT', 'clusters': ['T02', 'T06'], 'title': '여자블라우스 여성셔츠 블라우스 여성긴팔블라우스 여성데일리블라우스 브이넥', 'cost': 22850, 'retail': 43415, 'ev': 21}
+{'id': 'PRD-N1-49', 'seg': ('GENDERLESS', 'BOTTOM'), 'score': 74, 'sub': 'SKIRT', 'clusters': ['T08', 'T10'], 'title': '코듀로이 데일리 가을 미니스커트 HS', 'cost': 11570, 'retail': 21983, 'ev': 10}
+{'id': 'PRD-N1-50', 'seg': ('GENDERLESS', 'BOTTOM'), 'score': 70, 'sub': 'SLACKS', 'clusters': ['T01'], 'title': '남녀공용 플레어핏 부츠컷 슬랙스 커플 롱다리 스판 팬츠', 'cost': 18200, 'retail': 34580, 'ev': 8}
+{'id': 'PRD-N1-51', 'seg': ('GENDERLESS', 'BOTTOM'), 'score': 70, 'sub': 'SLACKS', 'clusters': ['T01'], 'title': '여성패션바지 긴바지 남녀공용 슬림핏 여성슬랙스 린넨 오버핏 여성와이드팬츠', 'cost': 20930, 'retail': 39767, 'ev': 8}
+{'id': 'PRD-N1-52', 'seg': ('GENDERLESS', 'BOTTOM'), 'score': 70, 'sub': 'PANTS', 'clusters': ['T05'], 'title': '남녀공용 스트링 바스락 와이드 팬츠', 'cost': 21300, 'retail': 40470, 'ev': 5}
+{'id': 'PRD-N1-53', 'seg': ('GENDERLESS', 'TOP'), 'score': 82, 'sub': 'SHIRT', 'clusters': ['T06', 'T08'], 'title': '홀리데이 캐주얼 후드 스웨트셔츠 UC-0136', 'cost': 8250, 'retail': 15675, 'ev': 11}
+{'id': 'PRD-N1-54', 'seg': ('GENDERLESS', 'TOP'), 'score': 82, 'sub': 'SHIRT', 'clusters': ['T06', 'T07'], 'title': '남녀공용 미니 깅엄 체크 캐주얼 셔츠 INSUM54', 'cost': 10100, 'retail': 19190, 'ev': 8}
+{'id': 'PRD-N1-55', 'seg': ('GENDERLESS', 'TOP'), 'score': 82, 'sub': 'TSHIRT', 'clusters': ['T05', 'T06'], 'title': '가을 봄 커플 워싱 빈티지 오버핏 긴팔 티셔츠', 'cost': 17950, 'retail': 34105, 'ev': 8}
+{'id': 'PRD-N1-56', 'seg': ('GENDERLESS', 'TOP'), 'score': 82, 'sub': 'TSHIRT', 'clusters': ['T05', 'T06'], 'title': '롱슬리브 오버핏 피그먼트 워싱 빈티지 맨투맨 티셔츠', 'cost': 23200, 'retail': 44080, 'ev': 8}
+{'id': 'PRD-N1-57', 'seg': ('MALE', 'BOTTOM'), 'score': 90, 'sub': 'JEANS', 'clusters': ['T01', 'T05'], 'title': '남성 3컬러 빈티지 스트레이트 데님팬츠 IS-DNP16', 'cost': 10650, 'retail': 20235, 'ev': 13}
+{'id': 'PRD-N1-58', 'seg': ('MALE', 'BOTTOM'), 'score': 90, 'sub': 'JEANS', 'clusters': ['T01', 'T05'], 'title': '남성 워싱 와이드 데님 팬츠 빈티지 스트레이트핏 가을 캐주얼 롱 청바지', 'cost': 19600, 'retail': 37240, 'ev': 13}
+{'id': 'PRD-N1-59', 'seg': ('MALE', 'TOP'), 'score': 90, 'sub': 'KNIT', 'clusters': ['T02', 'T05', 'T08'], 'title': '남성니트 겨울니트 오버핏니트 브이넥니트 남성스웨터 남성 남자니트 밑단', 'cost': 20080, 'retail': 38152, 'ev': 25}
+{'id': 'PRD-N1-60', 'seg': ('MALE', 'TOP'), 'score': 82, 'sub': 'SHIRT', 'clusters': ['T06', 'T07'], 'title': '남자 긴팔 셔츠 옥스포드 간절기 남방 정장 와이셔츠', 'cost': 8250, 'retail': 15675, 'ev': 8}
+FINAL60: {('MALE', 'TOP'): 10, ('MALE', 'BOTTOM'): 10, ('FEMALE', 'TOP'): 10, ('FEMALE', 'BOTTOM'): 10, ('GENDERLESS', 'TOP'): 10, ('GENDERLESS', 'BOTTOM'): 10}
+ids unique: True | nos unique: True | total: 60
+new-item price-policy violations: []
+no-traceability: []
+season-defect check (should be []): []
+saved final_60_catalog.json
