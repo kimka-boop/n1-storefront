@@ -418,6 +418,14 @@
   min-width: 56px;
 }
 
+/* [SESSION H · TASK 11] 검증된 옵션 재고 메타데이타 — 사이즈 선택 아래·가격 위, 작고 조용함.
+   표시 자체가 "확인된 숫자"라는 뜻이므로 강조하지 않는다 (binary/unknown/stale은 렌더되지 않음) */
+.stockCount {
+  margin: -14px 0 14px;
+  font-size: 12px;
+  color: #66685f;
+}
+
 /* 미확정 구매 — 조용한 CTA (검정 실선, 채움 없음) */
 .ctaQuiet {
   background: transparent;

@@ -13,7 +13,7 @@
  * - 선택 색상의 원시 값(raw)이 구매 모달까지 전달 (quickBuyUrl)
  * - 소재 영역 AI 이미지 고지(스타일링 참고용)
  */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import ImageCrop, { CROP_HERO, CROP_FULL, CROP_DETAIL } from "@/components/product/ImageCrop";
@@ -30,6 +30,12 @@ import type { CartItem } from "@/lib/cart";
 import { PRODUCT_STORY } from "@/lib/productContent";
 import { mediaFor } from "@/lib/media";
 import { productColors, purchaseState, quickBuyUrl } from "@/lib/experience";
+import {
+  pdpStockState,
+  effectiveBuyState,
+  STOCK_LOOKUP_FAILURE_NOTE,
+  StockViewLite,
+} from "@/lib/stockDisplay";
 import { interpretFit, categoryOf } from "@/lib/fit";
 import {
   genderKo,
@@ -99,6 +105,10 @@ export default function ProductPage() {
   const heroRef = useRef<HTMLDivElement>(null);
   const decisionRef = useRef<HTMLDivElement>(null);
 
+  // ── [SESSION H · TASK 11] B 재고 파이프라인(n1.stock.v1) 뷰 — 검증된 값만 표시에 쓴다 ──
+  const [stockView, setStockView] = useState<StockViewLite | null>(null);
+  const [stockLookupFailed, setStockLookupFailed] = useState(false);
+
   // ── 나에게 맞게 보기: Smart Fit V2 Fit Context (훅은 early return 이전에 unconditional) ──
   const { fit: authFit } = useAuth();
   const { add: addCartLine, setOpen: setCartOpen } = useCart();
@@ -134,6 +144,34 @@ export default function ProductPage() {
     };
   }, [id]);
 
+  // ── [SESSION H] /api/stock?sku= 조회 — ok:true + unknown 레코드도 정상(미스테이징)이며,
+  //    통신 실패(non-ok·파싱 실패)만 lookup 실패로 별도 truthful fallback 한다 (TASK H7) ──
+  const productId = product?.id;
+  useEffect(() => {
+    if (state !== "ready" || !productId) return;
+    let alive = true;
+    setStockView(null);
+    setStockLookupFailed(false);
+    fetch(`/api/stock?sku=${encodeURIComponent(productId)}`, { cache: "no-store" })
+      .then((r) => {
+        if (!r.ok) throw new Error(`stock ${r.status}`);
+        return r.json() as Promise<{ ok?: boolean; stocks?: Record<string, StockViewLite> }>;
+      })
+      .then((d) => {
+        if (!alive) return;
+        if (!d || d.ok !== true || typeof d.stocks !== "object" || d.stocks === null) {
+          throw new Error("stock contract");
+        }
+        setStockView(d.stocks[productId] ?? null); // 미스테이징 sku도 unknown 레코드로 온다
+      })
+      .catch(() => {
+        if (alive) setStockLookupFailed(true); // 조회 실패 — 미확인과 구분되는 안내로만 표시
+      });
+    return () => {
+      alive = false;
+    };
+  }, [state, productId]);
+
   useEffect(() => {
     const el = heroRef.current;
     if (!el || !product) return;
@@ -143,6 +181,30 @@ export default function ProductPage() {
     io.observe(el);
     return () => io.disconnect();
   }, [product]);
+
+  // ── [SESSION H · TASK 11] 재고 표시/구매 판정 — B 파이프라인 우선, 시트 폴백.
+  //    hooks는 early return 이전에 전부 실행되어야 한다(loading→ready 전환 시 훅 수 불변). ──
+  const stockUi = useMemo(
+    () => pdpStockState(stockView, stockLookupFailed, selColor, selSize),
+    [stockView, stockLookupFailed, selColor, selSize],
+  );
+  const sheetBuy = useMemo(
+    () => (product ? purchaseState(product, selColor, selSize) : ("unconfirmed" as const)),
+    [product, selColor, selSize],
+  );
+  // 사이즈 후보 — 시트 sizeOptions 우선, 재고 파이프라인이 확인한 사이즈로 보완
+  const sizeChoices = useMemo(() => {
+    const base = product?.sizeOptions ?? [];
+    const extra = stockUi.sizes.filter((s) => !base.includes(s));
+    return [...base, ...extra];
+  }, [product, stockUi]);
+  useEffect(() => {
+    if (!selSize && sizeChoices.length === 1) setSelSize(sizeChoices[0]);
+  }, [selSize, sizeChoices]);
+  const maxQty = stockUi.capQty; // 확인된 수량이면 그 값으로 cap — 반드시 실패할 주문을 미리 막는다
+  useEffect(() => {
+    if (buyQty > maxQty) setBuyQty(maxQty);
+  }, [maxQty, buyQty]);
 
   if (state === "loading") {
     return <main className={styles.page}><p className={styles.loading}>불러오는 중</p></main>;
@@ -190,13 +252,14 @@ export default function ProductPage() {
 
   const colors = productColors(product.colorOptions); // {value: 원시, label: 표시}
   const activeView = media?.views.find((v) => v.key === viewKey) ?? media?.views[0];
-  const buy = purchaseState(product, selColor, selSize);
+  const effBuy = effectiveBuyState(sheetBuy, stockUi, sizeChoices, selSize);
 
-  // ── 구매 (미션 §6): 장바구니에 담기 / 바로 구매 — 원시 옵션 값 그대로 전달 (미션 §8)
+  // ── 구매 (미션 §6): 장바구니에 담기 / 바로 구매 — 원시 옵션 값 그대로 전달 (미션 §8) ──
   const variantStockSnap =
-    typeof product.optionStock?.[selColor && selSize ? `${selColor}_${selSize}` : selSize] === "number"
+    stockUi.count ??
+    (typeof product.optionStock?.[selColor && selSize ? `${selColor}_${selSize}` : selSize] === "number"
       ? product.optionStock![selColor && selSize ? `${selColor}_${selSize}` : selSize]
-      : null;
+      : null);
   const buildCartItem = (): CartItem => ({
     sku: product.id,
     name: product.name,
@@ -434,9 +497,9 @@ export default function ProductPage() {
                 ))}
               </div>
             ) : null}
-            {product.sizeOptions?.length ? (
+            {sizeChoices.length ? (
               <div className={styles.sizeRow} role="radiogroup" aria-label="사이즈 선택">
-                {product.sizeOptions.map((s) => (
+                {sizeChoices.map((s) => (
                   <button
                     key={s}
                     type="button"
@@ -450,23 +513,31 @@ export default function ProductPage() {
                 ))}
               </div>
             ) : null}
+            {/* [SESSION H · TASK 11] 검증된 숫자 옵션 재고만 표시 — 작고 조용한 metadata.
+                binary/unknown/stale은 countLabel이 null — 숫자를 만들지 않는다 (TASK H2·H3). */}
+            {stockUi.countLabel ? (
+              <p className={styles.stockCount}>{stockUi.countLabel}</p>
+            ) : null}
             <p className={styles.price}>{won(product.price)}</p>
 
-            {buy === "soldout" || soldOut ? (
+            {effBuy === "soldout" || soldOut ? (
               <>
                 <button type="button" className={styles.cta} disabled>품절</button>
                 <p className={styles.holdNotice}>공급 확인 정보가 보강 중인 상품입니다.</p>
               </>
-            ) : buy === "choose" ? (
+            ) : effBuy === "choose" ? (
               <button type="button" className={styles.cta} disabled>옵션을 선택해 주세요</button>
-            ) : buy === "unconfirmed" ? (
+            ) : effBuy === "unconfirmed" ? (
               <>
                 <button type="button" className={`${styles.cta} ${styles.ctaQuiet}`} onClick={openCs}>
                   재고 확인 후 구매 가능
                 </button>
-                <p className={styles.holdNotice}>
-                  옵션 재고가 확인 중입니다 — 고객센터로 문의해 주시면 준비를 도와드립니다.
-                </p>
+                {/* [SESSION H · TASK 14] 정상 재고 파이프라인(조회 성공)에서는 기존 "옵션 재고가
+                    확인 중입니다…" copy를 내보내지 않는다. 조회 실패(lookup failure)일 때만
+                    별도의 truthful fallback — 실패 사실을 실패대로 말한다. */}
+                {stockUi.lookup === "failed" ? (
+                  <p className={styles.holdNotice}>{STOCK_LOOKUP_FAILURE_NOTE}</p>
+                ) : null}
               </>
             ) : (
               <>
@@ -484,8 +555,8 @@ export default function ProductPage() {
                   <button
                     type="button"
                     className={styles.qtyBtn}
-                    onClick={() => setBuyQty((q) => Math.min(10, q + 1))}
-                    disabled={buyQty >= 10}
+                    onClick={() => setBuyQty((q) => Math.min(maxQty, q + 1))}
+                    disabled={buyQty >= maxQty}
                     aria-label="수량 늘리기"
                   >
                     ＋
@@ -560,7 +631,7 @@ export default function ProductPage() {
       <StickyBuyBar
         name={product.name}
         price={product.price}
-        soldOut={soldOut || buy === "soldout"}
+        soldOut={soldOut || effBuy === "soldout"}
         heroVisible={heroVisible}
         onBuy={scrollToDecision}
       />

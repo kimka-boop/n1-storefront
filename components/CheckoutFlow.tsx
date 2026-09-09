@@ -170,7 +170,13 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
       });
       const data = await res.json();
       if (!data.ok) {
-        setError(data.error || "주문 처리 실패");
+        // [Session H · TASK 13] 409 = 결제 개시 직전 재고 게이트가 확정 품절/수량부족으로 중단.
+        // 서버 메시지를 그대로(truthful) 보여주고, 카트는 성공 경로에서만 비워지므로 유지된다.
+        setError(
+          res.status === 409
+            ? `${data.error} — 장바구니는 그대로 유지됩니다.`
+            : data.error || "주문 처리 실패",
+        );
         return;
       }
       consumeIdempotencyKey(); // 성공 — 다음 주문은 새 멱등키로

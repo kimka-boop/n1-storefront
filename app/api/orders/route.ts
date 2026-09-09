@@ -21,6 +21,13 @@
  * [Session C — 회원 주문내역 §9]
  *  - GET /api/orders?token=… — 세션 토큰의 계정 이메일과 일치하는(고객이메일) 주문만 조회.
  *    본인 주문이 아닌 것은 절대 내려가지 않는다. 토큰 없음/무효 → 401.
+ *
+ * [Session H — 최종 재고 확인 (TASK 13)]
+ *  - 결제 개시(고객 upsert·Orders 인입·차감·알림) 직전에 finalStockCheck로 선택 옵션을
+ *    재검증한다: B 파이프라인 확정 품절/수량부족 → 409로 결제 중단(카트 유지·truthful 메시지),
+ *    미확정 → C 원본(Products 옵션별재고) 폴백 — 정확히 일치하는 키만, 없으면 "재고 미확인".
+ *  - 재고 차감은 Stock_Staging 기준(검증 숫자만·검증일시 불변). Products AB열(unisex_score)
+ *    기록은 제거했다 — 데이터 오염 방지.
  */
 import { NextResponse } from "next/server";
 import {
@@ -36,6 +43,8 @@ import { withIdempotency } from "@/lib/idempotency";
 import { projectOrderForOwner } from "@/lib/orderView";
 import { displayLabel } from "@/lib/orderState";
 import { sendTelegramMessage } from "@/lib/telegram";
+import { checkoutFinalStockCheck, decrementStagingStock, sheetOptionQty } from "@/lib/stockCheckout";
+import { gateFromStockCheck, gateFromSheetStock, GateLine } from "@/lib/stockGate";
 
 export const dynamic = "force-dynamic";
 
@@ -84,7 +93,9 @@ async function createOrderRecord(body: OrderBody): Promise<CreateResult> {
   const productsSheet = doc.sheetsByIndex[0]; // Products
   const pRows = await productsSheet.getRows();
 
-  // ── 2. 서버 측 가격 재계산 (클라이언트 금액 신뢰 금지 — Price Authority §8) + 재고 확인 ──
+  // ── 2. 서버 측 가격 재계산 (클라이언트 금액 신뢰 금지 — Price Authority §8) ──
+  // [SESSION H] 옵션별재고 확인은 이 루프에서 제거되고 3.7의 finalStockCheck 게이트로
+  // 이동했다 — 결제 개시 직전 단일 시점에 B 파이프라인(확정) + C 원본(폴백) 순으로 판정한다.
   let total = 0;
   const resolved: { sku: string; color: string; size: string; qty: number; unit_price: number; supplier: string; colorIndex: number; name: string }[] = [];
   for (const it of items) {
@@ -92,17 +103,6 @@ async function createOrderRecord(body: OrderBody): Promise<CreateResult> {
     if (!p) throw Object.assign(new Error(`존재하지 않는 상품: ${it.sku}`), { status: 400 });
     const price = Number(String(p.get("판매가") || "0").replace(/[^\d]/g, "")) || 0;
     const qty = Math.max(1, Math.min(10, Number(it.qty) || 1));
-    // 옵션별재고 확인
-    const stockMap: Record<string, number> = {};
-    for (const pair of String(p.get("옵션별재고") || "").split("|")) {
-      const [k, v] = pair.split(":");
-      if (k && v) stockMap[k.trim()] = Number(v) || 0;
-    }
-    const key = it.color && it.size ? `${it.color}_${it.size}` : (it.size || it.color || "");
-    const avail = stockMap[key] ?? Object.values(stockMap).reduce((a, b) => Math.max(a, b), 0);
-    if (avail < qty) {
-      throw Object.assign(new Error(`품절: 잔여 ${avail}개`), { status: 409 });
-    }
     total += price * qty;
     resolved.push({ sku: it.sku, color: it.color || "", size: it.size || "", qty, unit_price: price, supplier: String(p.get("공급사명") || ""), colorIndex: (typeof it.colorIndex === "number" ? it.colorIndex : -1), name: String(p.get("상품명") || it.sku) });
   }
@@ -140,6 +140,31 @@ async function createOrderRecord(body: OrderBody): Promise<CreateResult> {
           },
         },
       };
+    }
+  }
+
+  // ── 3.7 [SESSION H · TASK 13] 결제 개시 직전 최종 재고 확인 (finalStockCheck) ──
+  // 멱등키 replay 판정 *뒤*에 실행한다 — 이미 생성된 주문의 재제출은 재고 변동과 무관하게
+  // 원본 응답을 replay한다. 게이트는 고객 upsert·Orders 인입·차감·알림(=결제 개시) 직전의
+  // 마지막 경계다. 선택한 정확한 옵션(color×size) 단위로 재검증한다.
+  const gateLines: GateLine[] = resolved.map((r) => ({ sku: r.sku, color: r.color, size: r.size, qty: r.qty, name: r.name }));
+  const stockCheck = await checkoutFinalStockCheck(gateLines);
+  const pipelineGate = gateFromStockCheck(stockCheck, gateLines);
+  if (pipelineGate && !pipelineGate.ok) {
+    // 확정 품절/수량 부족 — 결제 중단. 카트 비움은 성공 경로에서만 일어나므로 유지된다.
+    throw Object.assign(new Error(pipelineGate.message), { status: 409 });
+  }
+  if (!pipelineGate) {
+    // 어댑터 미확정(미스테이징·STALE·TYPE B 수량미확인·조회 실패) → C 원본(Products
+    // 옵션별재고) 폴백. 정확히 일치하는 옵션 키만 읽는다 — 값이 없으면 "재고 미확인"으로
+    // truthful 차단한다(품절로 창작 금지).
+    const rowBySku = new Map(pRows.map((r) => [String(r.get("상품ID")), r] as const));
+    const sheetGate = gateFromSheetStock(gateLines, (line) => {
+      const row = rowBySku.get(line.sku);
+      return row ? sheetOptionQty(row, line) : undefined;
+    });
+    if (!sheetGate.ok) {
+      throw Object.assign(new Error(sheetGate.message), { status: 409 });
     }
   }
 
@@ -185,45 +210,15 @@ async function createOrderRecord(body: OrderBody): Promise<CreateResult> {
     ...(idempotencyKey ? { "멱등키": idempotencyKey } : {}),
   });
 
-  // ── 6. 재고 차감 (Products 옵션별재고) — getCell 직접 갱신 (검증된 방식) ──
-  const stockSheet = doc.sheetsByIndex[0];
-  const newValByRow: Record<number, string> = {};
-  for (const r of resolved) {
-    const pIndex = pRows.findIndex((pr) => pr.get("상품ID") === r.sku);
-    if (pIndex === -1) continue;
-    const prow = pRows[pIndex];
-    const stockMap: Record<string, number> = {};
-    for (const pair of String(prow.get("옵션별재고") || "").split("|")) {
-      const [k, v] = pair.split(":");
-      if (k && v) stockMap[k.trim()] = Number(v) || 0;
-    }
-    const key = r.color && r.size ? `${r.color}_${r.size}` : (r.size || r.color || "");
-    let tKey = key;
-    if (!(tKey in stockMap)) {
-      // 폴백 1: 색상 인덱스 기반 (UI가 colorIndex 전송 시 — mojibake 무관 정확 매칭)
-      const stockKeys = Object.keys(stockMap); // 시트 기입 순서 유지 (정렬 금지)
-      if (typeof r.colorIndex === "number" && r.colorIndex >= 0 && r.size) {
-        const cand = stockKeys.filter((k) => k.endsWith(`_${r.size}`));
-        if (cand[r.colorIndex]) tKey = cand[r.colorIndex];
-      }
-      // 폴백 2: 사이즈만 일치하는 후보가 유일할 때
-      if (!(tKey in stockMap) && r.size) {
-        const cand = stockKeys.filter((k) => k.endsWith(`_${r.size}`) || k === r.size);
-        if (cand.length === 1) tKey = cand[0];
-      }
-    }
-    console.log(`[stock-final] 요청키="${key}" 사용키="${tKey}" 매칭=${tKey in stockMap} 차감전=${stockMap[tKey]}`);
-    if (stockMap[tKey] !== undefined) stockMap[tKey] = Math.max(0, stockMap[tKey] - r.qty);
-    newValByRow[pIndex + 2] = Object.entries(stockMap).map(([k, v]) => `${k}:${v}`).join("|"); // +2: 헤더 보정
-  }
-  console.log("[stock-decrement] 대상 행:", Object.keys(newValByRow), "값:", newValByRow);
-  await stockSheet.loadCells(`AB2:AB${pRows.length + 1}`); // AB열 = 옵션별재고(28)
-  for (const [rowNum, val] of Object.entries(newValByRow)) {
-    const cell = stockSheet.getCell(Number(rowNum) - 1, 27); // 0-based: 행-1, 열 27=AB
-    cell.value = val;
-  }
-  await stockSheet.saveUpdatedCells();
-  console.log("[stock-decrement] 저장 완료");
+  // ── 6. [SESSION H] 재고 차감 — Stock_Staging 기준 ──
+  // 기존 Products AB열(getCell(row,27)) 차감은 제거했다: 신규 시트의 AB열은 unisex_score라
+  // 옵션 문자열을 쓰면 실 데이터를 오염시킨다 (Session B 리포트 지뢰 1). 검증 원장
+  // Stock_Staging의 확인된 숫자만 차감하며(검증일시 불변·비고에 근거 기록), staging 미기입
+  // sku는 차감을 보류한다 — 다음 공급처 재검증(cadence)이 값을 다시 맞춘다.
+  const decrement = await decrementStagingStock(gateLines, orderId);
+  console.log(
+    `[stock-decrement] ${orderId} — staging 차감: [${decrement.decremented.join(", ") || "없음"}] 보류: [${decrement.skipped.join(", ") || "없음"}]`,
+  );
 
   // ── 7. 디렉터 텔레그램 알림 ──
   const itemsDesc = resolved.map((r) => `${r.sku}(${r.color}${r.size ? " " + r.size : ""})x${r.qty}`).join(", ");
