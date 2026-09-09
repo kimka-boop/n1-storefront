@@ -225,8 +225,10 @@
   transition: border-color 200ms ease-out, color 200ms ease-out;
 }
 .colorChipOn {
+  background: #111111;
+  color: #faf9f7;
   border-color: #111111;
-  color: #111111;
+  font-weight: 600;
 }
 .price {
   font-size: 22px;
@@ -620,4 +622,58 @@
 .pairReason { font-size: 12px; color: #8b877e; letter-spacing: 0.06em; }
 @media (max-width: 640px) {
   .pairLink { grid-template-columns: minmax(84px, 108px) minmax(0, 1fr); gap: 14px; }
+}
+
+/* ═══ MOBILE EMERGENCY REPAIR (2026-09-10) — append-only ═══ */
+
+/* §7 — 모바일 PDP 대표컷 과점유 수렴: 4/5 프레밍은 유지하되 폭을 78vw(≤300px)로 —
+   첫 화면에 이름·가격이 들어오고, 거친 크롭 없이 에디토리얼 비율 유지 */
+@media (max-width: 640px) {
+  .heroCap { max-width: min(78vw, 300px); margin: 0 auto; }
+}
+
+/* §22 — 이름 아래 가격 + 이미지 고지 */
+.heroPrice {
+  margin-top: 10px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #111;
+}
+.heroNote {
+  margin-top: 10px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #a8a49c;
+}
+
+/* §19 — 문의 두 줄 문장 (display.ts AS_NEW의 
+ 반영) */
+.inquiry { white-space: pre-line; line-height: 1.8; }
+
+/* §17 — 상품 정보 가독성: 라벨/본문 위계 + 행간 + 구분 리듬 */
+.facts { row-gap: 2px; }
+.facts dt {
+  color: #8f8b80;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-top: 18px;
+}
+.facts dd {
+  margin: 6px 0 0;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #33322e;
+  word-break: keep-all;
+}
+.facts dd.quality { line-height: 1.85; }
+@media (max-width: 640px) {
+  .facts dt { margin-top: 22px; }
+  .facts dd { font-size: 14.5px; line-height: 1.8; }
+}
+
+/* §10 — 옵션 칩 모바일 터치 타깃 44px */
+@media (max-width: 640px) {
+  .colorChip { min-height: 44px; padding: 10px 16px; }
 }

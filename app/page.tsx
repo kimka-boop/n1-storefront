@@ -35,6 +35,7 @@ import {
   noticeAsText,
   materialText,
   washingText,
+  originDisplay,
 } from "@/lib/display";
 
 interface FitInfo { thickness: string; stretch: string; sheer: string; lining: string; shape: string; }
@@ -1054,8 +1055,8 @@ export default function Home() {
                   {orRef(selected.notice?.manufacturer) ? (
                     <div className="info-row"><span>제조자(수입자)</span><b>{selected.notice!.manufacturer}</b></div>
                   ) : null}
-                  {orRef(selected.origin) ? (
-                    <div className="info-row"><span>제조국(원산지)</span><b>{selected.origin}</b></div>
+                  {originDisplay(selected.origin) ? (
+                    <div className="info-row"><span>제조국(원산지)</span><b>{originDisplay(selected.origin)}</b></div>
                   ) : null}
                   {orRef(selected.notice?.madeAt) ? (
                     <div className="info-row"><span>제조연월</span><b>{selected.notice!.madeAt}</b></div>

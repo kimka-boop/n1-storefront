@@ -51,40 +51,47 @@ export default function TonePanel({
 }: {
   fit: { thickness?: string; stretch?: string; sheer?: string; lining?: string };
 }) {
-  const metrics: Metric[] = [
-    {
-      label: "두께감",
-      left: "얇은 공기",
-      right: "도톰한 여유",
-      level: mapLevel("thickness", fit.thickness || ""),
-      caption: fit.thickness || "정보 없음",
-    },
-    {
-      label: "신축성",
-      left: "고정된 실루엣",
-      right: "흐르는 신축",
-      level: mapLevel("stretch", fit.stretch || ""),
-      caption: fit.stretch || "정보 없음",
-    },
-    {
-      label: "비침",
-      left: "밀실",
-      right: "시원한 개방",
-      level: mapLevel("sheer", fit.sheer || ""),
-      caption: fit.sheer || "정보 없음",
-    },
-    {
-      label: "안감",
-      left: "얇은 한 겹",
-      right: "있음",
-      level: mapLevel("lining", fit.lining || ""),
-      caption: fit.lining || "정보 없음",
-    },
-  ];
+  // §12·§13 — UNKNOWN 값은 절대 렌더하지 않는다: 알려진 지표만, 규모 막대도
+  // 정규화 값이 있을 때만. 모르면 지표 자체를 생략한다 (빈 막대·"정보 없음" 스케일 금지).
+  const KNOWN = (v?: string) => {
+    const s = (v || "").trim();
+    return s && s.toUpperCase() !== "UNKNOWN" ? s : null;
+  };
+  const known: Metric[] = [];
+  const thickness = KNOWN(fit.thickness);
+  if (thickness && mapLevel("thickness", thickness) !== null) {
+    known.push({
+      label: "두께감", left: "얇은 공기", right: "도톰한 여유",
+      level: mapLevel("thickness", thickness), caption: thickness,
+    });
+  }
+  const stretch = KNOWN(fit.stretch);
+  if (stretch && mapLevel("stretch", stretch) !== null) {
+    known.push({
+      label: "신축성", left: "고정된 실루엣", right: "흐르는 신축",
+      level: mapLevel("stretch", stretch), caption: stretch,
+    });
+  }
+  const sheer = KNOWN(fit.sheer);
+  if (sheer && mapLevel("sheer", sheer) !== null) {
+    known.push({
+      label: "비침", left: "밀실", right: "시원한 개방",
+      level: mapLevel("sheer", sheer), caption: sheer,
+    });
+  }
+  const lining = KNOWN(fit.lining);
+  if (lining && mapLevel("lining", lining) !== null) {
+    known.push({
+      label: "안감", left: "얇은 한 겹", right: "있음",
+      level: mapLevel("lining", lining), caption: lining,
+    });
+  }
+
+  if (!known.length) return null; // 알려진 물성이 없으면 패널 자체를 렌더하지 않는다
 
   return (
     <div className={styles.toneGrid}>
-      {metrics.map((m) => (
+      {known.map((m) => (
         <div key={m.label} className={styles.toneCell}>
           <p className={styles.toneLabel}>{m.label}</p>
           <div

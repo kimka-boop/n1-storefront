@@ -45,6 +45,7 @@ import {
   noticeAsText,
   sizeSummary,
   washingText,
+  originDisplay,
 } from "@/lib/display";
 import styles from "./product.module.css";
 
@@ -276,8 +277,7 @@ export default function ProductPage() {
   const origin = clean(product.origin);
   const manufacturer = clean(product.notice?.manufacturer);
   const washing = washingText(product.washingInfo);
-  // §15 RULE C — 공급사 세탁 정보 부재 시 제조사 지침으로 위장하지 않고 안전 상태를 보인다
-  const carePending = !washing;
+  // §15 — 공급사 세탁 정보 부재: 자리 표시 문구 대신 조용히 생략 (RULE C: 창작 금지)
   const whyThis = clean(product.whyThisProduct);
   const sizes = sizeSummary(product.sizeChart);
   const genderLabel = genderKo(product.gender);
@@ -340,6 +340,13 @@ export default function ProductPage() {
             {[genderLabel, categoryLabel].filter(Boolean).join(" · ")}
           </p>
           <h1 className={styles.heroName}>{product.name}</h1>
+          {/* §22 — 이름 바로 아래 가격: 구매 정보가 첫 화면에 도달한다 */}
+          <p className={styles.heroPrice}>{won(product.price)}</p>
+          {media ? (
+            <p className={styles.heroNote}>
+              이미지는 스타일링 참고용 AI 컷입니다 — 실측·소재는 표기 정보로 확인해 주세요.
+            </p>
+          ) : null}
         </SceneSection>
       </div>
 
@@ -394,135 +401,6 @@ export default function ProductPage() {
         </div>
       </SceneSection>
 
-      {/* ── Scene 3 MATERIAL — 제품 단독컷 + 소재 구성 + 톤 패널 ── */}
-      <SceneSection id="scene3" kicker="Material" title="소재">
-        <div className={styles.twoCol}>
-          {media?.productOnly ? (
-            <ImageCrop
-              src={media.productOnly}
-              alt={`${product.id} 제품 단독 컷`}
-              token={CROP_DETAIL}
-              className={styles.sideMedia}
-            />
-          ) : (
-            <ImageCrop
-              src={media?.front ?? ""}
-              alt={`${product.id} 소재 디테일`}
-              token={CROP_DETAIL}
-              className={styles.sideMedia}
-            />
-          )}
-          <div>
-            {materialKnown ? (
-              <div className={styles.materialBlock}>
-                <MaterialComposition material={material} />
-              </div>
-            ) : (
-              <p className={styles.lede}>소재 정보가 보강 중입니다.</p>
-            )}
-            <TonePanel fit={fit} />
-            {media && (
-              <p className={styles.aiDisclosure}>
-                이미지는 스타일링 참고용 AI 컷입니다 — 실측·소재는 표기 정보로 확인해 주세요.
-              </p>
-            )}
-          </div>
-        </div>
-      </SceneSection>
-
-      {/* ── Scene 4 FIT — 정면 전신 실루엣 + 치수 ── */}
-      <SceneSection id="scene4" kicker="Fit" title="핏">
-        {media ? (
-          <ImageCrop
-            src={media.front}
-            alt={`${product.id} 정면 착용컷`}
-            token={CROP_FULL}
-          />
-        ) : null}
-        {product.modelInfo ? (
-          <p className={styles.lede}>모델 {product.modelInfo}</p>
-        ) : null}
-        {(product.sizeChart || "").trim() ? (
-          <SizeTable raw={product.sizeChart!} />
-        ) : (
-          <p className={styles.sizeMissing}>
-            수치표 미제공 — 착용컷으로 확인하실 수 있습니다.
-          </p>
-        )}
-        {/* 개인 해석층 — 상품 사실(위) 아래에서 FACT → CONTEXT → INTERPRETATION →
-            LIMITATION 순서 유지. 결과는 상품 설명을 대체하지 않는다 (§21) */}
-        {fitInterp && fitInterp.evidence !== "UNAVAILABLE" ? (
-          <div className={styles.yourFit}>
-            <p className={styles.yourFitKicker}>Your fit</p>
-            <p className={styles.yourFact}>{fitInterp.productFact}</p>
-            {/* TASK 9 (Session J): 치수 컨텍스트를 라벨·값 두 줄로 분리 (구 "내 설정" 접두사 폐지) */}
-            <p className={styles.yourFitDimsLabel}>{MY_DIMENSIONS_LABEL}</p>
-            <p className={styles.yourFitDims}>{fitInterp.yourContext}</p>
-            <p className={styles.yourFitText}>{fitInterp.interpretation}</p>
-            {fitInterp.sizeHint ? <p className={styles.yourFitNote}>{fitInterp.sizeHint}</p> : null}
-            <p className={styles.yourFitNote}>{fitInterp.limitation}</p>
-            <button className={styles.yourFitEntry} style={{ marginTop: 14 }} onClick={() => setShowFitFlow(true)}>
-              수정하기 →
-            </button>
-          </div>
-        ) : fitInterp ? (
-          <div className={styles.yourFit}>
-            <p className={styles.yourFitKicker}>Your fit</p>
-            <p className={styles.yourFitText}>{fitInterp.interpretation}</p>
-            <button className={styles.yourFitEntry} style={{ marginTop: 14 }} onClick={() => setShowFitFlow(true)}>
-              스마트 핏 →
-            </button>
-          </div>
-        ) : (
-          <button className={styles.yourFitEntry} onClick={() => setShowFitFlow(true)}>
-            스마트 핏 →
-          </button>
-        )}
-      </SceneSection>
-
-      {showFitFlow && (
-        <SmartFitFlow
-          onClose={() => setShowFitFlow(false)}
-          product={fitInput}
-          needCategory={fitCategory === "bottom" ? "bottom" : "top"}
-        />
-      )}
-
-      {/* ── Scene 5 INFO — 확인된 정보의 조용한 요약 ── */}
-      <SceneSection id="scene5" kicker="Info" title="핵심 정보">
-        <dl className={styles.facts}>
-          {materialKnown ? (
-            <>
-              <dt>소재 구성</dt>
-              <dd><MaterialComposition material={material} /></dd>
-            </>
-          ) : null}
-          {sizes ? (
-            <>
-              <dt>치수</dt>
-              <dd>{sizes}{(product.sizeChart || "").trim() ? " — 위 표 참조" : ""}</dd>
-            </>
-          ) : (
-            <>
-              <dt>치수</dt>
-              <dd>수치표 미제공 — 착용컷으로 확인</dd>
-            </>
-          )}
-          {origin ? (
-            <>
-              <dt>원산지</dt>
-              <dd>{origin}</dd>
-            </>
-          ) : null}
-          {manufacturer ? (
-            <>
-              <dt>제조사</dt>
-              <dd>{manufacturer}</dd>
-            </>
-          ) : null}
-        </dl>
-      </SceneSection>
-
       {/* ── Scene 6 DECISION — 옵션 · 상태 · 구매 (Glass ③ — 불투명 패널) ── */}
       <div ref={decisionRef}>
         <SceneSection id="scene6" kicker="Decision" title="구매">
@@ -564,8 +442,6 @@ export default function ProductPage() {
             {stockUi.countLabel ? (
               <p className={styles.stockCount}>{stockUi.countLabel}</p>
             ) : null}
-            <p className={styles.price}>{won(product.price)}</p>
-
             {/* ── §34 구매 CTA 상태 — OPTIONS_REQUIRED / READY / OUT_OF_STOCK / VALIDATING /
                 ERROR(+ 데이터 미스테이징 quiet path). 단일 disabled 남발 금지 ── */}
             {stockValidating && effBuy !== "soldout" ? (
@@ -633,7 +509,63 @@ export default function ProductPage() {
         </SceneSection>
       </div>
 
-      {/* ── 상품 정보 ── */}
+      {/* ── MATERIAL — 소재가 확인된 상품만 렌더한다 (§12·§14: UNKNOWN·보강 중 문구 금지) ── */}
+      {materialKnown ? (
+        <SceneSection id="scene3" kicker="Material" title="소재">
+          <div className={styles.materialBlock}>
+            <MaterialComposition material={material} />
+          </div>
+          <TonePanel fit={fit} />
+        </SceneSection>
+      ) : null}
+
+      {/* ── FIT — 치수·모델·내 핏 (중복 대형 이미지 제거 — 대표컷은 Scene 1).
+          확인된 내용이 없으면 섹션 헤더만 남기지 않는다 (§33 빈 헤더 금지) ── */}
+      {(clean(product.modelInfo) || (clean(product.sizeChart) && (product.sizeChart || "").trim()) || fitInterp) ? (
+      <SceneSection id="scene4" kicker="Fit" title="핏">
+        {clean(product.modelInfo) ? (
+          <p className={styles.lede}>모델 {clean(product.modelInfo)}</p>
+        ) : null}
+        {(product.sizeChart || "").trim() && clean(product.sizeChart) ? (
+          <SizeTable raw={product.sizeChart!} />
+        ) : null}
+        {/* 개인 해석층 — 상품 사실(위) 아래에서 FACT → CONTEXT → INTERPRETATION →
+            LIMITATION 순서 유지. 결과는 상품 설명을 대체하지 않는다 (§21) */}
+        {fitInterp && fitInterp.evidence !== "UNAVAILABLE" ? (
+          <div className={styles.yourFit}>
+            <p className={styles.yourFitKicker}>Your fit</p>
+            <p className={styles.yourFact}>{fitInterp.productFact}</p>
+            {/* TASK 9 (Session J): 치수 컨텍스트를 라벨·값 두 줄로 분리 (구 "내 설정" 접두사 폐지) */}
+            <p className={styles.yourFitDimsLabel}>{MY_DIMENSIONS_LABEL}</p>
+            <p className={styles.yourFitDims}>{fitInterp.yourContext}</p>
+            <p className={styles.yourFitText}>{fitInterp.interpretation}</p>
+            {fitInterp.sizeHint ? <p className={styles.yourFitNote}>{fitInterp.sizeHint}</p> : null}
+            <p className={styles.yourFitNote}>{fitInterp.limitation}</p>
+            <button className={styles.yourFitEntry} style={{ marginTop: 14 }} onClick={() => setShowFitFlow(true)}>
+              수정하기 →
+            </button>
+          </div>
+        ) : fitInterp ? (
+          <div className={styles.yourFit}>
+            <p className={styles.yourFitKicker}>Your fit</p>
+            <p className={styles.yourFitText}>{fitInterp.interpretation}</p>
+            <button className={styles.yourFitEntry} style={{ marginTop: 14 }} onClick={() => setShowFitFlow(true)}>
+              스마트 핏 →
+            </button>
+          </div>
+        ) : null}
+      </SceneSection>
+      ) : null}
+
+      {showFitFlow && (
+        <SmartFitFlow
+          onClose={() => setShowFitFlow(false)}
+          product={fitInput}
+          needCategory={fitCategory === "bottom" ? "bottom" : "top"}
+        />
+      )}
+
+      {/* ── INFO 상품 정보 — 확인된 사실만, 하나로 통합 (§17 가독 구조) ── */}
       <SceneSection id="facts" kicker="Info" title="상품 정보">
         <dl className={styles.facts}>
           {materialKnown ? (
@@ -642,21 +574,22 @@ export default function ProductPage() {
               <dd><MaterialComposition material={material} /></dd>
             </>
           ) : null}
+          {sizes ? (
+            <>
+              <dt>치수</dt>
+              <dd>{sizes}{(product.sizeChart || "").trim() ? " — 위 표 참조" : ""}</dd>
+            </>
+          ) : null}
           {washing ? (
             <>
               <dt>세탁 안내</dt>
               <dd>{washing}</dd>
             </>
-          ) : carePending ? (
-            <>
-              <dt>세탁 안내</dt>
-              <dd>세탁 정보 확인 중 — 확인되는 대로 이 자리에 안내해 드립니다.</dd>
-            </>
           ) : null}
-          {origin ? (
+          {originDisplay(origin) ? (
             <>
               <dt>원산지</dt>
-              <dd>{origin}</dd>
+              <dd>{originDisplay(origin)}</dd>
             </>
           ) : null}
           {manufacturer ? (
@@ -679,7 +612,7 @@ export default function ProductPage() {
           {product.notice?.as ? (
             <>
               <dt>문의</dt>
-              <dd>{noticeAsText(product.notice.as)}</dd>
+              <dd className={styles.inquiry}>{noticeAsText(product.notice.as)}</dd>
             </>
           ) : null}
         </dl>

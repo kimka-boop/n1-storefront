@@ -72,7 +72,7 @@ export async function fetchCatalog(): Promise<CatalogProduct[]> {
       madeAt: r.get("제조연월") || "",
       colorSize: "상세페이지 참조",
       quality: "전자상거래 법에 규정되어 있는 소비자 청약철회 가능 범위를 준수합니다.",
-      as: "N°1 고객센터 (상품 문의는 화면 상단의 문의 아이콘을 이용해 주세요)",
+      as: "N°1 고객센터\n상품 문의는 화면 상단의 문의 아이콘을 이용해 주세요.",
     },
     colorOptions: (r.get("색상옵션") || "").split(",").map((s: string) => s.trim()).filter(Boolean),
     sizeOptions: (r.get("사이즈옵션") || "").split(",").map((s: string) => s.trim()).filter(Boolean),

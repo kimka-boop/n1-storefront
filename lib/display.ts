@@ -73,10 +73,11 @@ export function washingText(value?: string): string {
 }
 
 /** 문의 안내 문구 (Owner 승인 표기 — 상단 유틸리티 문의 아이콘 위치 안내)
- *  2026-09-10 Storefront Repair: 하단 플로팅 FAB이 상단 분할 글래스 유틸리티로 이동함에 따라
- *  "페이지 하단 좌측 말풍선 아이콘" 안내는 더 이상 사실이 아니다 — 상단 기준으로 갱신. */
+ *  Mobile Emergency Repair(2026-09-10): 두 줄 자연 문장 형식으로 정리 —
+ *  "N°1 고객센터 / 상품 문의는 화면 상단의 문의 아이콘을 이용해 주세요."
+ *  구 하단 말풍선 안내는 더 이상 사실이 아니다. */
 const AS_NEW =
-  "N°1 고객센터 (상품 문의는 화면 상단의 문의 아이콘을 이용해 주세요)";
+  "N°1 고객센터\n상품 문의는 화면 상단의 문의 아이콘을 이용해 주세요.";
 
 export function noticeAsText(value?: string): string {
   const v = (value || "").trim();
@@ -90,6 +91,23 @@ export function categoryShort(category?: string): string {
   if (!v) return "";
   const parts = v.split("-");
   return parts[parts.length - 1] || v;
+}
+
+/** 원산지 표기 정규화 (Mobile Emergency Repair §16):
+ *  공급사 원문 "수입산 / 아시아 / 중국" → 고객 노출은 마지막 국가 "중국".
+ *  계층 나열은 중복 정보 — 원문은 시트/출처 컬럼에 그대로 보존된다.
+ *  "상세정보별도표기" 등 실제 국가가 아닌 값은 "" (정직 생략). 절대 국가를 만들지 않는다. */
+export function originDisplay(raw?: string): string {
+  const v = (raw || "").trim();
+  if (!v || v.toUpperCase() === "UNKNOWN" || v === "상세정보별도표기") return "";
+  const segments = v.split("/").map((s) => s.trim()).filter(Boolean);
+  if (!segments.length) return "";
+  const last = segments[segments.length - 1];
+  // 마지막 세그먼트가 국가로 쓸 수 없는 일반 어휘면 원문 유지 (창작 금지)
+  if (/수입산|아시아|유럽|기타|상세|표기|별도/.test(last)) {
+    return segments.length > 1 ? segments[segments.length - 2] : "";
+  }
+  return last;
 }
 
 /* ────────────────────────────────────────────────────────────

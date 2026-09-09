@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/components/CartProvider";
 import { cartItemKey, colorDisplayLabel } from "@/lib/cart";
 import { getShippingFee, clearBuyNow } from "@/lib/checkout";
+import { CartIcon } from "@/components/Icons";
 
 export default function CartDrawer() {
   const { items, ready, open, setOpen, remove, setQty, subtotal, count } = useCart();
@@ -80,9 +81,14 @@ export default function CartDrawer() {
         </div>
 
         {items.length === 0 ? (
+          /* §20 — 빈 카트도 설계된 상태: 상중앙 정렬 + 아이콘 + 의도 있는 CTA */
           <div className="cart-empty">
-            <p>장바구니가 비어 있습니다.</p>
-            <Link href="/" className="cart-empty-link" onClick={() => setOpen(false)}>
+            <span className="cart-empty-icon" aria-hidden="true">
+              <CartIcon size={26} />
+            </span>
+            <p className="cart-empty-title">장바구니가 비어 있습니다.</p>
+            <p className="cart-empty-sub">마음에 드는 조각을 골라 담아 보세요.</p>
+            <Link href="/" className="cart-empty-cta" onClick={() => setOpen(false)}>
               컬렉션 보러가기 →
             </Link>
             {hasPending && (
