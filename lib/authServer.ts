@@ -103,11 +103,30 @@ export async function verifyPassword(
 
 /* ─────────────────────────── store ─────────────────────────── */
 
+/** §11 — 회원 주소(구조화). 주문 스냅샷과 분리된 기본 주소 (미션 §12: 주문 행은 주문 시점 주소 보존) */
+export interface MemberAddress {
+  postalCode: string;
+  roadAddress: string;
+  detailAddress: string;
+}
+
+export function sanitizeMemberAddress(raw: unknown): MemberAddress | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const r = raw as Record<string, unknown>;
+  const postalCode = String(r.postalCode ?? r.postal_code ?? "").replace(/\D/g, "").slice(0, 5);
+  const roadAddress = String(r.roadAddress ?? r.road_address ?? "").trim();
+  const detailAddress = String(r.detailAddress ?? r.detail_address ?? "").trim();
+  if (!postalCode && !roadAddress) return undefined; // 부분 입력만으로는 주소로 인정하지 않는다
+  if (!postalCode || !roadAddress) return undefined;
+  return { postalCode, roadAddress, detailAddress };
+}
+
 export interface Account {
   username: string; // 정규형
   email: string; // 정규형
   hash: string; // s1 또는(레거시 행) 구버전
   profile: { gender: string; size: string; fit: string };
+  address?: MemberAddress;
   createdAt: string;
   emailVerified: boolean;
   /** 이메일 인증 필수 정책 하의 미인증 계정 — true면 로그인이 403 EMAIL_NOT_VERIFIED로 게이트된다.
@@ -131,6 +150,8 @@ export interface AuthPersistence {
   markVerified?(email: string): Promise<void>;
   /** 대기 중인 계정의 이메일 수정 (오타 정정) — 유일성은 호출자(AuthStore)가 보장 */
   updateEmail?(oldEmail: string, newEmail: string): Promise<void>;
+  /** 기본 주소 갱신 (§11) — null이면 주소 공백화 */
+  updateAddress?(email: string, address: MemberAddress | null): Promise<void>;
 }
 
 export type RegisterResult =
@@ -165,6 +186,7 @@ export class AuthStore {
     email: unknown;
     password: unknown;
     profile: Partial<FitWire> | undefined;
+    address?: unknown;
   }): Promise<RegisterResult> {
     const u = validateUsername(input.username);
     if (u.ok === false) return { ok: false, status: 400, error: u.error };
@@ -200,6 +222,7 @@ export class AuthStore {
         size: String(wire.size || ""),
         fit: String(wire.fit),
       },
+      address: sanitizeMemberAddress(input.address),
       createdAt: new Date().toISOString(),
       emailVerified: false,
       // 이메일 인증 필수 정책 — 모든 신규 가입은 인증 대기로 생성되며,
@@ -391,6 +414,24 @@ export class AuthStore {
     account.profile = next;
     await this.persist.updateProfile?.(email, reset ? null : next);
     return { ok: true, profile: next };
+  }
+
+  /** 기본 주소 갱신 (§11) — 주문 스냅샷과 무관(§12: 과거 주문 불변) */
+  async updateAddress(
+    token: unknown,
+    address: unknown,
+  ): Promise<{ ok: boolean; status?: number; error?: string; address?: MemberAddress | null }> {
+    const email = this.sessionEmail(token);
+    if (!email) return { ok: false, status: 401, error: "로그인 필요" };
+    const account = this.byEmail.get(email);
+    if (!account) return { ok: false, status: 401, error: "로그인 필요" };
+    const next = sanitizeMemberAddress(address) ?? null;
+    if (address && !next) {
+      return { ok: false, status: 400, error: "우편번호와 도로명 주소를 모두 입력해 주세요" };
+    }
+    account.address = next ?? undefined;
+    await this.persist.updateAddress?.(email, next);
+    return { ok: true, address: next };
   }
 
   /** 테스트·재시작 시딩용 — 영구 저장소에서 메모리로 적재(중복 행은 정직하게 거부).

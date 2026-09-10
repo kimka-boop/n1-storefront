@@ -27,6 +27,9 @@ import {
   currentOrderStatusLabel,
 } from "@/lib/returnRequest";
 import { sendTelegramMessage } from "@/lib/telegram";
+import { emitHermesEvent } from "@/lib/hermesEvents";
+import { sendReturnApprovalRequest } from "@/lib/telegramOps";
+import { returnWindowOf } from "@/lib/returnPolicy";
 import { clientSafeFailure, logInternal } from "@/lib/errorSanitize";
 
 export const dynamic = "force-dynamic";
@@ -78,6 +81,43 @@ export async function POST(req: Request) {
     if (result.ok === false) {
       return NextResponse.json({ ok: false, error: result.error }, { status: result.status });
     }
+
+    // §41·§42 — 접수 이벤트 + 오너 승인 카드(결제발주센터 봇). best-effort — 접수 자체는 완료.
+    try {
+      const orderRecord = await findOrderById(doc, body?.order_id);
+      await emitHermesEvent(() => getDoc(), {
+        eventType: "RETURN_REQUESTED",
+        orderId: body?.order_id,
+        payload: {
+          request_id: result.request_id,
+          channel: String(result.request?.channel || body?.token ? "member" : "guest"),
+          reason_code: String(body?.reason_code || ""),
+        },
+      });
+      if (orderRecord) {
+        const win = returnWindowOf(String(orderRecord.raw?.["도착시각"] || ""));
+        await sendReturnApprovalRequest({
+          requestId: result.request_id,
+          orderId: String(body?.order_id || ""),
+          customerType: orderRecord.raw?.["고객유형"] || (orderRecord.customerId.startsWith("C-") ? "MEMBER" : "GUEST"),
+          productDesc: (() => {
+            try {
+              const items = JSON.parse(orderRecord.itemsJson || "[]");
+              return items.map((i: { name?: string; sku?: string }) => `${i.name || i.sku}`).join(", ").slice(0, 80);
+            } catch { return orderRecord.itemsJson.slice(0, 80); }
+          })(),
+          amount: orderRecord.total,
+          shipStatus: orderRecord.shipStatus,
+          deliveredAt: String(orderRecord.raw?.["도착시각"] || ""),
+          requestedAt: new Date().toISOString(),
+          customerReason: String(body?.note || body?.reason_code || ""),
+          hermesVerdict: win.windowLabel || "상태 확인 후 판정",
+        });
+      }
+    } catch (e) {
+      console.warn("[return-request] 승인 카드/이벤트 실패 (접수 유지):", (e as Error).message);
+    }
+
     return NextResponse.json({
       ok: true,
       request_id: result.request_id,

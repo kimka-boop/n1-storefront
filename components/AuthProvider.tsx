@@ -43,10 +43,12 @@ interface AuthState {
   token: string | null;
   email: string | null;
   username: string | null;
+  /** §11 — 회원 기본 주소(구조화). 주문 스냅샷과 분리(§12) */
+  address: { postalCode: string; roadAddress: string; detailAddress: string } | null;
   /** 이메일 인증 대기(신규 정책의 미인증 계정) — 서버 응답의 verificationRequired만 반영한다 */
   pending: boolean;
   fit: FitContext | null; // Fit Context V2 — 게스트/회원 공용 단일 진실
-  login: (token: string, email: string, serverProfile?: unknown, username?: string | null, pending?: boolean) => void;
+  login: (token: string, email: string, serverProfile?: unknown, username?: string | null, pending?: boolean, serverAddress?: unknown) => void;
   setPending: (pending: boolean) => void;
   logout: () => void;
   saveFit: (ctx: FitContext) => void;
@@ -55,7 +57,7 @@ interface AuthState {
 }
 
 const AuthCtx = createContext<AuthState>({
-  token: null, email: null, username: null, pending: false, fit: null,
+  token: null, email: null, username: null, address: null, pending: false, fit: null,
   login: () => {}, setPending: () => {}, logout: () => {}, saveFit: () => {}, resetFit: () => {}, ready: false,
 });
 
@@ -65,6 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [username, setUsername] = useState<string | null>(null);
   const [pending, setPendingState] = useState(false);
   const [fit, setFit] = useState<FitContext | null>(null);
+  const [address, setAddress] = useState<AuthState["address"]>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -77,7 +80,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // 클라이언트 저장값은 참고용으로 시작하고, 응답이 진실로 덮어쓴다.
       fetch(`/api/auth?token=${encodeURIComponent(t)}`)
         .then((r) => (r.ok ? r.json() : null))
-        .then((d) => { if (d && d.ok) setPendingState(Boolean(d.verificationRequired) && !d.emailVerified); })
+        .then((d) => {
+          if (d && d.ok) {
+            setPendingState(Boolean(d.verificationRequired) && !d.emailVerified);
+            setAddress(d.address ?? null); // §11 — 서버 기본 주소 readback
+          }
+        })
         .catch(() => {});
     }
     // 회원이면 기기 슬롯(localStorage)에서, 게스트면 세션 저장소에서만 읽는다 —
@@ -105,8 +113,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const login = (tk: string, em: string, serverProfile?: unknown, un?: string | null, pending?: boolean) => {
+  const login = (tk: string, em: string, serverProfile?: unknown, un?: string | null, pending?: boolean, serverAddress?: unknown) => {
     setToken(tk); setEmail(em); setUsername(un ?? null);
+    setAddress((serverAddress as AuthState["address"]) ?? null);
     // 인증 필수 정책 — 서버가 판정한 대기 상태만 반영한다(클라이언트 제출값 무관)
     setPendingState(Boolean(pending));
     localStorage.setItem("n1_auth_token", tk);
@@ -139,7 +148,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
-    setToken(null); setEmail(null); setUsername(null); setPendingState(false);
+    setToken(null); setEmail(null); setUsername(null); setPendingState(false); setAddress(null);
     localStorage.removeItem("n1_auth_token");
     localStorage.removeItem("n1_auth_email");
     localStorage.removeItem("n1_auth_username");
@@ -179,7 +188,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthCtx.Provider
-      value={{ token, email, username, pending, fit, login, setPending, logout, saveFit, resetFit, ready }}
+      value={{ token, address, email, username, pending, fit, login, setPending, logout, saveFit, resetFit, ready }}
     >
       {children}
     </AuthCtx.Provider>

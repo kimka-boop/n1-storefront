@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { useCart } from "@/components/CartProvider";
+import { PostcodeSearch, emptyAddress, type AddressValue } from "@/components/PostcodeSearch";
 import { colorDisplayLabel } from "@/lib/cart";
 import { getShippingFee, takeBuyNow, clearBuyNow } from "@/lib/checkout";
 import { getPaymentMethods } from "@/lib/payments";
@@ -118,6 +119,8 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
   const [source, setSource] = useState<Source>("cart");
   const [loaded, setLoaded] = useState(false);
   const [form, setForm] = useState<CheckoutForm>(EMPTY_FORM);
+  // §11 — 우편번호 찾기(다음 우편번호) 연동 구조화 주소. 필드는 직접 수정 가능.
+  const [addr, setAddr] = useState<AddressValue>(emptyAddress());
   const [payMethod, setPayMethod] = useState("bank_transfer");
   const [reviewed, setReviewed] = useState(false); // ④ 최종 주문 검토 확인
   const [submitting, setSubmitting] = useState(false);
@@ -164,6 +167,17 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
     }
   }, [stage, authToken, authEmail]);
 
+  // 구조화 주소 폼 동기화 — pending 복원(legacy flat) 이후에도 우편번호 검색 컴포넌트가 값을 공유
+  useEffect(() => {
+    if (stage !== "form") return;
+    setAddr((a) =>
+      a.postalCode === form.postal_code && a.roadAddress === form.address1
+        ? a
+        : { postalCode: form.postal_code, roadAddress: form.address1, jibunAddress: "", detailAddress: form.address2 }
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage, loaded]);
+
   const subtotal = useMemo(() => lines.reduce((s, i) => s + i.unit_price * i.qty, 0), [lines]);
   const fee = getShippingFee(subtotal);
   const finalTotal = subtotal + fee;
@@ -174,6 +188,13 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
     setError("");
     try {
       const isMember = Boolean(authToken && form.email);
+      // §13 — 게스트도 주문 확인 이메일 수신용 이메일을 필수로 수집한다
+      const emailOk = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email.trim());
+      if (!emailOk) {
+        setError("주문 안내를 받을 이메일 주소를 입력해 주세요.");
+        setSubmitting(false);
+        return;
+      }
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -181,12 +202,12 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
           customer: {
             name: form.name,
             phone: form.phone,
-            postal_code: form.postal_code,
-            address1: form.address1,
-            address2: form.address2,
+            postal_code: addr.postalCode,
+            address1: addr.roadAddress,
+            address2: addr.detailAddress,
             delivery_memo: form.delivery_memo,
             depositor: form.depositor || form.name,
-            email: isMember ? form.email : undefined,
+            email: form.email, // 게스트도 주문 이메일은 저장 (§13·§15·§62)
             member: isMember,
           },
           items: lines.map((i) => ({ sku: i.sku, color: i.color, size: i.size, qty: i.qty })),
@@ -324,22 +345,19 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
               <section className="checkout-section">
                 <h2 className="checkout-step">2 · 주문자 · 배송 정보</h2>
                 <div className="checkout-fields">
-                  <input placeholder="주문자명" autoComplete="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                  <input placeholder="받는 분 성함" autoComplete="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
                   <input placeholder="연락처 (010-0000-0000)" type="tel" inputMode="tel" autoComplete="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-                  <input
-                    className="addr-postal"
-                    placeholder="우편번호 (5자리)"
-                    inputMode="numeric"
-                    autoComplete="postal-code"
-                    maxLength={5}
-                    value={form.postal_code}
-                    onChange={(e) => setForm({ ...form, postal_code: e.target.value.replace(/[^\d]/g, "").slice(0, 5) })}
+                  {/* §11 — 우편번호 찾기 → 공식 주소 선택 → 상세 직접 입력 (필드 직접 수정 가능) */}
+                  <PostcodeSearch
+                    value={addr}
+                    onChange={(next) => {
+                      setAddr(next);
+                      setForm((f) => ({ ...f, postal_code: next.postalCode, address1: next.roadAddress, address2: next.detailAddress }));
+                    }}
                   />
-                  <input placeholder="기본 주소 (도로명/지번)" autoComplete="address-line1" value={form.address1} onChange={(e) => setForm({ ...form, address1: e.target.value })} />
-                  <input placeholder="상세 주소 (동·호수 등 — 선택)" autoComplete="address-line2" value={form.address2} onChange={(e) => setForm({ ...form, address2: e.target.value })} />
                   <input placeholder="배송 메모 (선택 — 문 앞 배송 등)" value={form.delivery_memo} onChange={(e) => setForm({ ...form, delivery_memo: e.target.value })} />
                   <input
-                    placeholder={authToken ? "이메일 (회원 계정)" : "이메일 (선택 — 주문 조회용)"}
+                    placeholder={authToken ? "이메일 (회원 계정)" : "이메일 (필수 — 주문 확인 안내용)"}
                     type="email"
                     inputMode="email"
                     autoComplete="email"
@@ -397,8 +415,8 @@ export default function CheckoutFlow({ stage }: { stage: "form" | "payment" | "p
                 <button
                   className="checkout-btn"
                   disabled={
-                    submitting || !reviewed || !form.name || !form.phone ||
-                    !/^\d{5}$/.test(form.postal_code) || !form.address1 ||
+                    submitting || !reviewed || !form.name || !form.phone || !form.email.trim() ||
+                    !/^\d{5}$/.test(addr.postalCode) || !addr.roadAddress ||
                     !methods.find((m) => m.id === payMethod)?.available
                   }
                   onClick={submitOrder}

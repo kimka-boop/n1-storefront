@@ -26,6 +26,7 @@ import SmartFitFlow from "@/components/SmartFitFlow";
 import { useAuth } from "@/components/AuthProvider";
 import { useCart } from "@/components/CartProvider";
 import { stashBuyNow } from "@/lib/checkout";
+import { PDP_SHIPPING_COPY } from "@/lib/businessRules";
 import type { CartItem } from "@/lib/cart";
 import { PRODUCT_STORY } from "@/lib/productContent";
 import { mediaFor } from "@/lib/media";
@@ -623,6 +624,14 @@ export default function ProductPage() {
               </dd>
             </>
           ) : null}
+          {/* §18 — 모든 PDP에 배송 섹션. 정책·출고 행동은 검증된 사실만 (SLA 날조 금지).
+               카피 단일 소스: lib/businessRules PDP_SHIPPING_COPY */}
+          <dt>배송</dt>
+          <dd className={styles.quality}>
+            {PDP_SHIPPING_COPY.map((line, i) => (
+              <p key={i}>{line}</p>
+            ))}
+          </dd>
           {product.notice?.as ? (
             <>
               <dt>문의</dt>

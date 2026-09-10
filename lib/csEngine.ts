@@ -37,6 +37,8 @@ import {
 } from "@/lib/csStore";
 import { testId, testPrefix } from "@/lib/cs";
 import { fetchCatalog, matchCatalogProduct, type CatalogProduct } from "@/lib/catalog";
+import { productColors } from "@/lib/experience";
+import { returnWindowOf } from "@/lib/returnPolicy";
 import {
   findOrderById,
   findOrdersByCustomerEmail,
@@ -62,6 +64,8 @@ export interface ChatEngineResult {
 // ───────────────────── 인텐트 키워드 ─────────────────────
 
 const ORDER_INTENT = /(주문|배송|송장|택배|언제|조회|도착|출고)/;
+// §28–29 — 일반 제품정보 의도 ("제품 정보 알려주세요") + 품번 직접 언급
+const PRODUCT_INFO_INTENT = /((제품|상품|이거|그거)\s*(정보|알려|뭐|어때|어떻게\s*되)|정보를?\s*알려주|품번\s*(알려|뭐)|PRD-N1-\d{2})/;
 const SIZE_INTENT = /(사이즈|치수|실측|핏|크기|오버|슬림|정핏|키|몸무게)/;
 const MATERIAL_INTENT = /(소재|재질|빨래|세탁|드라이|혼용|안감|비침|두께|신축)/;
 const PRICE_INTENT = /(가격|얼마|재고|재입고|구매|살\s*수|할인\s*중|품절)/;
@@ -174,7 +178,11 @@ export async function handleCustomerMessage(
 
   // ── 2. 권한 경계 (미션 §23)
   const decision = classifyEscalation(text, session.orderRefs.length > 0);
-  if (decision.escalate) {
+  // §34 — 환불·반품 의지는 자동 에스컬레이션보다 워크플로 시작이 우선이다:
+  // 회원은 본인 주문 확인 경로를, 게스트는 본인확인 안내를 먼저 받는다 (§35·§36).
+  // 상담원 연결은 워크플로 응답 안내 또는 명시적 "전문 상담원" 요청으로 이어진다.
+  const isReturnIntent = POLICY_RETURN_INTENT.test(text);
+  if (decision.escalate && !isReturnIntent) {
     return escalateSession(session, decision.reason!);
   }
 
@@ -303,6 +311,11 @@ async function buildTopicalAnswer(session: CsSession, text: string): Promise<Top
     return { reply: "주문번호를 알려주시면 바로 상태를 확인해드릴게요. (예: 주문번호 12345)" };
   }
 
+  // §28–29 — 일반 제품정보 요청: Product Master 기반 전체 요약 (6–10그룹)
+  if (PRODUCT_INFO_INTENT.test(text)) {
+    return productAnswer(session, text, { size: false, material: false, price: false, fullInfo: true });
+  }
+
   // 상품 문의 — 주문 컨텍스트의 상품 우선 (미션 §37: 다시 묻지 않는다)
   if (SIZE_INTENT.test(text) || MATERIAL_INTENT.test(text) || PRICE_INTENT.test(text)) {
     return productAnswer(session, text, {
@@ -312,8 +325,43 @@ async function buildTopicalAnswer(session: CsSession, text: string): Promise<Top
     });
   }
 
-  // 정책 안내 (확정 텍스트만)
+  // §34 — 환불/반품 의지는 워크플로 시작만 한다 (실행은 안전 경계에서)
   if (POLICY_RETURN_INTENT.test(text)) {
+    // §35 — 인증 회원: 본인 최근 주문만 조회해 카드로 제시
+    if (session.customer.type === "MEMBER" && session.customer.email) {
+      try {
+        const doc = await getDoc();
+        const orders = await findOrdersByCustomerEmail(doc, session.customer.email, 5);
+        if (orders.length === 0) {
+          return { reply: `반품·환불 도와드릴게요. 다만 최근 주문내역을 찾지 못했습니다. 주문번호를 알려주시면 바로 확인해드릴게요.\n\n${POLICY_RETURN}` };
+        }
+        const cards = orders.map((o) => {
+          const win = returnWindowOf(String(o.raw?.["도착시각"] || ""));
+          const lines = (safeParseItems(o.itemsJson || "[]") as Array<{ sku?: string; name?: string; color?: string }>)
+            .slice(0, 2)
+            .map((i) => `${i.name || i.sku}${i.color ? ` (${i.color})` : ""}`)
+            .join(", ");
+          return [
+            `· ${o.orderId} — ${o.shipStatus}`,
+            lines ? `  ${lines}` : "",
+            win.windowLabel ? `  ${win.windowLabel}` : "",
+          ].filter(Boolean).join("\n");
+        });
+        if (orders.length === 1) {
+          session.orderRefs.push(orders[0].orderId);
+          return { reply: `반품·환불 도와드릴게요. 최근 주문을 찾았어요.\n\n${cards[0]}\n\n이 주문에 대한 반품·환불이 맞을까요? 사유를 함께 알려주시면 접수를 진행할게요.` };
+        }
+        return { reply: `반품·환불 도와드릴게요. 어떤 주문에 대한 문의인가요?\n\n${cards.join("\n\n")}\n\n${POLICY_RETURN}` };
+      } catch {
+        // 조회 실패 — 정책 안내로 폴백 (실패를 숨기지 않는다)
+      }
+    }
+    // §36 — 게스트: 무단 주문 열람 없이 본인 확인 경로만 안내
+    if (session.customer.type === "GUEST") {
+      return {
+        reply: `반품·환불 도와드릴게요. 비회원 주문은 본인 확인이 필요해요 — 주문번호와 주문 때 입력한 연락처를 알려주시거나, [주문 조회 · 반품/교환] 화면에서 본인 확인 후 요청할 수 있습니다.\n\n${POLICY_RETURN}`,
+      };
+    }
     return { reply: `반품·환불 안내입니다.\n\n${POLICY_RETURN}\n\n실제 반품·환불 처리는 상담원을 통해 진행됩니다 — 원하시면 연결해드릴게요.` };
   }
   if (POLICY_EXCHANGE_INTENT.test(text)) {
@@ -339,9 +387,10 @@ function cleanField(v: string | undefined | null): string {
 async function productAnswer(
   session: CsSession,
   text: string,
-  wants: { size: boolean; material: boolean; price: boolean },
+  wants: { size: boolean; material: boolean; price: boolean; fullInfo?: boolean },
 ): Promise<TopicalAnswer> {
   let product: CatalogProduct | null = null;
+  let candidates: CatalogProduct[] = [];
   try {
     const catalog = await fetchCatalog();
     // 주문 컨텍스트 상품 우선 (항목이 1개뿐인 주문)
@@ -355,25 +404,86 @@ async function productAnswer(
         }
       } catch {}
     }
-    if (!product) product = matchCatalogProduct(catalog, text);
+    if (!product) {
+      // §29 — 정확 품번 우선, 없으면 이름 토큰 스코어로 후보 수집.
+      // 유일 후보면 응답, 복수 후보면 고객에게 선택을 요청한다 (지어내지 않는다).
+      const q = text.toUpperCase();
+      const exact = catalog.find((p) => p.id && q.includes(p.id.toUpperCase()));
+      if (exact) {
+        product = exact;
+      } else {
+        const scored = catalog
+          .map((p) => {
+            let score = 0;
+            for (const token of (p.name || "").split(/\s+/)) {
+              if (token.length >= 2 && text.includes(token)) score += token.length;
+            }
+            return { p, score };
+          })
+          .filter((x) => x.score > 0)
+          .sort((a, b) => b.score - a.score);
+        if (scored.length === 1) product = scored[0].p;
+        else if (scored.length > 1) candidates = scored.slice(0, 3).map((x) => x.p);
+      }
+    }
   } catch {
     return {
       reply: "지금 상품 정보를 바로 확인하기 어려워요. 상품명을 알려주시면 다시 확인해드릴게요.",
     };
   }
 
-  if (!product) {
-    // 어떤 상품인지 한 번만 확인 — 컨텍스트가 전혀 없을 때 (미션 §37)
-    return { reply: "어느 상품이 궁금하신가요? 상품명이나 품번(PRD-…)을 알려주시면 바로 확인해드릴게요." };
+  if (!product && candidates.length >= 2) {
+    const list = candidates.map((c) => `· ${c.name} (품번 ${c.id})`).join("\n");
+    return { reply: `어떤 상품인지 알려주시면 정확히 확인해드릴게요.\n\n${list}` };
   }
 
-  const head = `『${product.name}』`;
+  if (!product) {
+    // §29 — 매칭 없음: 없다고 정직하게 말한다 ( hallucination 금지)
+    return { reply: "해당 상품을 찾지 못했어요. 상품명이나 품번(PRD-…)을 다시 알려주시겠어요?" };
+  }
+
+  const head = `『${product.name}』(품번 ${product.id})`;
+  const clean = (v: string | undefined | null) => cleanField(v);
   const blocks: string[] = [];
 
+  if (wants.fullInfo) {
+    // §30 — 전체 요약: 실제 있는 필드만, 6–10개의 읽기 좋은 그룹.
+    blocks.push(`[가격] ${product.price.toLocaleString("ko-KR")}원`);
+    blocks.push(`[구매 가능 상태] ${clean(product.stockStatus) || "옵션별 재고 확인 중"}`);
+    const colors = productColors(product.colorOptions || []);
+    if (colors.length) blocks.push(`[색상] ${colors.map((c) => c.label).join(", ")}`);
+    if (product.sizeOptions?.length) blocks.push(`[사이즈] ${product.sizeOptions.join(", ")}`);
+    const fitShape = clean(product.fit?.shape);
+    if (fitShape) blocks.push(`[핏] ${fitShape}`);
+    const material = clean(product.material);
+    if (material) blocks.push(`[소재] ${material}`);
+    const props = [
+      product.fit?.thickness && `두께감 ${product.fit.thickness}`,
+      product.fit?.stretch && `신축성 ${product.fit.stretch}`,
+      product.fit?.sheer && `비침 ${product.fit.sheer}`,
+      product.fit?.lining && `안감 ${product.fit.lining}`,
+    ].filter(Boolean) as string[];
+    if (props.length) blocks.push(`[촉감·기능] ${props.join(" · ")}`);
+    const washing = washingText(clean(product.washingInfo));
+    if (washing) blocks.push(`[세탁/관리] ${washing}`);
+    blocks.push(
+      `[배송] 기본 배송비 3,000원 · 5만원 이상 구매 시 무료배송. 결제 또는 입금 확인 후 공급처 출고 일정에 따라 배송이 시작됩니다 — 배송이 시작되면 운송장과 함께 안내드려요.`,
+    );
+    const why = clean(product.whyThisProduct);
+    if (why) blocks.push(`[왜 이 제품인가] ${why}`);
+    return {
+      reply: `${head} 안내입니다.
+
+${blocks.join("\n\n")}
+
+원하시면 실측 사이즈나 핏도 같이 봐드릴게요.`,
+    };
+  }
+
   if (wants.size) {
-    const sizeChart = cleanField(product.sizeChart);
-    const modelInfo = cleanField(product.modelInfo);
-    const fitShape = cleanField(product.fit?.shape);
+    const sizeChart = clean(product.sizeChart);
+    const modelInfo = clean(product.modelInfo);
+    const fitShape = clean(product.fit?.shape);
     blocks.push(
       sizeChart
         ? `[실측 사이즈]\n${sizeChart}`
@@ -384,8 +494,8 @@ async function productAnswer(
     if (sizeChart) blocks.push("· 실측은 단면 기준(cm)이며 1~3cm 오차가 있을 수 있습니다.");
   }
   if (wants.material) {
-    const material = cleanField(product.material);
-    const washing = washingText(cleanField(product.washingInfo));
+    const material = clean(product.material);
+    const washing = washingText(clean(product.washingInfo));
     blocks.push(
       material
         ? `[소재] ${material}${washing ? `\n[세탁/취급] ${washing}` : ""}`
@@ -395,11 +505,13 @@ async function productAnswer(
   if (wants.price) {
     blocks.push(
       `[가격] ${product.price.toLocaleString("ko-KR")}원`,
-      `[재고 상태] ${cleanField(product.stockStatus) || "확인 중"}`,
+      `[재고 상태] ${clean(product.stockStatus) || "확인 중"}`,
     );
   }
 
-  return { reply: `${head} 안내입니다.\n\n${blocks.join("\n\n")}` };
+  return { reply: `${head} 안내입니다.
+
+${blocks.join("\n\n")}` };
 }
 
 // ───────────────────── escalation (미션 §24·§25·§26·§45) ─────────────────────

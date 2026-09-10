@@ -30,12 +30,13 @@ import {
   getDoc,
   getOrdersSheet,
   upsertCustomer,
-  ensureOrdersIdempotencyColumn,
-  ensureOrdersExtraColumns,
+  ensureOrdersContract,
+  ensurePostalCellTextFormat,
   findOrderByIdempotencyKey,
   findOrdersByMemberEmail,
 } from "@/lib/sheets";
 import { DEFAULT_PAYMENT_METHOD, resolveServerPaymentMethod } from "@/lib/payments";
+import { dispatchOrderEmail } from "@/lib/transactionalEmail";
 import { resolvePaymentProvider } from "@/lib/paymentProvider";
 import { createPaymentRequestForOrder } from "@/lib/paymentFlow";
 import { buildPaymentFlowDeps } from "@/lib/paymentFlowWiring";
@@ -142,14 +143,14 @@ async function createOrderRecord(body: OrderBody): Promise<CreateResult> {
   // 이전까지 시트 total은 상품금만이었으나, 결제 대금은 서버가 끝까지 계산하는 것이 계약이다
   // (근거 분해는 상품금액/배송비/할인 컬럼으로 함께 기록).
   let subtotal = 0;
-  const resolved: { sku: string; color: string; size: string; qty: number; unit_price: number; supplier: string; colorIndex: number; name: string }[] = [];
+  const resolved: { sku: string; color: string; size: string; qty: number; unit_price: number; supplier: string; supplier_product_id: string; colorIndex: number; name: string }[] = [];
   for (const it of items) {
     const p = pRows.find((r) => r.get("상품ID") === it.sku);
     if (!p) throw Object.assign(new Error(`존재하지 않는 상품: ${it.sku}`), { status: 400 });
     const price = Number(String(p.get("판매가") || "0").replace(/[^\d]/g, "")) || 0;
     const qty = Math.max(1, Math.min(10, Number(it.qty) || 1));
     subtotal += price * qty;
-    resolved.push({ sku: it.sku, color: it.color || "", size: it.size || "", qty, unit_price: price, supplier: String(p.get("공급사명") || ""), colorIndex: (typeof it.colorIndex === "number" ? it.colorIndex : -1), name: String(p.get("상품명") || it.sku) });
+    resolved.push({ sku: it.sku, color: it.color || "", size: it.size || "", qty, unit_price: price, supplier: String(p.get("공급사명") || ""), supplier_product_id: String(p.get("공급사코드") || ""), colorIndex: (typeof it.colorIndex === "number" ? it.colorIndex : -1), name: String(p.get("상품명") || it.sku) });
   }
   const shippingFee = getShippingFee(subtotal);
   const discount = 0;
@@ -235,9 +236,11 @@ async function createOrderRecord(body: OrderBody): Promise<CreateResult> {
       console.error("[orders] Orders 시트 탭을 찾지 못했습니다");
       throw Object.assign(new Error("주문 접수 중 문제가 발생했습니다"), { status: 500 });
     }
-    if (idempotencyKey) await ensureOrdersIdempotencyColumn(doc);
-    await ensureOrdersExtraColumns(doc);
-    await ordersSheet.addRow({
+    // ORD-0 수리 + 확장 컬럼 보장 — 한국어 계약 헤더 없으면 백업 탭 후 개명 마이그레이션
+    await ensureOrdersContract(doc);
+    // 우편번호 앞자리 0 보존 — 이후 row.save()가 행 전체를 USER_ENTERED 재기록하므로
+    // 셀 형식을 TEXT로 고정하지 않으면 "06236"이 재파싱되어 6236이 된다 (실측 결함).
+    const addedRow = await ordersSheet.addRow({
       "주문번호": orderId,
       "주문일시": now.toISOString(),
       "결제수단": paymentMethod,
@@ -248,11 +251,13 @@ async function createOrderRecord(body: OrderBody): Promise<CreateResult> {
       "고객명": customer.name,
       "연락처": customer.phone,
       "배송지": addr.full,
-      "우편번호": addr.postalCode,
+      "우편번호": addr.postalCode ? `'${addr.postalCode}` : "", // 앞자리 0 보존 (USER_ENTERED apostrophe = text 마커)
       "주소1": addr.address1,
       "주소2": addr.address2,
       "배송메모": addr.deliveryMemo,
-      "고객이메일": isMember ? String(customer.email) : "",
+      "고객이메일": String(customer.email || ""), // 게스트도 주문 안내 이메일 수신 (§13·§15)
+      "고객유형": isMember ? "MEMBER" : "GUEST", // §14 — 주문 행 자체에 고객 정체성 기록
+      "테스트구분": idPrefix === "TEST" ? "TEST_ONLY" : "",
       "주문출처": source === "buynow" ? "buynow" : "cart",
       "주문항목": JSON.stringify(resolved),
       "상품금액": String(subtotal),
@@ -265,9 +270,22 @@ async function createOrderRecord(body: OrderBody): Promise<CreateResult> {
       "배송상태": "접수",
       "택배사": "",
       "송장번호": "",
+      "공급사주문번호": "", // §17 — TestSupplierAdapter 바인딩 (PHASE G)
+      "공급사발주시각": "",
+      "출고시각": "",
+      "배송중시각": "",
+      "도착시각": "",
+      "최종배송확인시각": "",
+      "배송이메일발송시각": "",
+      "배송이메일상태": "",
       "CS메모": "",
       ...(idempotencyKey ? { "멱등키": idempotencyKey } : {}),
     });
+    try {
+      await ensurePostalCellTextFormat(ordersSheet, addedRow.rowNumber);
+    } catch (e) {
+      console.warn("[orders] 우편번호 TEXT 형식 지정 실패 (주문 흐름 유지):", (e as Error).message);
+    }
 
     // ── 7. 재고 차감 — PG 주문은 결제 검증 후로 이연, 무통장은 즉시 (미션 §19~22) ──
     if (paymentMethod === "bank_transfer") {
@@ -301,6 +319,36 @@ async function createOrderRecord(body: OrderBody): Promise<CreateResult> {
   const itemsDesc = resolved.map((r) => `${r.sku}(${r.color}${r.size ? " " + r.size : ""})x${r.qty}`).join(", ");
   if (paymentMethod === "bank_transfer") {
     await notifyNewOrder(orderId, customer.name!, payable, shipType, itemsDesc);
+  }
+
+  // §54·§62 — 주문 확인 이메일 (멱등 마커, bridge 큐). 실패가 주문을 바꾸지 않는다.
+  try {
+    const emailRecord = {
+      orderId,
+      orderTime: new Date().toISOString(),
+      paymentMethod,
+      paymentStatus: paymentMethod === "pg_card" ? "결제대기" : "입금대기",
+      depositor: customer.depositor || customer.name,
+      customerName: customer.name!,
+      customerPhone: customer.phone!,
+      customerAddress: addr.full,
+      customerId,
+      itemsJson: JSON.stringify(resolved),
+      total: payable,
+      shipType,
+      shipStatus: "접수",
+      carrier: "",
+      trackingNo: "",
+      csMemo: "",
+      raw: {
+        "고객이메일": String(customer.email || ""),
+        "상품금액": String(subtotal),
+        "배송비": String(shippingFee),
+      },
+    };
+    await dispatchOrderEmail(await getDoc(), emailRecord, "order_confirmation");
+  } catch (e) {
+    console.warn("[orders] 주문 확인 이메일 큐 실패 (주문 흐름 유지):", (e as Error).message);
   }
 
   // ── 10. 고객 응답 ──

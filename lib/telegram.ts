@@ -102,6 +102,13 @@ export async function sendTelegramLong(
 
 export interface TelegramUpdate {
   update_id: number;
+  /** §42 — inline 키보드 버튼 응답 (ops 승인 경로 전용; 일반 CS 폴링은 무시) */
+  callback_query?: {
+    id?: string | number;
+    data?: string;
+    message?: { message_id?: number; chat?: { id: number | string } };
+    from?: { id?: number; username?: string };
+  };
   message?: {
     message_id: number;
     text?: string;

@@ -110,6 +110,37 @@ export const bridgeEmailProvider: EmailProvider = {
 
 // ── 어댑터 해석 — 유일한 진입점 ──
 
+/** §54 — 주문 라이프사이클 트랜잭션 이메일 (bridge 큐 적재 전용) */
+export function queueBridgeTransactional(input: {
+  to: string;
+  subject: string;
+  text: string;
+  kind: string;
+  refId: string;
+}): EmailSendResult {
+  const dir = bridgeOutboundDir();
+  fs.mkdirSync(dir, { recursive: true });
+  const ref = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.json`;
+  fs.writeFileSync(
+    path.join(dir, ref),
+    JSON.stringify(
+      {
+        queuedAt: new Date().toISOString(),
+        kind: input.kind,
+        refId: input.refId,
+        to: input.to,
+        subject: input.subject,
+        text: input.text,
+        delivery: "bridge",
+      },
+      null,
+      2,
+    ),
+    "utf8",
+  );
+  return { ok: true, provider: "bridge", delivery: "bridge", ref };
+}
+
 export interface ResolvedEmailProvider {
   provider: EmailProvider;
   /** 실제 외부 전송이 가능한 상태인가 (가입 플로우의 발송 확신도 판단용) */

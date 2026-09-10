@@ -52,7 +52,7 @@ export async function findReturnRequestsByOrder(
     return rows
       .map((r) => {
         const record: Record<string, string> = {};
-        for (const key of Object.keys(sheet.headerValues || {})) record[key] = str(r.get(key));
+        for (const key of (sheet.headerValues || [])) record[key] = str(r.get(key));
         return record;
       })
       .filter((r) => r["주문번호"] === orderId)

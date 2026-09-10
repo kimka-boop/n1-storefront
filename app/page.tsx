@@ -30,6 +30,14 @@ import {
 } from "@/lib/experience";
 import { PRODUCT_STORY } from "@/lib/productContent";
 import {
+  WEEKLY_TAGLINE,
+  WEEKLY_CLOSE_LABEL,
+  WEEKLY_OPEN_LABEL,
+  FOOTER_LABEL,
+  PDP_SHIPPING_COPY,
+} from "@/lib/businessRules";
+import { PostcodeSearch, emptyAddress, type AddressValue } from "@/components/PostcodeSearch";
+import {
   genderKo,
   categoryShort,
   noticeQualityText,
@@ -157,9 +165,10 @@ function PolicyTabs() {
       <div className="policy-content">
         {tab === "shipping" && (
           <ul className="policy-list">
-            <li>· 파스토 당일출고 — <b>오후 1시 이전 결제 시 당일 출고</b> (전국 택배, 평균 1~3일 소요)</li>
+            {/* §18 — 검증되지 않은 SLA(당일출고)·할증액 절대 표기 금지. lib/businessRules 정직 카피 */}
+            <li>· {PDP_SHIPPING_COPY[0]}</li>
             <li>· 배송비: 기본 3,000원 — 5만원 이상 구매 시 무료배송</li>
-            <li className="policy-highlight">· 제주 및 도서·산간 지역은 3,000원의 추가 배송비가 발생합니다.</li>
+            <li className="policy-highlight">· {PDP_SHIPPING_COPY[2]}</li>
           </ul>
         )}
         {tab === "exchange" && (
@@ -224,15 +233,17 @@ export default function Home() {
   const [dDay, setDDay] = useState("");
 
   useEffect(() => {
+    // §4B — 릴리즈는 월요일 00:00 KST. 카운트다운도 다음 월요일을 겨냥한다.
+    // (1=Monday): 남은 일수 = (1 - day + 7) % 7, day==1이면 7일 뒤 차기 월요일.
     const calc = () => {
       const now = new Date();
       const day = now.getDay();
-      let daysLeft = (7 - day) % 7;
+      let daysLeft = (8 - day) % 7;
       if (daysLeft === 0) daysLeft = 7;
       const next = new Date(now);
       next.setDate(now.getDate() + daysLeft);
-      next.setHours(24, 0, 0, 0);
-      const diff = Math.floor((next.getTime() - now.getTime()) / 86400000);
+      next.setHours(0, 0, 0, 0);
+      const diff = Math.ceil((next.getTime() - now.getTime()) / 86400000);
       setDDay(daysLeft === 0 ? "D-DAY" : `D-${diff}`);
     };
     calc();
@@ -438,10 +449,14 @@ export default function Home() {
   const [selSize, setSelSize] = useState("");
   const [optTouched, setOptTouched] = useState(false);
   const [orderStage, setOrderStage] = useState<"options" | "form" | "done">("options");
-  const [orderForm, setOrderForm] = useState({ name: "", phone: "", address: "", depositor: "" });
+  const [orderForm, setOrderForm] = useState({ name: "", phone: "", email: "", depositor: "", memo: "" });
+  const [orderAddr, setOrderAddr] = useState<AddressValue>(emptyAddress());
   const [orderResult, setOrderResult] = useState<{ order_id: string; total: number; type: string; notice?: string; bank: string; account: string; holder: string } | null>(null);
   const [orderError, setOrderError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const quickOrderReady = Boolean(
+    orderForm.name.trim() && orderForm.phone.trim() && orderAddr.postalCode && orderAddr.roadAddress && orderAddr.detailAddress.trim()
+  );
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -584,7 +599,11 @@ export default function Home() {
           customer: {
             name: orderForm.name,
             phone: orderForm.phone,
-            address: orderForm.address,
+            email: orderForm.email.trim() || undefined,
+            postal_code: orderAddr.postalCode,
+            address1: orderAddr.roadAddress,
+            address2: orderAddr.detailAddress,
+            delivery_memo: orderForm.memo.trim() || undefined,
             depositor: orderForm.depositor || orderForm.name,
           },
           items: [{
@@ -621,7 +640,7 @@ export default function Home() {
     } finally {
       setSubmitting(false);
     }
-  }, [selected, orderForm, selColor, selSize, fetchProducts]);
+  }, [selected, orderForm, orderAddr, selColor, selSize, fetchProducts]);
 
   const closeDetail = () => setSelected(null);
   const nextSlide = (e?: React.MouseEvent) => { e?.stopPropagation(); setSlide((s) => (s + 1) % Math.max(slideIds.length, 1)); };
@@ -666,13 +685,13 @@ export default function Home() {
     <main>
       <header className="hero">
         <div className="hero-brand">
-          {/* §43 — 카피는 데이터를 따른다: 60 Pieces · 17 Outfits 카운트는 시트 기준 실시간 */}
+          {/* §43 — 카피는 데이터를 따른다: 60 Pieces · 20 Outfits 카운트는 시트 기준 실시간 */}
           <h1>N°1</h1>
           <p className="hero-tag">{products.length} Pieces · {pairs.length} Outfits</p>
-          <p className="hero-tagline">매주 일요일, 마음에 드는 몇 벌만 골라 보여드립니다</p>
+          <p className="hero-tagline">{WEEKLY_TAGLINE}</p>
         </div>
         <p className="hero-drop">
-          이번 컬렉션 마감 {dDay || "—"} · 매주 일요일 자정에 새 컬렉션이 열립니다
+          {WEEKLY_CLOSE_LABEL} {dDay || "—"} · {WEEKLY_OPEN_LABEL}
         </p>
       </header>
 
@@ -882,7 +901,7 @@ export default function Home() {
         </button>
       </section>
 
-      <footer>© N°1 — 매주 일요일, 새로운 컬렉션</footer>
+      <footer>{FOOTER_LABEL}</footer>
 
       {/* ── 빠른 주문 모달 (PDP 구매 진입점) ── */}
       {selected && (
@@ -993,12 +1012,16 @@ export default function Home() {
                 {orderStage === "form" && (
                   <div className="order-form">
                     <h4 className="order-form-title">주문 정보 입력</h4>
-                    <input className="order-input" placeholder="주문자명" value={orderForm.name}
+                    <input className="order-input" placeholder="받는 분 성함" value={orderForm.name}
                       onChange={(e) => setOrderForm({ ...orderForm, name: e.target.value })} />
                     <input className="order-input" placeholder="연락처 (010-0000-0000)" type="tel" value={orderForm.phone}
                       onChange={(e) => setOrderForm({ ...orderForm, phone: e.target.value })} />
-                    <input className="order-input" placeholder="배송지 주소" value={orderForm.address}
-                      onChange={(e) => setOrderForm({ ...orderForm, address: e.target.value })} />
+                    <input className="order-input" placeholder="이메일 (주문 안내 발송용)" type="email" value={orderForm.email}
+                      onChange={(e) => setOrderForm({ ...orderForm, email: e.target.value })} />
+                    {/* §13 — 구조화 주소: 우편번호 찾기 → 공식 주소 선택 → 상세 직접 입력 */}
+                    <PostcodeSearch value={orderAddr} onChange={setOrderAddr} compact />
+                    <input className="order-input" placeholder="배송 메모 (선택)" value={orderForm.memo}
+                      onChange={(e) => setOrderForm({ ...orderForm, memo: e.target.value })} />
                     <input className="order-input" placeholder="입금자명 (주문자명과 같으면 비워도 됨)" value={orderForm.depositor}
                       onChange={(e) => setOrderForm({ ...orderForm, depositor: e.target.value })} />
                     <p className="order-summary">
@@ -1009,7 +1032,7 @@ export default function Home() {
                     <div className="order-form-btns">
                       <button className="order-btn-back" onClick={() => setOrderStage("options")}>← 이전</button>
                       <button className="buy-btn order-btn-submit"
-                        disabled={submitting || !orderForm.name || !orderForm.phone || !orderForm.address}
+                        disabled={submitting || !quickOrderReady}
                         onClick={submitOrder}>
                         {submitting ? "처리 중..." : "주문하기 (계좌이체)"}
                       </button>
@@ -1034,7 +1057,7 @@ export default function Home() {
               </div>
               <div className="info-rows">
                 <div className="info-row"><span>품번</span><b>{selected.id}</b></div>
-                <div className="info-row"><span>배송</span><b>파스토 당일출고 (오후 1시 이전 결제 시)</b></div>
+                <div className="info-row"><span>배송</span><b>공급처 출고 일정에 따라 배송 시작 · 운송장 안내</b></div>
               </div>
 
               <div className="spec-block">

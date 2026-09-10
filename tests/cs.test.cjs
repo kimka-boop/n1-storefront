@@ -119,13 +119,16 @@ test('human takeover: AI stays silent and escalation is not duplicated', async (
   assert.equal(sess.status, 'HUMAN_ACTIVE');
 });
 
-// ── CASE 15: Telegram 실패 — 거짓 성공 없음
-test('telegram send failure is honest (no token → not sent)', async () => {
+// ── CASE 15: 환불 의지 — 워크플로 시작이 우선 (미션 §34·§36, 구계약 '무조건 에스컬레이션' 대체)
+//   게스트에게는 본인확인 경로만 안내된다 — 임의 주문 열람 없음, 거짓 성공 없음.
+test('refund intent starts the workflow honestly (guest ownership guidance, no fake escalation)', async () => {
   freshSession('#SESS_TEST_4');
   const r = await engine.handleCustomerMessage('#SESS_TEST_4', '환불해주세요');
-  assert.equal(r.escalated, true);
-  assert.ok(r.reply.includes('전문 상담원')); // 고객 안내는 상태를 정확히 표현
-  // 운영자 전송은 실패(토큰 미설정) — 시스템은 콘솔 경고만, 성공 위장 없음
+  assert.equal(r.escalated, false);
+  assert.ok(r.reply.includes('본인 확인') || r.reply.includes('주문번호')); // 게스트 본인확인 안내 (§36)
+  // 명시적 상담원 요청은 여전히 에스컬레이션 — 토큰 미설정이면 성공 위장 없음(콘솔 경고만)
+  const r2 = await engine.handleCustomerMessage('#SESS_TEST_4', '전문 상담원 연결해주세요');
+  assert.equal(r2.escalated, true);
 });
 
 // ── CASE 16: 프라이버시 — 주문 요약은 비민감 필드만, 본인확인은 뒷자리

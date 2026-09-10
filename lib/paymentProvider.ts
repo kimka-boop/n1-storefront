@@ -270,11 +270,26 @@ export const testOnlyProvider: PaymentProvider = {
       : { ok: false, provider: this.name, provider_payment_id: ref.provider_payment_id, status: "FAILED", failure_code: "TEST_TX_NOT_FOUND" };
   },
   async refundPayment(ref) {
+    // §47 — 환불 실행 성공은 명시적으로 보고해야 한다. CANCELLED 전환 후
+    // testVerification(CANCELLED)은 ok:false라 "거절"과 "성공"이 구분되지 않았다 (실측 결함).
     const tx = testTxStore().get(ref.provider_payment_id);
-    if (tx && tx.status === "CONFIRMED") tx.status = "CANCELLED";
-    return tx
-      ? testVerification(tx)
-      : { ok: false, provider: this.name, provider_payment_id: ref.provider_payment_id, status: "FAILED", failure_code: "TEST_TX_NOT_FOUND" };
+    if (!tx) {
+      return { ok: false, provider: this.name, provider_payment_id: ref.provider_payment_id, status: "FAILED", failure_code: "TEST_TX_NOT_FOUND" };
+    }
+    if (tx.status !== "CONFIRMED") {
+      return { ok: false, provider: this.name, provider_payment_id: ref.provider_payment_id, status: "FAILED", failure_code: "TEST_REFUND_NOT_CONFIRMED" };
+    }
+    tx.status = "CANCELLED"; // 테스트 PG 내부: 환불 = 거래 취소
+    return {
+      ok: true,
+      provider: this.name,
+      provider_payment_id: tx.providerPaymentId,
+      status: "CANCELLED",
+      amount: ref.amount,
+      currency: tx.currency,
+      paid_at: tx.settledAt,
+      raw_ref: "test_pg_refund",
+    };
   },
   async getPaymentStatus(ref) {
     return this.verifyPayment(ref);

@@ -55,6 +55,8 @@ async function getDoc() {
 /* ── Users 시트 — 기존 계약 컬럼 유지 + username/인증 컬럼 확장(끝에 덧붙임). ── */
 const BASE_HEADERS = ["이메일", "비밀번호해시", "성별", "기준사이즈", "핏취향", "가입일"];
 const EXT_HEADERS = ["사용자이름", "이메일인증"];
+// §11 — 회원 기본 주소(구조화). 기존 컬럼 뒤에 가산 — 레거시 행 호환.
+const ADDR_HEADERS = ["우편번호", "주소1", "주소2"];
 
 /** 이메일인증 컬럼 값 — "확인" | "인증대기"(신규 정책의 미인증) | "미확인"(레거시, grandfathered) */
 export const VERIFY_COL_VERIFIED = "확인";
@@ -70,7 +72,7 @@ async function getUsersSheet(doc: any) {
   }
   await sheet.loadHeaderRow();
   const hv: string[] = sheet.headerValues || [];
-  const missing = EXT_HEADERS.filter((h) => !hv.includes(h));
+  const missing = [...EXT_HEADERS, ...ADDR_HEADERS].filter((h) => !hv.includes(h));
   if (missing.length) {
     // 기존 컬럼 순서는 그대로 두고 새 컬럼을 끝에 덧붙인다 — 레거시 행 호환.
     // [SESSION L] google-spreadsheet v5 API명은 setHeaderRow다 — setHeaderValues(v4)는
@@ -96,6 +98,11 @@ function rowToAccount(r: any): Account | null {
       size: String(r.get("기준사이즈") || ""),
       fit: String(r.get("핏취향") || ""),
     },
+    address: r.get("우편번호") && r.get("주소1") ? {
+      postalCode: String(r.get("우편번호") || "").replace(/^'/, ""),
+      roadAddress: String(r.get("주소1") || ""),
+      detailAddress: String(r.get("주소2") || ""),
+    } : undefined,
     createdAt: String(r.get("가입일") || new Date().toISOString()),
     emailVerified: verifyState === VERIFY_COL_VERIFIED,
     // "인증대기"만 로그인 게이트 대상 — 레거시 "미확인"은 기존 회원 자격 유지(grandfathered)
@@ -125,6 +132,9 @@ async function sheetPersistence(): Promise<AuthPersistence & { seedAll(store: Au
         "가입일": a.createdAt,
         "사용자이름": a.username,
         "이메일인증": a.emailVerified ? VERIFY_COL_VERIFIED : a.verificationPending ? VERIFY_COL_PENDING : VERIFY_COL_LEGACY,
+        "우편번호": a.address?.postalCode ? `'${a.address.postalCode}` : "",
+        "주소1": a.address?.roadAddress || "",
+        "주소2": a.address?.detailAddress || "",
       });
     },
     async updateHash(email: string, hash: string) {
@@ -149,6 +159,15 @@ async function sheetPersistence(): Promise<AuthPersistence & { seedAll(store: Au
         row.set("기준사이즈", profile.size);
         row.set("핏취향", profile.fit);
       }
+      await row.save();
+    },
+    async updateAddress(email: string, address: { postalCode: string; roadAddress: string; detailAddress: string } | null) {
+      const rows = await sheet.getRows();
+      const row = rows.find((r: any) => String(r.get("이메일") || "").trim().toLowerCase() === email);
+      if (!row) return;
+      row.set("우편번호", address?.postalCode ? `'${address.postalCode}` : "");
+      row.set("주소1", address?.roadAddress || "");
+      row.set("주소2", address?.detailAddress || "");
       await row.save();
     },
     async markVerified(email: string) {

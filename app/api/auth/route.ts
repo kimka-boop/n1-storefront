@@ -112,6 +112,7 @@ export async function POST(req: Request) {
         email: body.email,
         password: body.password,
         profile: body.profile,
+        address: body.address, // §11 — 구조화 기본 주소 (선택)
       });
       if (result.ok === false) return bad(result.error, result.status);
       const { account } = result;
@@ -125,6 +126,7 @@ export async function POST(req: Request) {
         email: account.email,
         username: account.username,
         profile: account.profile,
+        address: account.address ?? null,
         emailVerified: account.emailVerified, // 항상 false — 확인은 서버 토큰 경로로만
         verificationRequired: account.verificationPending,
         verificationSent: dispatch.sent,
@@ -145,6 +147,7 @@ export async function POST(req: Request) {
         email: result.account.email,
         username: result.account.username,
         profile: result.account.profile,
+        address: result.account.address ?? null,
         emailVerified: result.account.emailVerified,
         verificationRequired: result.account.verificationPending,
       });
@@ -162,6 +165,13 @@ export async function POST(req: Request) {
       const result = await store.updateProfile(body.token, profile, Boolean(body[RESET_FIT_PROFILE_FLAG]));
       if (result.ok === false) return bad(result.error, result.status || 401);
       return NextResponse.json({ ok: true, profile: result.profile });
+    }
+
+    /* ═══ 기본 주소 갱신 (§11) — 세션 권위. 주문 스냅샷 불변(§12) ═══ */
+    if (action === "update-address") {
+      const result = await store.updateAddress(body.token, body.address);
+      if (result.ok === false) return bad(result.error || "주소 저장에 실패했어요", result.status || 401);
+      return NextResponse.json({ ok: true, address: result.address ?? null });
     }
 
     /* ═══ 인증 메일 재발송 — 존재 유출 없는 균일 계약 (쿨다운 60s) ═══ */
@@ -232,6 +242,7 @@ export async function GET(req: Request) {
       email: account.email,
       username: account.username,
       profile: account.profile,
+      address: account.address ?? null,
       emailVerified: account.emailVerified,
       verificationRequired: account.verificationPending,
     });

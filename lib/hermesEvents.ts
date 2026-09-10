@@ -29,7 +29,20 @@ export type HermesEventType =
   | "PAYMENT_VERIFIED"
   | "PAYMENT_CONFIRMED"
   | "PAYMENT_FAILED"
-  | "PAYMENT_CANCELLED";
+  | "PAYMENT_CANCELLED"
+  // ── Master Acceptance §20–§47 — 주문 라이프사이클 확장 이벤트 ──
+  | "SUPPLIER_ORDER_DRYRUN" // §67–68 — TestSupplierAdapter 발주 기록 (TEST_ONLY)
+  | "SHIPMENT_STARTED" // §23 — 첫 운송장 출현
+  | "DELIVERED_CONFIRMED" // §25 — 최종 고객 수령 확인
+  | "ORDER_CANCEL_REQUESTED" // §40 — 배송준비 단계 취소 요청
+  | "ORDER_CANCELLED" // §40 — 취소 확정
+  | "RETURN_REQUESTED" // §41 — 반품 접수
+  | "RETURN_APPROVED" // §42–43 — 오너 승인 (환불 아님)
+  | "RETURN_REJECTED"
+  | "RETURN_EXTERNAL_ACTION_REQUIRED" // §45 — 공급사 반품 어댑터 미연결 수동 폴백
+  | "RETURN_RECEIVED"
+  | "REFUND_READY"
+  | "REFUNDED"; // §47 — 환불 실행 완료 (provider 검증 후)
 
 export interface HermesOrderEvent {
   eventType: HermesEventType;

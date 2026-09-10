@@ -23,6 +23,7 @@ import LqSeg from "./LqSeg";
 import { FIT_LABEL } from "@/lib/fit";
 import { type FitContext, type PreferredFit, encodeProfileForServer } from "@/lib/fitContext";
 import { useUsernameCheck } from "./useUsernameCheck";
+import { PostcodeSearch, emptyAddress, type AddressValue } from "./PostcodeSearch";
 
 const TOP_SIZES = ["95(M)", "100(L)", "105(XL)", "110(2XL)", "FREE"];
 const EMAIL_HINT = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -35,6 +36,12 @@ export default function AuthNav() {
   const [regEmail, setRegEmail] = useState("");
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
+  // §11 — 가입 시 기본 배송지(선택). 우편번호 찾기로 공식 주소를 받고 상세는 직접 입력.
+  const [regAddr, setRegAddr] = useState<AddressValue>(emptyAddress());
+  const addrPartial = Boolean(
+    (regAddr.postalCode || regAddr.roadAddress || regAddr.detailAddress) &&
+    !(regAddr.postalCode && regAddr.roadAddress)
+  );
   const [qFit, setQFit] = useState<PreferredFit | "">("");
   const [qSize, setQSize] = useState("");
   const [err, setErr] = useState("");
@@ -67,21 +74,29 @@ export default function AuthNav() {
         const res = await fetch("/api/auth", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "register", username: regUsername, email: regEmail, password: pw, profile: encodeProfileForServer(base) }),
+          body: JSON.stringify({
+            action: "register", username: regUsername, email: regEmail, password: pw,
+            profile: encodeProfileForServer(base),
+            address: regAddr.postalCode && regAddr.roadAddress ? {
+              postalCode: regAddr.postalCode,
+              roadAddress: regAddr.roadAddress,
+              detailAddress: regAddr.detailAddress,
+            } : undefined,
+          }),
         });
         const data = await res.json();
         if (data.ok) {
           // 인증 필수 정책 — 서버가 대기 계정으로 판정하면 인증 안내 화면으로 보낸다.
           // "보냈다"고 말할 수 있는 건 verificationSent가 true일 때뿐이다(정직 계약).
           if (data.verificationRequired) {
-            login(data.token, data.email, data.profile, data.username, true);
+            login(data.token, data.email, data.profile, data.username, true, data.address);
             setPendingView({
               email: data.email, via: "session", editing: false, editValue: "",
               sent: Boolean(data.verificationSent),
               note: data.verificationSent ? undefined : (data.verificationMessage || "인증 메일 발송이 지연되고 있어요 — 잠시 후 다시 보내기로 시도해 주세요"),
             });
           } else {
-            login(data.token, data.email, data.profile, data.username);
+            login(data.token, data.email, data.profile, data.username, false, data.address);
             setConfirmMsg("시작했어요 — 이 핏을 기억할게요");
           }
         }
@@ -99,7 +114,7 @@ export default function AuthNav() {
         body: JSON.stringify({ action: "login", id: regEmail, password: pw }),
       });
       const data = await res.json();
-      if (data.ok) { login(data.token, data.email, data.profile, data.username, data.verificationRequired); setConfirmMsg("기억했어요"); }
+      if (data.ok) { login(data.token, data.email, data.profile, data.username, data.verificationRequired, data.address); setConfirmMsg("기억했어요"); }
       else if (data.code === "EMAIL_NOT_VERIFIED") {
         // 미인증 대기 계정 — 인증 안내 화면. 아이디+비밀번호는 이미 검증된 값이라
         // 이 화면에서의 이메일 정정(change-pending-email id+password 경로)에 재사용한다.
@@ -303,10 +318,17 @@ export default function AuthNav() {
                   ) : null}
                   <input className="lq-input" placeholder="비밀번호 (6자 이상)" type="password" value={pw} onChange={(e) => setPw(e.target.value)} aria-label="비밀번호" autoComplete="new-password" />
                   <input className="lq-input" placeholder="비밀번호 확인" type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} aria-label="비밀번호 확인" autoComplete="new-password" />
+                  <p className="lq-row-label" style={{ marginTop: 14 }}>기본 배송지 <span style={{ opacity: 0.6 }}>(선택 — 나중에 바꿀 수 있어요)</span></p>
+                  <PostcodeSearch value={regAddr} onChange={setRegAddr} compact />
+                  {addrPartial ? (
+                    <p className="lq-row-note" role="alert" style={{ color: "#a0432d", marginBottom: 8 }}>
+                      우편번호 찾기로 주소를 선택하거나, 주소를 비워 두세요
+                    </p>
+                  ) : null}
                   {err && <p className="lq-row-note" role="alert" style={{ color: "#a0432d", marginBottom: 10 }}>{err}</p>}
                   <button className="lq-act"
                     disabled={busy || !regUsername || userCheck.status === "taken" || userCheck.status === "invalid" ||
-                      !regEmail || !EMAIL_HINT.test(regEmail) || !pw || pw !== pw2}
+                      !regEmail || !EMAIL_HINT.test(regEmail) || !pw || pw !== pw2 || addrPartial}
                     onClick={() => { if (pw.length < 6) { setErr("비밀번호는 6자 이상"); return; } setErr(""); setStep(2); }}>
                     {busy ? "처리 중..." : "다음 → 핏 프로필"}
                   </button>
