@@ -29,6 +29,16 @@ export function ChatIcon({ size = 20 }: { size?: number }) {
   );
 }
 
+export function SearchIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg style={{ display: "block" }} fill="none" stroke="currentColor" strokeWidth={1.5}
+      width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="11" cy="11" r="6.75" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.9 15.9L20.6 20.6" />
+    </svg>
+  );
+}
+
 export function CardIcon({ size = 14 }: { size?: number }) {
   return (
     <svg style={{ display: "block" }} fill="none" stroke="currentColor" strokeWidth={1.5}

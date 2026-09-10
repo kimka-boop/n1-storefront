@@ -17,6 +17,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
+import { SearchIcon } from "@/components/Icons";
 import { mediaFor } from "@/lib/media";
 import { FIT_LABEL, fitPresetSize, preferenceShift, categoryOf, interpretFit, type FitProductInput } from "@/lib/fit";
 import { pairFitLine } from "@/lib/fitDisplay";
@@ -239,6 +240,28 @@ export default function Home() {
     return () => clearInterval(t);
   }, []);
 
+  // ── 스티키 감지 (Mobile Regression Repair §2): 카테고리 내비 직전의 sentinel가
+  // 뷰포트 밖으로 나가는 순간 = 내비가 stuck — html 플래그를 토글해 상단 분할
+  // 글래스 유틸리티가 카테고리 밴드에 도킹한다(HEADER_STATE → CATEGORY_DOCKED_STATE).
+  // scrollY 매직넘버 아님 — IntersectionObserver 기하 판정. 플래그는 fixed 독의
+  // 시각 상태만 바꾸므로 문서 레이아웃(·스크롤 위치)은 전혀 흔들리지 않는다(§21).
+  const catSentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const sentinel = catSentinelRef.current;
+    if (!sentinel || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        document.documentElement.classList.toggle("n1-cat-stuck", !entries[0].isIntersecting);
+      },
+      { threshold: 0 }
+    );
+    io.observe(sentinel);
+    return () => {
+      io.disconnect();
+      document.documentElement.classList.remove("n1-cat-stuck");
+    };
+  }, []);
+
   // ── 컬렉션 필터: 성별(정확 enum) + 컬렉션 내 검색 ──
   const [genderTab, setGenderTab] = useState<GenderKey>("all");
   const [query, setQuery] = useState("");
@@ -306,26 +329,21 @@ export default function Home() {
       track?.querySelector<HTMLElement>(`[data-tab="${genderTab}"]`) ??
       track?.querySelector<HTMLElement>('[data-tab="all"]');
     if (!track || !btn) return;
-    // Glass Lab §9 + 긴 라벨 규칙(§4): 렌즈 폭은 interaction zone과
-    // 라벨+카운트 group(+breathing) 중 큰 값, 최소폭 보장.
-    // Storefront Repair(§4·§23): 라벨+카운트가 숨 쉬는 폭 — breathing 24→44px,
-    // 최소폭 64→88px. 활성 렌즈가 크게 의도 있게 읽히고 텍스트를 클리핑하지 않는다.
-    // offsetLeft는 track(offsetParent) 기준이라 rect 방식보다 안정적.
+    // Mobile Regression Repair §5 — 렌즈 폭 = 라벨(+카운트) 폭 + 정준 패딩 20px.
+    // zone(이웃 탭 중점 사이 경계)의 94%를 경질 상한: 렌즈가 이웃 탭 영역을
+    // 침범하지 않는다. 폭이 정준이므로 렌즈 가장자리↔이웃 버튼 경계의 시각
+    // 간격은 활성 탭과 무관하게 항상 일정. offsetLeft는 track(offsetParent)
+    // 기준이라 rect 방식보다 안정적.
     const labels = Array.from(track.querySelectorAll<HTMLElement>("[data-tab]"));
     const trackW = track.clientWidth;
     const centers = labels.map((c) => c.offsetLeft + c.offsetWidth / 2);
     const i = labels.indexOf(btn);
-    const prevC = i > 0 ? centers[i - 1] : 0;
-    const nextC = i < centers.length - 1 ? centers[i + 1] : trackW;
-    const zoneL = (prevC + centers[i]) / 2;
-    const zoneR = (centers[i] + nextC) / 2;
+    const zoneL = i > 0 ? (centers[i - 1] + centers[i]) / 2 : 0;
+    const zoneR = i < centers.length - 1 ? (centers[i] + centers[i + 1]) / 2 : trackW;
     const zone = zoneR - zoneL;
-    const byGroup = btn.offsetWidth + 44; // 라벨+카운트 group + breathing room
-    const byZone = zone * 0.82;
-    const cap = zone * 0.94; // 이웃 zone 침범 방지 상한
-    const w = Math.max(88, Math.min(Math.max(byGroup, Math.min(byZone, cap)), cap));
-    // §1 — 렌즈는 track 밖으로 절대 나가지 않는다 (뷰포트 가장자리 클리핑 방지)
-    const left = Math.max(0, Math.min(centers[i] - w / 2, trackW - w));
+    const w = Math.max(48, Math.min(btn.offsetWidth + 20, zone * 0.94));
+    // 렌즈는 zone 안에서 중심 정렬 — track 밖으로도 절대 나가지 않는다(§1)
+    const left = Math.max(zoneL, Math.min(centers[i] - w / 2, zoneR - w));
     setLensPlacement((prev) =>
       prev && Math.abs(prev.left - left) < 0.5 && Math.abs(prev.width - w) < 0.5 ? prev : { left, width: w });
   }, [genderTab]);
@@ -670,7 +688,9 @@ export default function Home() {
 
       {/* ── 컬렉션 내비 (sticky glass rail + 드래그 가능한 Liquid Glass 셀렉터) ──
           N°1 브랜드 내비는 이 그룹 밖 — 홈은 위 hero 브랜드, 그 외 페이지는 SiteHeader.
-          §5 — 스마트 핏은 카테고리 행에서 제거되어 상단 유틸리티(AuthNav)로 이동했다. */}
+          §5 — 스마트 핏은 카테고리 행에서 제거되어 상단 유틸리티(AuthNav)로 이동했다.
+          sentinel — 내비 stuck 판정 기준점(높이 0, 레이아웃 영향 없음). */}
+      <div ref={catSentinelRef} className="cat-sticky-sentinel" aria-hidden="true" />
       <nav className="collection-nav" aria-label="컬렉션 필터">
         <div
           className="gtab-track"
@@ -714,6 +734,7 @@ export default function Home() {
             {productsLoaded ? `${products.length} Pieces · 추천 코디 ${pairRows.length}쌍` : "불러오는 중 —"}
           </p>
           <div className="collection-search">
+            <SearchIcon size={13} />
             <input
               type="search"
               value={query}

@@ -98,12 +98,14 @@ export default function AuthNav() {
       <div className="auth-nav">
         {/* §5 — 스마트 핏은 카테고리 행이 아닌 상단 유틸리티 그룹의 일원.
             같은 auth-link 패밀리 — 작고 조용한 텍스트 링크. */}
+        {/* §13 (Mobile Regression Repair): "· 설정됨"은 내비 항목이 아니라 종속 상태 —
+            작고 옅게. 링크 라벨은 "스마트 핏"만으로 로그인/회원가입과 동일 위계. */}
         <button
           className="auth-link"
           onClick={() => window.dispatchEvent(new Event("n1:open-fit"))}
           aria-label={fit ? "스마트 핏 — 설정됨, 열어서 수정" : "스마트 핏 설정하기"}
         >
-          {fit ? "스마트 핏 · 설정됨" : "스마트 핏"}
+          스마트 핏{fit && <span className="auth-fit-state"> · 설정됨</span>}
         </button>
         {token && email ? (
           <>

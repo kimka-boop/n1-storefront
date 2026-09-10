@@ -36,7 +36,7 @@ import {
   STOCK_LOOKUP_FAILURE_NOTE,
   StockViewLite,
 } from "@/lib/stockDisplay";
-import { interpretFit, categoryOf } from "@/lib/fit";
+import { interpretFit, categoryOf, chartInfo } from "@/lib/fit";
 import { MY_DIMENSIONS_LABEL, pairFitLine } from "@/lib/fitDisplay";
 import {
   genderKo,
@@ -271,6 +271,7 @@ export default function ProductPage() {
   };
   const fitCategory = categoryOf({ name: product.name, category: product.category });
   const fitInterp = authFit ? interpretFit(fitInput, authFit) : null;
+  const chartReal = chartInfo(product.sizeChart, fitCategory).real;
   const material = clean(product.material);
   const materialKnown = material !== "";
   const fit = product.fit ?? {};
@@ -520,8 +521,9 @@ export default function ProductPage() {
       ) : null}
 
       {/* ── FIT — 치수·모델·내 핏 (중복 대형 이미지 제거 — 대표컷은 Scene 1).
-          확인된 내용이 없으면 섹션 헤더만 남기지 않는다 (§33 빈 헤더 금지) ── */}
-      {(clean(product.modelInfo) || (clean(product.sizeChart) && (product.sizeChart || "").trim()) || fitInterp) ? (
+          Mobile Regression Repair §10·§11: 프로필이 없다고 섹션을 무음 삭제하지
+          않는다 — readiness 상태(스마트 핏 설정 진입 + 정직한 한계 문구)로
+          안내한다. 모든 표시 문구는 interpretFit 계약/실제 데이터 상태 기반. ── */}
       <SceneSection id="scene4" kicker="Fit" title="핏">
         {clean(product.modelInfo) ? (
           <p className={styles.lede}>모델 {clean(product.modelInfo)}</p>
@@ -553,9 +555,21 @@ export default function ProductPage() {
               스마트 핏 →
             </button>
           </div>
-        ) : null}
+        ) : (
+          /* §11 readiness — 데이터가 부족할 때 보여주는 정상 상태. 설정 CTA는
+             PDP 로컬 SmartFitFlow(상품 컨텍스트 전달)를 연다 */
+          <div className={styles.yourFit}>
+            <p className={styles.yourFitKicker}>Your fit</p>
+            <p className={styles.yourFitText}>선호하는 핏과 평소 사이즈를 알려주시면 이 상품을 나에게 맞게 읽어드려요.</p>
+            {!chartReal && (
+              <p className={styles.yourFitNote}>이 상품은 실측 수치표가 아직 준비 중이에요 — 착용 컷과 표기 정보로 함께 확인해 주세요.</p>
+            )}
+            <button className={styles.yourFitEntry} style={{ marginTop: 14 }} onClick={() => setShowFitFlow(true)}>
+              스마트 핏 →
+            </button>
+          </div>
+        )}
       </SceneSection>
-      ) : null}
 
       {showFitFlow && (
         <SmartFitFlow
