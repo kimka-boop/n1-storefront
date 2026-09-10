@@ -23,17 +23,32 @@ const path = require("node:path");
 
 // next start 는 .env.local 을 자동 주입하지만, 이 스크립트는 단독 node 프로세스다 —
 // 같은 파일을 같은 우선순위(기존 env 유지)로 읽는다. 값은 출력하지 않는다.
+// dotenv 규약: KEY="..." quoted 값은 개행을 포함할 수 있다(멀티라인) — GOOGLE_PRIVATE_KEY가 그렇다.
 (function loadEnvLocal() {
   const envPath = path.join(__dirname, "..", ".env.local");
   if (!fs.existsSync(envPath)) return;
-  for (const line of fs.readFileSync(envPath, "utf-8").split(/\r?\n/)) {
-    const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
+  const lines = fs.readFileSync(envPath, "utf-8").split(/\r?\n/);
+  for (let i = 0; i < lines.length; i++) {
+    const m = lines[i].match(/^([A-Z0-9_]+)=(.*)$/);
     if (!m) continue;
     let value = m[2].trim();
-    // dotenv 규약 — 감싼 따옴표는 값의 일부가 아니다 (개행 치환 전에 벗긴다)
-    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
-      value = value.slice(1, -1);
+    const quote = value.startsWith('"') || value.startsWith("'") ? value[0] : null;
+    if (quote) {
+      value = value.slice(1);
+      if (value.endsWith(quote)) {
+        value = value.slice(0, -1);
+      } else {
+        // 멀티라인 quoted — 닫는 따옴표가 나올 때까지 행을 이어 붙인다
+        const buf = [value];
+        while (++i < lines.length) {
+          buf.push(lines[i]);
+          if (lines[i].trimEnd().endsWith(quote)) break;
+        }
+        value = buf.join("\n");
+        if (value.endsWith(quote)) value = value.slice(0, -1);
+      }
     }
+    value = value.replace(/\\n/g, "\n");
     if (!process.env[m[1]]) process.env[m[1]] = value;
   }
 })();
