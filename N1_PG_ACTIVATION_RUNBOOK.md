@@ -104,6 +104,21 @@ https://<도메인>/api/payments/webhook
 - 봇2(N1 결제발주센터): PG 결제 확정 시 "✅ N°1 결제 완료 … 발주 진행해주세요" 알림.
 - 실패 추적: Payments 시트 failure_code / failure_message (AMOUNT_MISMATCH 등).
 
+## 2.5 세이브드 결제 수단(빌링키) 활성화 — PG 연결과 함께 (2026-09-10 추가)
+
+PG 어댑터가 라이브가 되면 등록된 회원은 PG 관리 결제 수단(빌링키)을 재사용할 수 있다.
+아키텍처는 이미 완비되어 있다 (`lib/savedPayments.ts` · `/api/payments/methods` ·
+`PaymentProvider.createBillingKeyRegistration/verifyBillingKeyRegistration/deleteBillingKey`).
+
+추가 구현(어댑터 내):
+1. `createBillingKeyRegistration` — PG 등록 위젯 URL 발급 (카드 입력은 PG 위젯에서 — 서버 비경유).
+2. `verifyBillingKeyRegistration` — **서버→PG 재조회**로 빌링키·표시 메타데이터(카드사·끝4자리) 수령.
+   클라이언트가 제출한 카드/키 값은 신뢰 경로 자체가 없다.
+3. 결제 요청 시 `saved_method`(billing key)로 청구 — `createPaymentRequestForOrder(deps, orderId, {savedMethod})`.
+4. raw 카드 데이터는 어디에도 저장되지 않는다 — `Payment_Methods` 시트에 카드 필드는 구조적으로 부재.
+
+검증: `tests/savedPayments.test.cjs` SP1–SP6 전부 PASS 상태 유지 + 라이브 소액 등록·청구 1건(Owner 승인).
+
 ## 3. 롤백
 
 `N1_PG_PROVIDER` 삭제 + `pg_card.available=false` → 즉시 pre-PG 상태로 복귀

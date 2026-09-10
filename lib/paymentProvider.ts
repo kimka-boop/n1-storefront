@@ -31,6 +31,9 @@ export interface ProviderOrderRef {
   customer_email?: string;
   success_url?: string;
   fail_url?: string;
+  /** 세이브드 결제 수단 사용 — PG 관리 빌링키로 청구 (빌링키 미지원 어댑터는 거절).
+   *  소유 검증(세션 이메일 일치)은 이 값을 넘기기 전에 호출자가 끝낸다. */
+  saved_method?: { method_id: string; provider_billing_key: string };
 }
 
 export interface ProviderRequestResult {
@@ -80,6 +83,44 @@ export interface PaymentProvider {
   cancelPayment(ref: { payment_id: string; provider_payment_id: string; reason?: string }): Promise<ProviderVerification>;
   refundPayment(ref: { payment_id: string; provider_payment_id: string; amount: number; reason?: string }): Promise<ProviderVerification>;
   getPaymentStatus(ref: { payment_id: string; provider_payment_id: string; order_id: string }): Promise<ProviderVerification>;
+
+  /* ── 빌링키(세이브드 페이) — PG 관리 결제 수단 (선택 구현; 미구현 어댑터는 슬롯만 노출) ──
+   * 계약: raw 카드 데이터는 어댑터 경유 금지 — 등록은 PG 위젯에서, 서버가 받는 것은
+   * PG가 발급한 빌링키와 표시 메타데이터(카드사·끝4자리)뿐. 등록 확정은 클라이언트
+   * 응답이 아니라 서버→PG 재조회로만 한다 (webhook 검증과 같은 서버 검증 계약). */
+  /** PG 등록 위젯 발급 — 고객이 이 URL/파라미터에서 카드를 등록한다 (서버 비경유) */
+  createBillingKeyRegistration?(req: {
+    member: { email: string; customer_name?: string };
+    success_url?: string;
+    fail_url?: string;
+  }): Promise<BillingKeyRegistrationResult>;
+  /** 등록 확정 — 서버가 PG를 직접 조회해 빌링키·표시 메타데이터를 받는다 (클라이언트 응답 신뢰 금지) */
+  verifyBillingKeyRegistration?(ref: { registration_ref: string; member_email: string }): Promise<BillingKeyVerification>;
+  /** 빌링키 폐기 (회원 삭제 요청 시) */
+  deleteBillingKey?(ref: { provider_billing_key: string }): Promise<{ ok: boolean; provider: string; code?: string; customer_message?: string }>;
+}
+
+export interface BillingKeyRegistrationResult {
+  ok: boolean;
+  provider: string;
+  code?: string;
+  customer_message?: string;
+  /** PG 등록 위젯 URL (redirect 방식) 또는 위젯 파라미터 */
+  registration_url?: string;
+  /** 서버가 이후 PG 재조회에 쓰는 등록 참조 번호 */
+  registration_ref?: string;
+}
+
+export interface BillingKeyVerification {
+  ok: boolean;
+  provider: string;
+  code?: string;
+  customer_message?: string;
+  /** PG가 발급한 빌링키 — 저장은 되지만 클라이언트 반환은 금지 */
+  provider_billing_key?: string;
+  /** PG가 돌려준 표시 메타데이터만 (카드번호·CVC 등은 구조적으로 존재하지 않는다) */
+  card_corp?: string;
+  last4?: string;
 }
 
 // ── NO_LIVE_PG — pre-PG 상태의 유일한 기본 어댑터 (미션 §17) ──
@@ -116,6 +157,15 @@ export const noLivePgProvider: PaymentProvider = {
   },
   async getPaymentStatus(ref) {
     return { ...notConfigured(this.name), provider_payment_id: ref.provider_payment_id, status: "FAILED" };
+  },
+  async createBillingKeyRegistration() {
+    return notConfigured(this.name);
+  },
+  async verifyBillingKeyRegistration() {
+    return { ok: false, provider: this.name, code: PAYMENT_PROVIDER_NOT_CONFIGURED, customer_message: CUSTOMER_MSG_PG_PREPARING };
+  },
+  async deleteBillingKey() {
+    return { ok: false, provider: this.name, code: PAYMENT_PROVIDER_NOT_CONFIGURED, customer_message: CUSTOMER_MSG_PG_PREPARING };
   },
 };
 
@@ -246,6 +296,8 @@ export interface ResolvedPaymentProvider {
   provider: PaymentProvider;
   /** PG 카드 결제가 실제로 가능한 상태인가 (라우트 게이트) */
   livePgAvailable: boolean;
+  /** PG 관리 세이브드 결제 수단(빌링키)이 실제로 가능한 상태인가 — pre-PG는 항상 false */
+  savedMethodsAvailable: boolean;
   /** 현재 구성 요약 — 시크릿 값 없이 (운영 진단용) */
   configSummary: string;
 }
@@ -264,16 +316,17 @@ export function resolvePaymentProvider(
 ): ResolvedPaymentProvider {
   const configured = (env.N1_PG_PROVIDER || "").trim().toLowerCase();
   if (!configured) {
-    return { provider: noLivePgProvider, livePgAvailable: false, configSummary: "N1_PG_PROVIDER unset → no_live_pg" };
+    return { provider: noLivePgProvider, livePgAvailable: false, savedMethodsAvailable: false, configSummary: "N1_PG_PROVIDER unset → no_live_pg" };
   }
   if (configured === "test") {
     const flag = (env.N1_PG_TEST_ONLY || "").trim().toLowerCase() === "true";
     if (flag) {
-      return { provider: testOnlyProvider, livePgAvailable: true, configSummary: "test_only (N1_PG_TEST_ONLY=true)" };
+      return { provider: testOnlyProvider, livePgAvailable: true, savedMethodsAvailable: false, configSummary: "test_only (N1_PG_TEST_ONLY=true)" };
     }
     return {
       provider: noLivePgProvider,
       livePgAvailable: false,
+      savedMethodsAvailable: false,
       configSummary: "N1_PG_PROVIDER=test but N1_PG_TEST_ONLY!=true → no_live_pg",
     };
   }
@@ -281,6 +334,7 @@ export function resolvePaymentProvider(
   return {
     provider: noLivePgProvider,
     livePgAvailable: false,
+    savedMethodsAvailable: false,
     configSummary: `N1_PG_PROVIDER=${configured} → adapter not implemented → no_live_pg`,
   };
 }

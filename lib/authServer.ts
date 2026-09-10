@@ -109,7 +109,10 @@ export interface Account {
   hash: string; // s1 또는(레거시 행) 구버전
   profile: { gender: string; size: string; fit: string };
   createdAt: string;
-  emailVerified: boolean; // §3 — EMAIL_VERIFY_DEFERRED 동안 항상 false
+  emailVerified: boolean;
+  /** 이메일 인증 필수 정책 하의 미인증 계정 — true면 로그인이 403 EMAIL_NOT_VERIFIED로 게이트된다.
+   *  레거시 행("미확인"으로 가입된 기존 회원)은 false — grandfathered(로그인 유지). */
+  verificationPending: boolean;
 }
 
 export type FitWire = { gender: string; size: string; fit: string };
@@ -124,6 +127,10 @@ export interface AuthPersistence {
   updateHash?(email: string, hash: string): Promise<void>;
   /** 프로필 갱신 / reset=true면 핏 필드 공백화 */
   updateProfile?(email: string, profile: FitWire | null): Promise<void>;
+  /** 이메일 소유 확인 완료 — emailVerified=true 영구 반영 */
+  markVerified?(email: string): Promise<void>;
+  /** 대기 중인 계정의 이메일 수정 (오타 정정) — 유일성은 호출자(AuthStore)가 보장 */
+  updateEmail?(oldEmail: string, newEmail: string): Promise<void>;
 }
 
 export type RegisterResult =
@@ -194,7 +201,10 @@ export class AuthStore {
         fit: String(wire.fit),
       },
       createdAt: new Date().toISOString(),
-      emailVerified: false, // §3 — 소유 확인 계약이 활성화될 때까지
+      emailVerified: false,
+      // 이메일 인증 필수 정책 — 모든 신규 가입은 인증 대기로 생성되며,
+      // 서버 토큰 확인(lib/emailVerify)으로만 해제된다.
+      verificationPending: true,
     };
 
     try {
@@ -213,13 +223,15 @@ export class AuthStore {
     return { ok: true, account };
   }
 
-  /** 아이디 또는 이메일 로그인. 레거시 행은 username을 묶고 해시를 승격한다. */
+  /** 아이디 또는 이메일 로그인. 레거시 행은 username을 묶고 해시를 승격한다.
+   *  인증 필수 정책: 미인증(대기) 계정은 비밀번호가 맞아도 403 EMAIL_NOT_VERIFIED —
+   *  완전한 회원이 아닌 상태로는 세션을 열지 않는다(서버 판정 — 클라이언트 플래그 무관). */
   async login(
     idOrEmail: unknown,
     password: unknown,
   ): Promise<
     | { ok: true; account: Account; token: string }
-    | { ok: false; status: number; error: string }
+    | { ok: false; status: number; error: string; code?: string }
   > {
     const id = typeof idOrEmail === "string" ? idOrEmail.trim().toLowerCase() : "";
     const pw = typeof password === "string" ? password : "";
@@ -239,14 +251,110 @@ export class AuthStore {
       account.hash = verdict.upgrade;
       await this.persist.updateHash?.(account.email, verdict.upgrade);
     }
+    if (account.verificationPending && !account.emailVerified) {
+      return {
+        ok: false,
+        status: 403,
+        code: "EMAIL_NOT_VERIFIED",
+        error: "이메일 인증이 필요해요 — 보낸 인증 메일의 링크를 눌러 주세요",
+      };
+    }
     const token = randomBytes(24).toString("base64url");
     this.sessions.set(token, account.email);
     return { ok: true, account, token };
   }
 
+  /** 이메일 소유 확인 완료 — 메모리+영구 저장소에 emailVerified=true 승격.
+   *  유일한 승격 경로다 (클라이언트 플래그로는 절대 도달하지 않는다). */
+  async markEmailVerified(email: string): Promise<Account | null> {
+    const account = this.byEmail.get(email);
+    if (!account) return null;
+    account.emailVerified = true;
+    account.verificationPending = false;
+    await this.persist.markVerified?.(email);
+    return account;
+  }
+
+  /**
+   * 대기(미인증) 계정의 이메일 정정 — 오타로 인한 재가입 강제가 없도록 한다.
+   * 본인 확인: 대기 세션 토큰 또는 아이디/이메일+비밀번호. 새 주소는 문법+유일성 재검증
+   * (원자적 예약 블록 — register와 동일 제약) 후 메모리 인덱스·영구 저장소가 함께 옮겨진다.
+   */
+  async changePendingEmail(input: {
+    sessionToken?: unknown;
+    idOrEmail?: unknown;
+    password?: unknown;
+    newEmail: unknown;
+  }): Promise<
+    | { ok: true; account: Account; previousEmail: string }
+    | { ok: false; status: number; error: string; code?: string }
+  > {
+    let account: Account | null = null;
+    if (input.sessionToken !== undefined) {
+      const email = this.sessionEmail(input.sessionToken);
+      if (email) account = this.byEmail.get(email) ?? null;
+      if (!account) return { ok: false, status: 401, error: "세션이 만료됐어요 — 다시 로그인해 주세요" };
+    } else {
+      const id = typeof input.idOrEmail === "string" ? input.idOrEmail.trim().toLowerCase() : "";
+      const pw = typeof input.password === "string" ? input.password : "";
+      if (!id || !pw) return { ok: false, status: 400, error: "아이디와 비밀번호를 입력해 주세요" };
+      const candidate = this.byUsername.get(id) ?? this.byEmail.get(id) ?? null;
+      const verdict = candidate ? await verifyPassword(pw, candidate.hash) : { ok: false };
+      // 계정 존재 유출 없는 균일 거절 (주문 lookup 404 계약과 같은 위생)
+      if (!candidate || verdict.ok === false) {
+        return { ok: false, status: 401, error: "아이디 또는 비밀번호가 일치하지 않습니다" };
+      }
+      account = candidate;
+    }
+    if (!(account.verificationPending && !account.emailVerified)) {
+      return { ok: false, status: 409, code: "NOT_PENDING", error: "인증 대기 중인 계정만 이메일을 수정할 수 있어요" };
+    }
+
+    const e = validateEmail(input.newEmail);
+    if (e.ok === false) return { ok: false, status: 400, error: e.error };
+    if (e.value === account.email) {
+      return { ok: false, status: 400, error: "같은 이메일이에요 — 새 주소를 입력해 주세요" };
+    }
+    // 시트 2차 방어 (register와 동일 계약)
+    if (await this.persist.exists("", e.value)) {
+      return { ok: false, status: 409, error: "이미 가입된 이메일이에요" };
+    }
+    // ── 원자적 예약 블록 (await 없음) ──
+    if (this.byEmail.has(e.value) || this.reservedEmails.has(e.value)) {
+      return { ok: false, status: 409, error: "이미 가입된 이메일이에요" };
+    }
+    this.reservedEmails.add(e.value);
+    // ────────────────────────────────
+
+    const previousEmail = account.email;
+    try {
+      await this.persist.updateEmail?.(previousEmail, e.value);
+    } catch {
+      this.reservedEmails.delete(e.value);
+      return { ok: false, status: 502, error: "이메일 수정에 실패했어요 — 잠시 후 다시 시도해 주세요" };
+    }
+    // 메모리 인덱스 이동
+    this.byEmail.delete(previousEmail);
+    account.email = e.value;
+    this.byEmail.set(e.value, account);
+    // 대기 세션은 새 주소로 재바인딩 — 가입 직후 오타를 고친 사용자가 같은 세션에서
+    // 계속 인증을 진행할 수 있어야 하기 때문 (로그아웃 강제 없음).
+    for (const entry of Array.from(this.sessions.entries())) {
+      if (entry[1] === previousEmail) this.sessions.set(entry[0], e.value);
+    }
+    this.reservedEmails.delete(e.value);
+    return { ok: true, account, previousEmail };
+  }
+
   sessionEmail(token: unknown): string | null {
     const t = typeof token === "string" ? token : "";
     return this.sessions.get(t) ?? null;
+  }
+
+  /** 이메일로 계정 조회 (재발송 플로우용 — 존재 유출은 호출자가 균일 응답으로 방어) */
+  accountByEmail(email: unknown): Account | null {
+    const e = typeof email === "string" ? email.trim().toLowerCase() : "";
+    return e ? this.byEmail.get(e) ?? null : null;
   }
 
   /** register 직후 로그인 없이 세션을 열기 위한 토큰 발급. */

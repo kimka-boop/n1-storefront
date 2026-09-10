@@ -123,6 +123,10 @@ export async function recalcPayableAmount(
 export async function createPaymentRequestForOrder(
   deps: PaymentFlowDeps,
   orderId: string,
+  options?: {
+    /** 세이브드 결제 수단 — 소유 검증(세션 이메일 일치)은 호출자가 끝낸 상태로 받는다 */
+    savedMethod?: { methodId: string; providerBillingKey: string };
+  },
 ): Promise<FlowResult> {
   const cleanId = String(orderId || "").trim();
   if (!cleanId) return fail(400, "ORDER_ID_REQUIRED", "order_id 누락");
@@ -204,6 +208,9 @@ export async function createPaymentRequestForOrder(
     order_name: items.map((i) => i.name).join(", ").slice(0, 80) || cleanId,
     customer_name: order.customerName,
     customer_email: String(order.raw?.["고객이메일"] || "") || undefined,
+    saved_method: options?.savedMethod
+      ? { method_id: options.savedMethod.methodId, provider_billing_key: options.savedMethod.providerBillingKey }
+      : undefined,
   });
 
   if (!request.ok) {

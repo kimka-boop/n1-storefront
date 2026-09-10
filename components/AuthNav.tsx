@@ -28,7 +28,7 @@ const TOP_SIZES = ["95(M)", "100(L)", "105(XL)", "110(2XL)", "FREE"];
 const EMAIL_HINT = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export default function AuthNav() {
-  const { token, email, username, fit, login, logout, saveFit } = useAuth();
+  const { token, email, username, pending, fit, login, logout, saveFit, setPending } = useAuth();
   const [modal, setModal] = useState<null | "register" | "login">(null);
   const [step, setStep] = useState(1);
   const [regUsername, setRegUsername] = useState("");
@@ -44,6 +44,13 @@ export default function AuthNav() {
   const [showFitQuestions, setShowFitQuestions] = useState(false);
   const userCheck = useUsernameCheck(regUsername);
   const sizeValue = TOP_SIZES.find((s) => s === qSize || s.replace(/\(.*\)/, "") === qSize) ?? "";
+
+  // ── 이메일 인증 대기 화면 — 서버가 발급한 상태만 보여준다(§2 클라이언트 신뢰 금지).
+  // via: "session"=가입 직후(대기 세션 토큰으로 정정 가능) / "login"=아이디+비밀번호로 정정
+  const [pendingView, setPendingView] = useState<
+    null | { email: string; sent: boolean; note?: string; via: "session" | "login"; editing: boolean; editValue: string }
+  >(null);
+  const [resendIn, setResendIn] = useState(0); // 재발송 쿨다운 표시(초)
 
   const doRegister = (profileOverride?: FitContext) => {
     const base: FitContext | null =
@@ -63,7 +70,21 @@ export default function AuthNav() {
           body: JSON.stringify({ action: "register", username: regUsername, email: regEmail, password: pw, profile: encodeProfileForServer(base) }),
         });
         const data = await res.json();
-        if (data.ok) { login(data.token, data.email, data.profile, data.username); setConfirmMsg("시작했어요 — 이 핏을 기억할게요"); }
+        if (data.ok) {
+          // 인증 필수 정책 — 서버가 대기 계정으로 판정하면 인증 안내 화면으로 보낸다.
+          // "보냈다"고 말할 수 있는 건 verificationSent가 true일 때뿐이다(정직 계약).
+          if (data.verificationRequired) {
+            login(data.token, data.email, data.profile, data.username, true);
+            setPendingView({
+              email: data.email, via: "session", editing: false, editValue: "",
+              sent: Boolean(data.verificationSent),
+              note: data.verificationSent ? undefined : (data.verificationMessage || "인증 메일 발송이 지연되고 있어요 — 잠시 후 다시 보내기로 시도해 주세요"),
+            });
+          } else {
+            login(data.token, data.email, data.profile, data.username);
+            setConfirmMsg("시작했어요 — 이 핏을 기억할게요");
+          }
+        }
         else setErr(data.error || "가입에 실패했어요 — 잠시 후 다시 시도해 주세요");
       } catch { setErr("서버 오류"); } finally { setBusy(false); }
     })();
@@ -78,9 +99,68 @@ export default function AuthNav() {
         body: JSON.stringify({ action: "login", id: regEmail, password: pw }),
       });
       const data = await res.json();
-      if (data.ok) { login(data.token, data.email, data.profile, data.username); setConfirmMsg("기억했어요"); }
+      if (data.ok) { login(data.token, data.email, data.profile, data.username, data.verificationRequired); setConfirmMsg("기억했어요"); }
+      else if (data.code === "EMAIL_NOT_VERIFIED") {
+        // 미인증 대기 계정 — 인증 안내 화면. 아이디+비밀번호는 이미 검증된 값이라
+        // 이 화면에서의 이메일 정정(change-pending-email id+password 경로)에 재사용한다.
+        const looksEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(regEmail.trim());
+        setPendingView({ email: looksEmail ? regEmail.trim() : "", via: "login", editing: false, editValue: "", sent: true });
+      }
       else setErr(data.error || "로그인에 실패했어요 — 잠시 후 다시 시도해 주세요");
     } catch { setErr("서버 오류"); } finally { setBusy(false); }
+  };
+
+  /* ── 인증 대기 화면 액션 — 재발송(쿨다운) / 이메일 정정 ── */
+  const doResend = () => {
+    const target = pendingView?.email?.trim();
+    if (!target || resendIn > 0) return;
+    void (async () => {
+      setBusy(true); setErr("");
+      try {
+        const res = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "resend-verification", email: target }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          setPendingView((v) => (v ? { ...v, sent: true, note: "요청이 접수됐어요 — 메일함을 확인해 주세요" } : v));
+          setResendIn(60);
+          const timer = setInterval(() => setResendIn((s) => (s <= 1 ? (clearInterval(timer), 0) : s - 1)), 1000);
+        } else {
+          setPendingView((v) => (v ? { ...v, note: data.error || "재발송에 실패했어요 — 잠시 후 다시 시도해 주세요" } : v));
+        }
+      } catch { setErr("서버 오류"); } finally { setBusy(false); }
+    })();
+  };
+
+  const doChangeEmail = () => {
+    const view = pendingView;
+    const next = view?.editValue?.trim();
+    if (!view || !next) return;
+    void (async () => {
+      setBusy(true); setErr("");
+      try {
+        const payload: Record<string, unknown> =
+          view.via === "session" && token
+            ? { action: "change-pending-email", token, newEmail: next }
+            : { action: "change-pending-email", id: regEmail.trim(), password: pw, newEmail: next };
+        const res = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          // 서버가 새 주소로 재발송한 결과만 반영한다 — 새 주소가 곧 진실이 된다.
+          setPendingView({ email: data.email, via: view.via, editing: false, editValue: "", sent: Boolean(data.verificationSent),
+            note: data.verificationSent ? "새 주소로 인증 메일을 다시 보냈어요" : (data.verificationMessage || "발송이 지연되고 있어요 — 다시 보내기를 눌러 주세요") });
+          if (view.via === "session" && token) login(token, data.email, undefined, username, true);
+        } else {
+          setErr(data.error || "이메일 수정에 실패했어요");
+        }
+      } catch { setErr("서버 오류"); } finally { setBusy(false); }
+    })();
   };
 
   const fitLabel = fit
@@ -89,6 +169,7 @@ export default function AuthNav() {
 
   const close = () => {
     setModal(null); setConfirmMsg(null); setStep(1); setErr("");
+    setPendingView(null); setResendIn(0);
     // 비밀번호 입력값은 모달이 닫히면 상태에서도 버린다 — 평문 잔존 없음(§2)
     setPw(""); setPw2("");
   };
@@ -109,7 +190,11 @@ export default function AuthNav() {
         </button>
         {token && email ? (
           <>
-            <span className="auth-user">{username || email.split("@")[0]}님{fit && ` (${fitLabel})`} ⚙️</span>
+            <span className="auth-user">
+              {username || email.split("@")[0]}님{fit && ` (${fitLabel})`}
+              {pending && <span className="auth-pending-badge" title="이메일 인증 대기 — 메일의 링크로 인증을 완료해 주세요"> · 인증 대기</span>}
+              ⚙️
+            </span>
             <button className="auth-link" onClick={logout}>로그아웃</button>
           </>
         ) : (
@@ -126,8 +211,52 @@ export default function AuthNav() {
           onClose={close}
           autoDissipateMs={confirmMsg ? 950 : undefined}
         >
-          <div className="lq-stage" key={confirmMsg ? "confirm" : `${modal}-${step}-${showFitQuestions ? "q" : "p"}`}>
-            {confirmMsg ? (
+          <div className="lq-stage" key={confirmMsg ? "confirm" : pendingView ? "verify" : `${modal}-${step}-${showFitQuestions ? "q" : "p"}`}>
+            {pendingView ? (
+              /* ═══ 이메일 인증 대기 — 서버 상태의 정직한 표시(§1·§5) ═══ */
+              <div className="lq-confirm lq-verify">
+                <p className="lq-kicker">이메일 인증</p>
+                {pendingView.sent ? (
+                  <p className="lq-confirm-mark">
+                    <strong className="lq-verify-mail">{pendingView.email}</strong> 으로 인증 메일을 보냈어요
+                  </p>
+                ) : (
+                  <p className="lq-confirm-mark">인증 메일 발송이 지연되고 있어요</p>
+                )}
+                {pendingView.note && <p className="lq-row-note" style={{ marginTop: 8 }}>{pendingView.note}</p>}
+                <p className="lq-confirm-sub">
+                  메일의 인증 링크를 누르면 가입이 완료돼요. 링크는 10분 동안 유효해요.
+                </p>
+                {pendingView.editing ? (
+                  <div style={{ marginTop: 10 }}>
+                    <input className="lq-input" placeholder="새 이메일 주소" type="email" value={pendingView.editValue}
+                      onChange={(e) => setPendingView((v) => (v ? { ...v, editValue: e.target.value } : v))}
+                      aria-label="새 이메일 주소" autoComplete="email" />
+                    {err && <p className="lq-row-note" role="alert" style={{ color: "#a0432d", margin: "6px 0 8px" }}>{err}</p>}
+                    <button className="lq-act" disabled={busy || !pendingView.editValue} onClick={doChangeEmail}>
+                      {busy ? "처리 중..." : "이 주소로 다시 보내기"}
+                    </button>
+                    <div className="lq-ghost-row">
+                      <button className="lq-ghost" onClick={() => { setPendingView((v) => (v ? { ...v, editing: false, editValue: "" } : v)); setErr(""); }}>
+                        취소
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="lq-ghost-row" style={{ marginTop: 14 }}>
+                    <button className="lq-ghost" onClick={() => { setPendingView((v) => (v ? { ...v, editing: true, editValue: "" } : v)); setErr(""); }}>
+                      이메일 주소 수정
+                    </button>
+                    <button className="lq-ghost" disabled={busy || resendIn > 0 || !pendingView.email} onClick={doResend}>
+                      {resendIn > 0 ? `다시 보내기 (${resendIn}초)` : "인증 메일 다시 보내기"}
+                    </button>
+                  </div>
+                )}
+                <p className="lq-row-note" style={{ marginTop: 14, opacity: 0.75 }}>
+                  인증을 마치기 전에는 로그인할 수 없어요 — 주문은 계속 게스트로도 가능해요.
+                </p>
+              </div>
+            ) : confirmMsg ? (
               <div className="lq-confirm">
                 <p className="lq-confirm-mark">{confirmMsg}</p>
                 <p className="lq-confirm-sub">이 핏으로 이어서 보여드릴게요.</p>

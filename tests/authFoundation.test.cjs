@@ -168,17 +168,26 @@ test('session tokens are 24-byte random values, not derived from email', async (
   assert.equal(store.sessionEmail('forged-token'), null);
 });
 
-/* ── A8 서버측: 로그인 readback — 저장된 프로필이 그대로 돌아온다 ── */
+/* ── A8 서버측: 로그인 readback — 저장된 프로필이 그대로 돌아온다 ──
+ * [EMAIL VERIFY 활성] 신규 가입은 인증 대기로 생성되고 서버 토큰 확인으로만 해제된다 —
+ * A8은 "인증 후" 로그인 readback 계약을 검증한다 (대기 게이트 자체는 emailVerify.test.cjs EV 계열). */
 test('A8-server — login and readback return the stored fit profile', async () => {
   const p = fakePersistence();
   const store = new authServer.AuthStore(p);
   const reg = await store.register({ username: 'read_user', email: 'read@x.com', password: 'secret1', profile: WIRE });
+  assert.equal(reg.ok, true);
+  assert.equal(reg.account.verificationPending, true, '신규 가입은 인증 대기다');
+  const gated = await store.login('read_user', 'secret1');
+  assert.equal(gated.ok, false, '미인증 계정은 로그인이 게이트된다');
+  assert.equal(gated.code, 'EMAIL_NOT_VERIFIED');
+  const marked = await store.markEmailVerified('read@x.com');
+  assert.ok(marked, '승격은 계정 객체로 돌아온다');
   const login = await store.login('read_user', 'secret1'); // 아이디 로그인
   assert.equal(login.ok, true);
   assert.deepEqual(login.account.profile, JSON.parse(JSON.stringify(reg.account.profile)));
   const acct = store.accountOf(login.token);
   assert.equal(acct.email, 'read@x.com');
-  assert.equal(acct.emailVerified, false, 'EMAIL_VERIFY_DEFERRED 동안 항상 false다');
+  assert.equal(acct.emailVerified, true, '서버 토큰 경로로만 true가 된다');
 });
 
 /* ── A9 서버측: 프로필 수정/초기화가 영구 저장소에 반영된다 ── */
@@ -224,13 +233,10 @@ test('username rules — normalization and validation are shared client/server',
   assert.equal(username.validateUsername('has space').ok, false);
 });
 
-/* ── §3: 이메일 확인 계약 — 지연 상태가 계약대로 응답한다 ── */
-test('EMAIL_VERIFY_DEFERRED contract responds honestly and never sends', async () => {
+/* ── §3: 이메일 확인 계약 — EMAIL_VERIFY_DEFERRED는 활성으로 전환되었다(2026-09-10).
+ * 지연 계약의 정직 응답 검증은 emailVerify.test.cjs EV 계열이 대신한다.
+ * 탈퇴 정책 코드 계약만 이 자리에 남긴다. ── */
+test('withdrawal policy code contract stays intact', async () => {
   const ev = require(path.resolve(__dirname, '../lib/emailVerify.ts'));
-  const res = await ev.deferredEmailVerify.requestEmailVerify('user@example.com');
-  assert.equal(res.ok, false, '발송을 흉내 내지 않는다');
-  assert.equal(res.code, ev.EMAIL_VERIFY_STATUS);
-  assert.equal(ev.EMAIL_VERIFY_STATUS, 'EMAIL_VERIFY_DEFERRED');
-  // 탈퇴 정책 코드 계약 — 개인화 삭제, 주문 기록 보존 분리
   assert.equal(ev.SMARTFIT_ON_WITHDRAWAL, 'DELETE_PERSONALIZATION_KEEP_ORDER_RECORDS');
 });

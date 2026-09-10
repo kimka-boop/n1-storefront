@@ -1,0 +1,7 @@
+{
+  "queuedAt": "2026-09-10T12:44:36.927Z",
+  "to": "ksbsamedad@gmail.com",
+  "subject": "[N°1] 이메일 인증 안내",
+  "text": "n1evtest님, 안녕하세요.\n\nN°1 가입 이메일 인증 요청입니다. 아래 링크를 눌러 인증을 완료해 주세요.\n\nhttp://localhost:3322/api/auth/verify?token=npgbcIoOuGMZhqMyzzdmZMd2rRPah3yCLQZL2PCOpV0\n\n이 링크는 2026-09-10T12:54:36.926Z (10분) 까지 유효하며 1회만 사용할 수 있습니다.\n본인이 요청하지 않았다면 이 메일은 무시하셔도 됩니다 — 계정은 생성되지 않습니다.\n\n— N°1",
+  "verifyUrl": "http://localhost:3322/api/auth/verify?token=npgbcIoOuGMZhqMyzzdmZMd2rRPah3yCLQZL2PCOpV0"
+}

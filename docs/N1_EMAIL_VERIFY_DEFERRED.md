@@ -1,3 +1,9 @@
+> **[활성 공지 2026-09-10]** 이 문서가 묘사한 지연 계약은 Email Verification Mission에서
+> 해제되었다. `lib/emailVerify.ts`는 실동작 구현(단일 사용 토큰·10분·해시 저장)으로 전환됐고,
+> provider 경계는 `lib/emailProvider.ts`, 활성 절차는 `N1_EMAIL_ACTIVATION_RUNBOOK.md`다.
+> 비밀번호 recovery는 여전히 잠겨 있다 — 소유 확인은 이제 가능하지만, recovery 구현 자체가
+> 별도 승인 과제다. 아하는 역사 기록으로 보존한다.
+
 # EMAIL_VERIFY_DEFERRED — 이메일 소유 확인 지연 계약
 
 > Owner: Session A (AUTH + SMART FIT) · 작성: 2026-09-09 · 상태: **ACTIVE CONTRACT**

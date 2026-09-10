@@ -39,18 +39,15 @@ import {
   encodeProfileForServer,
 } from "@/lib/fitContext";
 
-interface AuthIdentity {
-  email: string;
-  username: string | null; // 레거시(이메일 전용) 계정은 null — 로그인은 이메일로 가능
-  emailVerified: boolean; // §3 — EMAIL_VERIFY_DEFERRED 동안 false
-}
-
 interface AuthState {
   token: string | null;
   email: string | null;
   username: string | null;
+  /** 이메일 인증 대기(신규 정책의 미인증 계정) — 서버 응답의 verificationRequired만 반영한다 */
+  pending: boolean;
   fit: FitContext | null; // Fit Context V2 — 게스트/회원 공용 단일 진실
-  login: (token: string, email: string, serverProfile?: unknown, username?: string | null) => void;
+  login: (token: string, email: string, serverProfile?: unknown, username?: string | null, pending?: boolean) => void;
+  setPending: (pending: boolean) => void;
   logout: () => void;
   saveFit: (ctx: FitContext) => void;
   resetFit: () => void;
@@ -58,14 +55,15 @@ interface AuthState {
 }
 
 const AuthCtx = createContext<AuthState>({
-  token: null, email: null, username: null, fit: null,
-  login: () => {}, logout: () => {}, saveFit: () => {}, resetFit: () => {}, ready: false,
+  token: null, email: null, username: null, pending: false, fit: null,
+  login: () => {}, setPending: () => {}, logout: () => {}, saveFit: () => {}, resetFit: () => {}, ready: false,
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
+  const [pending, setPendingState] = useState(false);
   const [fit, setFit] = useState<FitContext | null>(null);
   const [ready, setReady] = useState(false);
 
@@ -73,7 +71,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const t = localStorage.getItem("n1_auth_token");
     const e = localStorage.getItem("n1_auth_email");
     const u = localStorage.getItem("n1_auth_username");
-    if (t && e) { setToken(t); setEmail(e); setUsername(u); }
+    if (t && e) {
+      setToken(t); setEmail(e); setUsername(u);
+      // 대기 플래그는 localStorage가 아니라 서버 readback으로만 확정한다 —
+      // 클라이언트 저장값은 참고용으로 시작하고, 응답이 진실로 덮어쓴다.
+      fetch(`/api/auth?token=${encodeURIComponent(t)}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => { if (d && d.ok) setPendingState(Boolean(d.verificationRequired) && !d.emailVerified); })
+        .catch(() => {});
+    }
     // 회원이면 기기 슬롯(localStorage)에서, 게스트면 세션 저장소에서만 읽는다 —
     // 게스트에게 이전 회원/이전 세션의 영구 데이터는 보이지 않는다(§6·§9).
     setFit(t && e ? loadMemberFitContext() : loadGuestFitContext());
@@ -99,8 +105,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const login = (tk: string, em: string, serverProfile?: unknown, un?: string | null) => {
+  const login = (tk: string, em: string, serverProfile?: unknown, un?: string | null, pending?: boolean) => {
     setToken(tk); setEmail(em); setUsername(un ?? null);
+    // 인증 필수 정책 — 서버가 판정한 대기 상태만 반영한다(클라이언트 제출값 무관)
+    setPendingState(Boolean(pending));
     localStorage.setItem("n1_auth_token", tk);
     localStorage.setItem("n1_auth_email", em);
     if (un) localStorage.setItem("n1_auth_username", un);
@@ -131,7 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
-    setToken(null); setEmail(null); setUsername(null);
+    setToken(null); setEmail(null); setUsername(null); setPendingState(false);
     localStorage.removeItem("n1_auth_token");
     localStorage.removeItem("n1_auth_email");
     localStorage.removeItem("n1_auth_username");
@@ -166,9 +174,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  /** 인증 완료(verify 링크 통과) 후 화면 상태를 즉시 해제 — readback 없이도 정직한 표시 */
+  const setPending = (p: boolean) => setPendingState(p);
+
   return (
     <AuthCtx.Provider
-      value={{ token, email, username, fit, login, logout, saveFit, resetFit, ready }}
+      value={{ token, email, username, pending, fit, login, setPending, logout, saveFit, resetFit, ready }}
     >
       {children}
     </AuthCtx.Provider>

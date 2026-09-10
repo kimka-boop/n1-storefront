@@ -479,6 +479,9 @@ footer { text-align: center; padding: 44px; color: var(--muted); font-size: var(
 .auth-link.primary { padding-bottom: 4px; } /* persistent underline 제거 — 로그인/회원가입 동일한 quiet navigation */
 .auth-link:focus-visible { outline: 1.5px solid #555e4c; outline-offset: 2px; }
 .auth-user { color: var(--ink, #0a0a0a); font-weight: 500; }
+.auth-pending-badge { color: #a0432d; font-weight: 400; }
+.lq-verify-mail { word-break: break-all; }
+.lq-verify .lq-ghost:disabled { opacity: 0.45; cursor: default; }
 /* fit-alt는 .lq-ghost-row/.lq-ghost로 대체됨 */
 
 /* ══════════════════════════════════════════════════════════════

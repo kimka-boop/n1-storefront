@@ -15,6 +15,8 @@ import { verifyGuestOwnership, publicOrderProbeRejected } from "@/lib/orderView"
 import { resolvePaymentProvider } from "@/lib/paymentProvider";
 import { createPaymentRequestForOrder } from "@/lib/paymentFlow";
 import { buildPaymentFlowDeps } from "@/lib/paymentFlowWiring";
+import { ensureStore } from "@/lib/authSheets";
+import { findOwnedMethod } from "@/lib/savedPayments";
 import { clientSafeFailure, logInternal } from "@/lib/errorSanitize";
 
 export const dynamic = "force-dynamic";
@@ -37,7 +39,26 @@ export async function POST(req: Request) {
 
     const { provider } = resolvePaymentProvider();
     const deps = await buildPaymentFlowDeps(provider);
-    const result = await createPaymentRequestForOrder(deps, orderId);
+
+    // 세이브드 결제 수단 경로 — 세션 이메일 소유 일치가 확인된 수단만 어댑터로 넘긴다.
+    // method_id 단독(소유 증명 없음)으로는 절대 결제되지 않는다 (IDOR 방지 계약).
+    let savedMethod: { methodId: string; providerBillingKey: string } | undefined;
+    const methodId = String(body?.method_id || "").trim();
+    if (methodId) {
+      const store = await ensureStore();
+      const account = store.accountOf(String(body?.token || ""));
+      if (!account) {
+        return NextResponse.json({ ok: false, code: "LOGIN_REQUIRED", error: "저장한 결제 수단으로 결제하려면 로그인이 필요해요" }, { status: 401 });
+      }
+      const doc2 = await getDoc();
+      const owned = await findOwnedMethod(doc2, account.email, methodId);
+      if (!owned) {
+        return NextResponse.json({ ok: false, code: "METHOD_NOT_FOUND", error: "결제 수단을 찾을 수 없어요" }, { status: 404 });
+      }
+      savedMethod = { methodId: owned.methodId, providerBillingKey: owned.providerBillingKey };
+    }
+
+    const result = await createPaymentRequestForOrder(deps, orderId, savedMethod ? { savedMethod } : undefined);
     return NextResponse.json(result.payload, { status: result.http });
   } catch (e: unknown) {
     const failure = clientSafeFailure(e);
