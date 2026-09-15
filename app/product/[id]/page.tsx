@@ -31,6 +31,7 @@ import type { CartItem } from "@/lib/cart";
 import { PRODUCT_STORY } from "@/lib/productContent";
 import { mediaFor } from "@/lib/media";
 import { productColors, purchaseState, quickBuyUrl } from "@/lib/experience";
+import { CATALOG_SERVING_APPROVED } from "@/lib/catalogStatus";
 import {
   pdpStockState,
   effectiveBuyState,
@@ -446,7 +447,14 @@ export default function ProductPage() {
             ) : null}
             {/* ── §34 구매 CTA 상태 — OPTIONS_REQUIRED / READY / OUT_OF_STOCK / VALIDATING /
                 ERROR(+ 데이터 미스테이징 quiet path). 단일 disabled 남발 금지 ── */}
-            {stockValidating && effBuy !== "soldout" ? (
+            {!CATALOG_SERVING_APPROVED ? (
+              <>
+                <button type="button" className={styles.cta} disabled>상품 준비 중</button>
+                <p className={styles.holdNotice}>
+                  컬렉션을 다시 준비하고 있어요 — 잠시 후 다시 열어봐 주세요.
+                </p>
+              </>
+            ) : stockValidating && effBuy !== "soldout" ? (
               <button type="button" className={styles.cta} disabled aria-live="polite">재고 확인 중</button>
             ) : effBuy === "soldout" || soldOut ? (
               <>
@@ -651,6 +659,7 @@ export default function ProductPage() {
         name={product.name}
         price={product.price}
         soldOut={soldOut || effBuy === "soldout"}
+        preparing={!CATALOG_SERVING_APPROVED}
         heroVisible={heroVisible}
         onBuy={scrollToDecision}
       />

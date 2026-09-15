@@ -11,12 +11,15 @@ export default function StickyBuyBar({
   name,
   price,
   soldOut,
+  preparing,
   heroVisible,
   onBuy,
 }: {
   name: string;
   price: number;
   soldOut: boolean;
+  /** [CATALOG SERVING GATE] 검역 중 — '품절'로 거짓 표시하지 않고 '준비 중'으로 정직 비활성 */
+  preparing?: boolean;
   heroVisible: boolean;
   onBuy: () => void;
 }) {
@@ -36,10 +39,10 @@ export default function StickyBuyBar({
       <button
         type="button"
         className={styles.buyBarCta}
-        disabled={soldOut}
+        disabled={soldOut || preparing}
         onClick={onBuy}
       >
-        {soldOut ? "품절" : "구매"}
+        {preparing ? "준비 중" : soldOut ? "품절" : "구매"}
       </button>
     </div>
   );
