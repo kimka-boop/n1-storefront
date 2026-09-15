@@ -50,7 +50,7 @@ import { sendTelegramMessage } from "@/lib/telegram";
 import { checkoutFinalStockCheck, decrementStagingStock, sheetOptionQty } from "@/lib/stockCheckout";
 import { gateFromStockCheck, gateFromSheetStock, GateLine } from "@/lib/stockGate";
 import { clientSafeRejection, clientSafeFailure, logInternal } from "@/lib/errorSanitize";
-import { CATALOG_SERVING_APPROVED, CATALOG_QUARANTINED_MESSAGE } from "@/lib/catalogStatus";
+import { catalogServingApproved, CATALOG_QUARANTINED_MESSAGE } from "@/lib/catalogStatus";
 
 export const dynamic = "force-dynamic";
 
@@ -396,7 +396,7 @@ export async function POST(req: Request) {
   try {
     // [CATALOG SERVING GATE — Owner Decision B/C 2026-09-16] 검역 카탈로그 주문 차단.
     // 시트값과 무관하게 fail-closed — 시트 쓰기·멱등 처리 이전에 최우선 거절한다.
-    if (!CATALOG_SERVING_APPROVED) {
+    if (!catalogServingApproved()) {
       throw Object.assign(new Error(CATALOG_QUARANTINED_MESSAGE), {
         status: 503,
         code: "CATALOG_QUARANTINED",

@@ -31,7 +31,7 @@ import type { CartItem } from "@/lib/cart";
 import { PRODUCT_STORY } from "@/lib/productContent";
 import { mediaFor } from "@/lib/media";
 import { productColors, purchaseState, quickBuyUrl } from "@/lib/experience";
-import { CATALOG_SERVING_APPROVED } from "@/lib/catalogStatus";
+import { CATALOG_SERVING_MIRROR } from "@/lib/catalogStatus";
 import {
   pdpStockState,
   effectiveBuyState,
@@ -447,7 +447,7 @@ export default function ProductPage() {
             ) : null}
             {/* ── §34 구매 CTA 상태 — OPTIONS_REQUIRED / READY / OUT_OF_STOCK / VALIDATING /
                 ERROR(+ 데이터 미스테이징 quiet path). 단일 disabled 남발 금지 ── */}
-            {!CATALOG_SERVING_APPROVED ? (
+            {!CATALOG_SERVING_MIRROR ? (
               <>
                 <button type="button" className={styles.cta} disabled>상품 준비 중</button>
                 <p className={styles.holdNotice}>
@@ -659,7 +659,7 @@ export default function ProductPage() {
         name={product.name}
         price={product.price}
         soldOut={soldOut || effBuy === "soldout"}
-        preparing={!CATALOG_SERVING_APPROVED}
+        preparing={!CATALOG_SERVING_MIRROR}
         heroVisible={heroVisible}
         onBuy={scrollToDecision}
       />
